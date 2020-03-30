@@ -5,31 +5,6 @@ Vue.use(Router)
 
 /* Layout */
 import Layout from '@/layout'
-
-/**
- * Note: sub-menu only appear when route children.length >= 1
- * Detail see: https://panjiachen.github.io/vue-element-admin-site/guide/essentials/router-and-nav.html
- *
- * hidden: true                   if set true, item will not show in the sidebar(default is false)
- * alwaysShow: true               if set true, will always show the root menu
- *                                if not set alwaysShow, when item has more than one children route,
- *                                it will becomes nested mode, otherwise not show the root menu
- * redirect: noRedirect           if set noRedirect will no redirect in the breadcrumb
- * name:'router-name'             the name is used by <keep-alive> (must set!!!)
- * meta : {
-    roles: ['admin','editor']    control the page roles (you can set multiple roles)
-    title: 'title'               the name show in sidebar and breadcrumb (recommend set)
-    icon: 'svg-name'             the icon show in the sidebar
-    breadcrumb: false            if set false, the item will hidden in breadcrumb(default is true)
-    activeMenu: '/example/list'  if set path, the sidebar will highlight the path you set
-  }
- */
-
-/**
- * constantRoutes
- * a base page that does not have permission requirements
- * all roles can be accessed
- */
 export const constantRoutes = [
   {
     path: '/login',
@@ -49,47 +24,109 @@ export const constantRoutes = [
     redirect: '/dashboard',
     children: [{
       path: 'dashboard',
-      name: 'Dashboard',
+      name: '首页',
       component: () => import('@/views/dashboard/index'),
-      meta: { title: 'Dashboard', icon: 'dashboard' }
+      meta: { title: '首页', icon: 'dashboard' }
     }]
   },
-
   {
-    path: '/example',
+    path: '/teachingModule',
     component: Layout,
-    redirect: '/example/table',
-    name: 'Example',
-    meta: { title: 'Example', icon: 'example' },
+    redirect: '/teachingModule/workload/workloadList',
+    name: 'TeachingModule',
+    meta: {
+      title: '教学教研考评模块',
+      icon: 'example'
+    },
     children: [
       {
-        path: 'table',
-        name: 'Table',
-        component: () => import('@/views/table/index'),
-        meta: { title: 'Table', icon: 'table' }
+        path: 'workload',
+        component: () => import('@/views/teachingMoudle/workload/index'), // Parent router-view
+        name: 'workload',
+        meta: { title: '工作量模块', icon: 'clipboard' },
+        children: [
+          {
+            path:'workloadList',
+            name:'workloadList',
+            component: () => import('@/views/teachingMoudle/workload/workloadList'),
+            meta: {title: '工作量List',icon:'list'}
+          },
+          {
+            path:'workloadAudit',
+            name:'workloadAudit',
+            component: () => import('@/views/teachingMoudle/workload/workloadAudit'),
+            meta: {title: '工作量审核单',icon:'list'}
+          }
+        ]
       },
       {
-        path: 'tree',
-        name: 'Tree',
-        component: () => import('@/views/tree/index'),
-        meta: { title: 'Tree', icon: 'tree' }
-      }
-    ]
-  },
-
-  {
-    path: '/form',
-    component: Layout,
-    children: [
+        path: 'teachRes',
+        name: 'teachRes',
+        component: () => import('@/views/teachingMoudle/teachRes/index'),
+        meta: { title: '教学教研模块', icon: 'nested' },
+        children: [
+          {
+            path:'teachResList',
+            name:'teachResList',
+            component: () => import('@/views/teachingMoudle/teachRes/teachResList'),
+            meta: {title: '教学教研List',icon:'list'}
+          },
+          {
+            path:'teachResAudit',
+            name:'teachResAudit',
+            component: () => import('@/views/teachingMoudle/teachRes/teachResAudit'),
+            meta: {title: '教学教研审核单',icon:'list'}
+          }
+        ]
+      },
       {
-        path: 'index',
-        name: 'Form',
-        component: () => import('@/views/form/index'),
-        meta: { title: 'Form', icon: 'form' }
+        path: 'teachProcess',
+        name: 'teachProcess',
+        component: () => import('@/views/teachingMoudle/teachProcess'),
+        meta: { title: '教学工程模块', icon: 'component' },
+        children: [
+          {
+            path:'teachProcessList',
+            name:'teachProcessList',
+            component: () => import('@/views/teachingMoudle/teachProcess/teachProcessList'),
+            meta: {title: '教学工程List',icon:'list'}
+          },
+          {
+            path:'teachProcessAudit',
+            name:'teachProcessAudit',
+            component: () => import('@/views/teachingMoudle/teachProcess/teachProcessAudit'),
+            meta: {title: '教学工程审核单',icon:'list'}
+          }
+        ]
+      },
+      {
+        path: 'other',
+        name: 'other',
+        component: () => import('@/views/teachingMoudle/other'),
+        meta: { title: '其他模块', icon: 'drag' },
+        children: [
+          {
+            path:'otherList',
+            name:'otherList',
+            component: () => import('@/views/teachingMoudle/other/otherList'),
+            meta: {title: '其他模块List',icon:'list'}
+          },
+          {
+            path:'otherAudit',
+            name:'otherAudit',
+            component: () => import('@/views/teachingMoudle/other/otherAudit'),
+            meta: {title: '其他模块审核单',icon:'list'}
+          }
+        ]
+      },
+      {
+        path:'dataStatistics',
+        name:'dataStatistics',
+        component:() => import('@/views/teachingMoudle/dataStatistic'),
+        meta:{title:'数据统计',icon:'chart'}
       }
     ]
   },
-
   {
     path: '/nested',
     component: Layout,
@@ -148,6 +185,20 @@ export const constantRoutes = [
     ]
   },
 
+  {
+    path: '/form',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'Form',
+        component: () => import('@/views/form/index'),
+        meta: { title: 'Form', icon: 'form' }
+      }
+    ]
+  },
+
+  
   {
     path: 'external-link',
     component: Layout,
