@@ -89,7 +89,8 @@ export default {
   watch: {
     $route: {
       handler: function(route) {
-        this.redirect = route.query && route.query.redirect
+        this.redirect = route.query && route.query.redirect;
+        console.log('this.redirect :', this.redirect);
       },
       immediate: true
     }
@@ -106,15 +107,17 @@ export default {
       })
     },
     handleLogin() {
+      console.log('object--- :');
       this.$refs.loginForm.validate(valid => {
         if (valid) {
-          this.loading = true
-          this.$store.dispatch('user/login', this.loginForm).then(() => {
-            this.$router.push({ path: this.redirect || '/' })
-            this.loading = false
-          }).catch(() => {
-            this.loading = false
-          })
+          // this.loading = true;
+           this.$router.push({ path: this.redirect || '/' });//将路由提出来了
+          // this.$store.dispatch('user/login', this.loginForm).then(() => {
+          //   this.$router.push({ path: this.redirect || '/' })
+          //   this.loading = false
+          // }).catch(() => {
+          //   this.loading = false
+          // })
         } else {
           console.log('error submit!!')
           return false

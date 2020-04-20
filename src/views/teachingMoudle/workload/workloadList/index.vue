@@ -40,34 +40,31 @@
               <span class="data-items">{{"是"}}</span>
              </el-form-item>
              <el-form-item label="教学工作量合计:">
-              <span class="data-items">权重: {{scope.row.forecast}}</span>
-              <span class="data-items">数据: {{90}}</span>
-              <span class="data-items">总分: {{45}}</span>
+              <span class="data-items">{{45}}</span>
              </el-form-item>
              <el-form-item label="用于计分的工作量:">
-              <span class="data-items">权重: {{scope.row.forecast}}</span>
-              <span class="data-items">数据: {{90}}</span>
-              <span class="data-items">总分: {{45}}</span>
+              <span class="data-items">{{45}}</span>
              </el-form-item>
           </el-form>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="序号" width="80">
+      <!-- 表格信息开始 -->
+      <el-table-column align="center" label="序号" width="60">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column width="120px" align="center" label="提交时间">
+      <el-table-column width="125px" align="center" label="提交时间">
         <template slot-scope="scope">
           <span>{{ scope.row.timestamp | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column width="100px" label="教学工作量合计">
+      <el-table-column width="120px" label="教学工作量合计">
         <template slot-scope="scope">
           {{sum}}
         </template>
       </el-table-column>
-      <el-table-column width="100px" label="用于计分的工作量">
+      <el-table-column width="135px" label="用于计分的工作量">
         <template slot-scope="scope">
           <svg-icon v-for="n in +scope.row.importance" :key="n" icon-class="star" class="meta-item__icon"/>
         </template>
@@ -77,17 +74,17 @@
           <el-tag :type="scope.row.status | statusFilter">{{ scope.row.status }}</el-tag>
         </template>
       </el-table-column>
-       <el-table-column width="80px" align="center" label="审核人">
+      <el-table-column width="70px" align="center" label="审核人">
         <template slot-scope="scope">
           <span>{{ scope.row.author }}</span>
         </template>
       </el-table-column>
-       <el-table-column width="150px" align="center" label="审核时间">
+      <el-table-column width="125px" align="center" label="审核时间">
         <template slot-scope="scope">
           <span>{{ scope.row.timestamp | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
         </template>
       </el-table-column>
-       <el-table-column
+      <el-table-column
         label="操作"
         align="center"
         class-name="small-padding fixed-width"
@@ -109,101 +106,101 @@
     </el-table>
     <!-- 创建数据单弹出框 -->
     <el-dialog v-el-drag-dialog :visible.sync="dialogTableVisible" title="创建工作量数据单" @dragDialog="handleDrag">
-     <el-form ref="form" :model="form">
+      <el-form ref="form" :model="form">
         <div class="label-items">上课教学工作量</div>
-      <el-row>
-         <el-col :span="8">
-            <el-form-item label="权重">             
-                  {{form.weight}}
-            </el-form-item>
-          </el-col>
+        <el-row>
           <el-col :span="8">
-            <el-form-item label="数据">
-                <el-input v-model="form.desc" />
-            </el-form-item>
-          </el-col>
-           <!-- <span class="data-items">数据：</span> <el-input v-model="form.name" /> -->
+              <el-form-item label="权重">             
+                    {{form.weight}}
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="数据">
+                  <el-input v-model="form.desc" />
+              </el-form-item>
+            </el-col>
+            <!-- <span class="data-items">数据：</span> <el-input v-model="form.name" /> -->
+            <el-col :span="8">
+              <el-form-item label="总分">         
+                    {{form.weight}}
+              </el-form-item>
+            </el-col>
+        </el-row>
+        <div class="label-items">辅导员带班工作量</div>
+        <el-row>
           <el-col :span="8">
+              <el-form-item label="权重">             
+                    {{form.weight}}
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="数据">
+                  <el-input v-model="form.desc" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
             <el-form-item label="总分">         
                   {{form.weight}}
             </el-form-item>
           </el-col>
-    </el-row>
-       <div class="label-items">辅导员带班工作量</div>
-      <el-row>
-         <el-col :span="8">
-            <el-form-item label="权重">             
-                  {{form.weight}}
-            </el-form-item>
-          </el-col>
+        </el-row>
+        <div class="label-items">实验教学工作量</div>
+        <el-row>
           <el-col :span="8">
-            <el-form-item label="数据">
-                <el-input v-model="form.desc" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-          <el-form-item label="总分">         
-                {{form.weight}}
-          </el-form-item>
-        </el-col>
-    </el-row>
-     <div class="label-items">实验教学工作量</div>
-      <el-row>
-         <el-col :span="8">
-            <el-form-item label="权重">             
-                  {{form.weight}}
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="数据">
-                <el-input v-model="form.desc" />
-            </el-form-item>
-          </el-col>
-           <!-- <span class="data-items">数据：</span> <el-input v-model="form.name" /> -->
-          <el-col :span="8">
-            <el-form-item label="总分">         
-                  {{form.weight}}
-            </el-form-item>
-          </el-col>
-    </el-row>
-     <div class="label-items">折抵教学工作量的科研经费金额</div>
+              <el-form-item label="权重">             
+                    {{form.weight}}
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="数据">
+                  <el-input v-model="form.desc" />
+              </el-form-item>
+            </el-col>
+            <!-- <span class="data-items">数据：</span> <el-input v-model="form.name" /> -->
+            <el-col :span="8">
+              <el-form-item label="总分">         
+                    {{form.weight}}
+              </el-form-item>
+            </el-col>
+        </el-row>
+        <div class="label-items">折抵教学工作量的科研经费金额</div>
         <el-form-item label="金额">
             <el-input v-model="form.desc" />
         </el-form-item>
-      <div class="label-items">科研经费折抵的工作量</div>
-      <el-row>
-         <el-col :span="8">
-            <el-form-item label="权重">             
-                  {{form.weight}}
-            </el-form-item>
-          </el-col>
+        <div class="label-items">科研经费折抵的工作量</div>
+        <el-row>
           <el-col :span="8">
-            <el-form-item label="数据">
-                <el-input v-model="form.desc" />
-            </el-form-item>
-          </el-col>
-           <!-- <span class="data-items">数据：</span> <el-input v-model="form.name" /> -->
-          <el-col :span="8">
-            <el-form-item label="总分">         
-                  {{form.weight}}
-            </el-form-item>
-          </el-col>
-      </el-row>
-      <el-form-item label="是否完成本部门人均相应工作量的三分之一">
-        <el-switch v-model="form.delivery" />
-      </el-form-item>
-      <el-form-item label="教学工作量合计">
-        {{100}}
-      </el-form-item>
-      <el-form-item label="用于计分的工作量">
-        {{100}}
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="onSubmit">提交</el-button>
-        <el-button @click="onCancel">取消</el-button>
-      </el-form-item>
-    </el-form>
-     
+              <el-form-item label="权重">             
+                    {{form.weight}}
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="数据">
+                  <el-input v-model="form.desc" />
+              </el-form-item>
+            </el-col>
+            <!-- <span class="data-items">数据：</span> <el-input v-model="form.name" /> -->
+            <el-col :span="8">
+              <el-form-item label="总分">         
+                    {{form.weight}}
+              </el-form-item>
+            </el-col>
+        </el-row>
+        <el-form-item label="是否完成本部门人均相应工作量的三分之一">
+          <el-switch v-model="form.delivery" />
+        </el-form-item>
+        <el-form-item label="教学工作量合计">
+          {{100}}
+        </el-form-item>
+        <el-form-item label="用于计分的工作量">
+          {{100}}
+        </el-form-item>
+        <el-form-item align="center">
+          <el-button type="primary" @click="handleSubmit">提交</el-button>
+           <el-button type="success" @click="handleSave">保存</el-button>
+          <el-button @click="handleCancel">取消</el-button>
+        </el-form-item>
+      </el-form> 
     </el-dialog>
   </div>
 </template>
@@ -255,7 +252,7 @@ export default {
         { 
           id: 1,
           timestamp: 622708727027,
-          author: "Deborah",
+          author: "张丹丹",
           reviewer: "Ronald",
           title: "Wfeevmqwub Mfvfxt Strkoggg Bdur Wfhjx Aiqd Dnwvju Uhxqh Pxsyd",
           content_short: "我是测试数据",
@@ -315,12 +312,14 @@ export default {
     handleDelete(row) {
       console.log('row :', row);
     },
-
-    //在表单中粘贴过来的
-     onSubmit() {
+     handleSubmit() {
       this.$message('submit!')
     },
-    onCancel() {
+    //暂存
+    handleSave() {
+      //暂存数据
+    },
+    handleCancel() {
       this.$message({
         message: 'cancel!',
         type: 'warning'

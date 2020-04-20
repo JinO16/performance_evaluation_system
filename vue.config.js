@@ -3,6 +3,7 @@ const path = require('path')
 const defaultSettings = require('./src/settings.js')
 
 function resolve(dir) {
+  console.log('dir--->',dir)
   return path.join(__dirname, dir)
 }
 

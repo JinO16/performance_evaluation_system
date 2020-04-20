@@ -124,8 +124,20 @@ export const constantRoutes = [
         name:'dataStatistics',
         component:() => import('@/views/teachingMoudle/dataStatistic'),
         meta:{title:'数据统计',icon:'chart'}
+      },
+      {
+        path:'teachingAudit',
+        name:'teachingAudit',
+        component:() => import('@/views/teachingMoudle/teachingSumAudit'),
+        meta:{title:'教学教研考评审核单',icon:'example'}
       }
     ]
+  },
+  //个人信息页面路由定义
+  {
+    path:'/user',
+    component:() => import('@/views/userInformation/index'),
+    name:'user'
   },
   {
     path: '/nested',
@@ -209,6 +221,31 @@ export const constantRoutes = [
       }
     ]
   },
+  {
+    path: '/setting',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'systemSetting',
+        component: () => import('@/views/systemSetting/index'),
+        meta: { title: '系统设置中心', icon: 'guide' }
+      }
+    ] 
+  },
+  {
+    path: '/personManager',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'personManager',
+        component: () => import('@/views/personManager/index'),
+        meta: { title: '人员信息管理', icon: 'user' }
+      }
+    ] 
+  },
+
 
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }

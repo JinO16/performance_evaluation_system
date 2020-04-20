@@ -45,6 +45,7 @@ const actions = {
 
   // get user info
   getInfo({ commit, state }) {
+    console.log('-------运行这了')
     return new Promise((resolve, reject) => {
       getInfo(state.token).then(response => {
         const { data } = response
