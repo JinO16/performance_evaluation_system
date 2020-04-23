@@ -12,9 +12,8 @@
                 </el-col>
                 <el-col :span="6">
                     <el-input
-                        placeholder="请输入姓名"
                         v-model="form.name"
-                        clearable
+                        disabled
                         >
                     </el-input>
                 </el-col>
@@ -38,6 +37,8 @@
                 <el-col :span="6"> 
                     <el-input
                     v-model="form.profession"
+                    placeholder="请输入职称"
+                    clearable
                     >
                     </el-input>
                 </el-col>
@@ -64,6 +65,8 @@
                 <el-col :span="6"> 
                     <el-input
                     v-model="form.degree"
+                    placeholder="请输入学位"
+                    clearable
                     >
                     </el-input>
                 </el-col>
@@ -75,25 +78,13 @@
                 <el-col :span="6"> 
                     <el-input
                     v-model="form.salaryID"
+                    disabled
                     >
                     </el-input>
                 </el-col>
             </div>
         </el-row>
-        <el-row>
-            <div class="row-item" >
-                <el-col :span="2">
-                    <span class="data-item">手机号:</span>
-                </el-col>
-                <el-col :span="6">
-                    <el-input
-                        placeholder="请输入手机号"
-                        v-model="form.phone"
-                        clearable
-                        >
-                    </el-input>
-                </el-col>
-            </div>
+        <el-row>  
             <div class="row-item" >
                 <el-col :span="2">
                     <span class="data-item">邮箱:</span>
@@ -115,6 +106,19 @@
                     <el-input
                         v-model="form.role"
                         disabled
+                        >
+                    </el-input>
+                </el-col>
+            </div>
+            <div class="row-item" >
+                <el-col :span="2">
+                    <span class="data-item">手机号:</span>
+                </el-col>
+                <el-col :span="6">
+                    <el-input
+                        placeholder="请输入手机号"
+                        v-model="form.phone"
+                        clearable
                         >
                     </el-input>
                 </el-col>
@@ -152,20 +156,76 @@
                     </el-select>
                 </el-col>
             </div>
+            <div class="row-item" >
+                <el-col :span="2">
+                    <span class="data-item">重设密码:</span>
+                </el-col>
+                <el-col :span="6"> 
+                    <el-button type="text" @click="handleResetPwd">点此重置密码</el-button>
+                </el-col>
+            </div>
         </el-row>
     </div>
     <div class="page-footer">
         <el-button type="primary" @click="handleSubmit">提交</el-button>
-        <el-button type="success" @click="handleReset">重置</el-button>
     </div>
+    <!-- 重置密码弹出框 -->
+    <el-dialog title="重置密码" :visible.sync="dialogPwdVisible">
+        <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+            <el-form-item label="原始密码" prop="oldPass">
+                <el-input type="password" v-model="ruleForm.oldPass" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="密码" prop="pass">
+                <el-input type="password" v-model="ruleForm.pass" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="确认密码" prop="checkPass">
+                <el-input type="password" v-model="ruleForm.checkPass" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="confirmPwd('ruleForm')">确定</el-button>
+                <el-button @click="resetPwd('ruleForm')">重置</el-button>
+            </el-form-item>
+        </el-form>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import {createUser} from '@/api/user';
+import { createUser, getInfo,updateUser} from '@/api/user';
 import {getAllLevel} from '@/api/setting';
 export default {
     data() {
+        //原密码的校验方式
+        var validatePass = (rule, value, callback) => {
+            if (value === '') {
+                callback(new Error('请输入原始密码'))
+            } else if (value !== this.form.password) {
+                callback(new Error('原始密码输入有误！'))
+            } else {
+                callback();
+            }
+        };
+        //验证输入密码的校验方式
+        var validatePass1 = (rule, value, callback) => {
+            if (value === '') {
+                callback(new Error('请输入密码'))
+            } else {
+                if (this.ruleForm.checkPass !== '') {
+                    this.$refs.ruleForm.validateField('checkPass');
+                }
+                callback();
+            }
+        };
+        //确认输入密码的校验方式
+        var validatePass2 = (rule, value, callback) => {
+            if (value === '') {
+                callback(new Error('请再次输入密码！'))
+            } else if (value !== this.ruleForm.pass) {
+                callback(new Error('两次输入的密码不一致！'))
+            } else {
+                callback();
+            }
+        };
         return {
             form:{
                 name:'',//姓名
@@ -181,44 +241,87 @@ export default {
                 station:'',//岗位
                 password: '',//密码（用户重设的密码，值提交最新密码即可）
             },
+            //校验密码字段
+            ruleForm: {
+                oldPass: '',
+                pass: '',
+                checkPass:''
+            },
+            //校验规则
+            rules: {
+                oldPass: [
+                    {validator: validatePass, trigger:'blur'}
+                ],
+                pass: [
+                    {validator: validatePass1, trigger: 'blur'}
+                ],
+                checkPass: [
+                    {validator: validatePass2, trigger: 'blur'}
+                ]
+            },
+            dialogPwdVisible: false,
             level_options:[],//级别
-                station_options:[{
-                    value:'01',
-                    label:'教学岗'
+            station_options:[{
+                value:'教学岗',
+                label:'教学岗'
                 },{
-                    value:'02',
-                    label:'科研岗'
+                value:'科研岗',
+                label:'科研岗'
                 },{
-                    value:'03',
-                    label:'教学科研并重岗'
-                }],
-                Institute_options:[{
-                    value:'00',
-                    label:'普通用户'
-                },{
-                    value:'01',
-                    label:'教学办公室'
-                },{
-                    value:'02',
-                    label:'科研办公室'
-                },{
-                    value:'03',
-                    label:'学科建设与研究生教育办公室'
-                }]
+                value:'教学科研并重岗',
+                label:'教学科研并重岗'
+            }],
+          
             
         }
     },
     mounted() {
-        this.handleGetAllLevelData()
+        this.handleGetAllLevelData();
+        this.handleGetPersonData()
     },
     methods:{
+        //获取个人信息接口
+        handleGetPersonData() {
+           this.$store.dispatch('user/getInfo').then(res => {
+               if (res.code === 200) {
+                   this.form = res.result;
+               }   
+           })
+        },
         //获取所有级别的接口
         handleGetAllLevelData() {
             const t = this;
             getAllLevel().then(res => {
-                console.log('res--->:', res);
                 this.level_options = res.result;
             })
+        },
+        //重置密码函数
+        handleResetPwd() {
+            this.dialogPwdVisible = true;
+        },
+        //重置密码确认函数
+        confirmPwd(value) {
+            console.log('value--->',value);
+            this.$refs[value].validate((valid) => {
+                if (valid) {
+                    this.form.password = this.ruleForm.pass;
+                    this.$message({
+                        type:'success',
+                        message:'确认成功'
+                    })
+                    this.dialogPwdVisible = false;
+                } else {
+                    this.$message({
+                        type:'error',
+                        message:'输入有误，请检查输入！'
+                    })
+                }
+            })
+
+        },
+        //重置密码重置函数
+        resetPwd(formName) {
+            this.$refs[formName].resetFields();
         },
         //返回函数
         goBack() {
@@ -226,9 +329,7 @@ export default {
         },
         //提交函数
         handleSubmit() {
-            console.log('提交:',this.form);
-            createUser(this.form).then(res => {
-                console.log('res :', res);
+            updateUser(this.form).then(res => {
                 if(res.code === 200) {
                     this.$message({
                         message: res.message,
@@ -242,11 +343,8 @@ export default {
                     })
                 } 
             })
-        },
-        //重置函数
-        handleReset() {
-            console.log('重置:' );
         }
+
     }
 }
 </script>

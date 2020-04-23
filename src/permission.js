@@ -19,21 +19,19 @@ router.beforeEach(async(to, from, next) => {
 
   // determine whether the user has logged in
   const hasToken = getToken()
-console.log('------>',hasToken)
   if (hasToken) {
     if (to.path === '/login') {
       // if is logged in, redirect to the home page
       next({ path: '/' })
       NProgress.done()
     } else {
-      const hasGetUserInfo = store.getters.name
+      const hasGetUserInfo = store.getters.jobID;
       if (hasGetUserInfo) {
         next()
       } else {
         try {
           // get user info
           await store.dispatch('user/getInfo')
-
           next()
         } catch (error) {
           // remove token and go to login page to re-login
@@ -52,8 +50,8 @@ console.log('------>',hasToken)
       next()
     } else {
       // other pages that do not have permission to access are redirected to the login page.
-      // next(`/login?redirect=${to.path}`)当没有token的时候，直接在登录状态下；
-      next();//目前没有token时先进入首页
+      next(`/login?redirect=${to.path}`)//当没有token的时候，直接在登录状态下；
+      // next();//目前没有token时先进入首页
       NProgress.done()
     }
   }

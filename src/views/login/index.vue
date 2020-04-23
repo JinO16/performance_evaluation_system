@@ -3,18 +3,18 @@
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">Login Form</h3>
+        <h3 class="title">登 录</h3>
       </div>
 
-      <el-form-item prop="username">
+      <el-form-item prop="工号">
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
         <el-input
-          ref="username"
-          v-model="loginForm.username"
-          placeholder="Username"
-          name="username"
+          ref="jobID"
+          v-model="loginForm.jobID"
+          placeholder="请输入工号"
+          name="jobID"
           type="text"
           tabindex="1"
           auto-complete="on"
@@ -43,23 +43,19 @@
 
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
 
-      <div class="tips">
-        <span style="margin-right:20px;">username: admin</span>
-        <span> password: any</span>
-      </div>
-
     </el-form>
   </div>
 </template>
 
 <script>
-import { validUsername } from '@/utils/validate'
-
+// import { validUsername } from '@/utils/validate'---验证用户名的地方，如果加入正则表达式验证，则在此文件加入
+import { login } from '@/api/user'
 export default {
   name: 'Login',
   data() {
     const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
+      // if (!validUsername(value)) {
+      if (value.length < 9) {
         callback(new Error('Please enter the correct user name'))
       } else {
         callback()
@@ -74,11 +70,11 @@ export default {
     }
     return {
       loginForm: {
-        username: 'admin',
-        password: '111111'
+        jobID: '',
+        password: ''
       },
       loginRules: {
-        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
+        jobID: [{ required: true, trigger: 'blur', validator: validateUsername }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
       loading: false,
@@ -90,7 +86,6 @@ export default {
     $route: {
       handler: function(route) {
         this.redirect = route.query && route.query.redirect;
-        console.log('this.redirect :', this.redirect);
       },
       immediate: true
     }
@@ -107,19 +102,23 @@ export default {
       })
     },
     handleLogin() {
-      console.log('object--- :');
-      this.$refs.loginForm.validate(valid => {
+      const t = this;
+      t.$refs.loginForm.validate(valid => {
         if (valid) {
-          // this.loading = true;
-           this.$router.push({ path: this.redirect || '/' });//将路由提出来了
-          // this.$store.dispatch('user/login', this.loginForm).then(() => {
-          //   this.$router.push({ path: this.redirect || '/' })
-          //   this.loading = false
-          // }).catch(() => {
-          //   this.loading = false
-          // })
+          const t = this;
+          t.$store.dispatch('user/login', t.loginForm).then((res) => {
+            if (res.code === 200) {
+              t.$message({
+                type:'success',
+                message:res.message
+              })
+              this.$router.push({ path: this.redirect || '/' })
+            }
+            this.loading = false
+          }).catch(() => {
+            this.loading = false
+          })
         } else {
-          console.log('error submit!!')
           return false
         }
       })

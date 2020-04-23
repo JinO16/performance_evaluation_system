@@ -1,25 +1,26 @@
 import request from '@/utils/request'
-
+//登录接口
 export function login(data) {
   return request({
-    url: '/vue-admin-template/user/login',
+    url: '/user/login',
     method: 'post',
-    data
+    data: Object.assign({},data)
   })
 }
-
+//用户登录获取该用户信息接口
 export function getInfo(token) {
   return request({
-    url: '/vue-admin-template/user/info',
+    url: '/user/getInfo',
     method: 'get',
     params: { token }
   })
 }
-
-export function logout() {
+//退出登录接口
+export function logout(token) {
   return request({
-    url: '/vue-admin-template/user/logout',
-    method: 'post'
+    url: '/user/logout',
+    method: 'post',
+    data: token 
   })
 }
 //添加用户接口
