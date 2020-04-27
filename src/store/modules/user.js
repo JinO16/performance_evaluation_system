@@ -6,7 +6,8 @@ const getDefaultState = () => {
   return {
     token: getToken(),
     jobID: '',
-    // name: '',
+    name: '',
+    station:''
     // avatar: ''
   }
 }
@@ -14,20 +15,27 @@ const getDefaultState = () => {
 const state = getDefaultState()
 
 const mutations = {
-  RESET_STATE: (state) => {
-    Object.assign(state, getDefaultState())
-  },
+  // RESET_STATE: (state) => {
+  //   Object.assign(state, getDefaultState())
+  // },
   SET_TOKEN: (state, token) => {
     state.token = token
   },
-  // SET_NAME: (state, name) => {
-  //   state.name = name
-  // },
+  SET_NAME: (state, name) => {
+    sessionStorage.setItem('name',name);
+    state.name = name
+  },
   // SET_AVATAR: (state, avatar) => {
   //   state.avatar = avatar
   // },
+
   SET_JOBID: (state, jobID) => {
+    sessionStorage.setItem('jobID',jobID);
     state.jobID = jobID
+  },
+  SET_STATION: (state, station) => {
+    sessionStorage.setItem('station',station);
+    state.station = station;
   }
 }
 
@@ -38,9 +46,8 @@ const actions = {
     const { jobID, password } = userInfo;
     return new Promise((resolve, reject) => {
       login({ jobID: jobID.trim(), password: password }).then(response => {
-          const id = response.result.jobID;
           commit('SET_TOKEN', response.token);
-          commit('SET_JOBID', id)
+         
           setToken(response.token);
           resolve(response);       
       }).catch(error => {
@@ -53,9 +60,13 @@ const actions = {
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
       getInfo(state.token).then(response => {
+        console.log('获取用户信息 :>> ', response);
         if (response.code !== 200) {
           reject('验证失败，请重新登录!')
         }
+        commit('SET_STATION',response.result.station);
+        commit('SET_JOBID', response.result.jobID);
+        commit('SET_NAME',response.result.name);
         resolve(response)
       }).catch(error => {
         reject(error)
@@ -69,7 +80,7 @@ const actions = {
       logout(state.token).then(res => {
         removeToken() // must remove  token  first
         resetRouter()
-        commit('RESET_STATE')
+        // commit('RESET_STATE')
         resolve(res)
       }).catch(error => {
         reject(error)
@@ -81,7 +92,7 @@ const actions = {
   resetToken({ commit }) {
     return new Promise(resolve => {
       removeToken() // must remove  token  first
-      commit('RESET_STATE')
+      // commit('RESET_STATE')
       resolve()
     })
   }

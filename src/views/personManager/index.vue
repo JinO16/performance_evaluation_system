@@ -286,8 +286,7 @@ export default {
         //获取所有用户信息列表方法
         getAllPerson(param) {
             param =  {
-                skip: 1,
-                
+                skip: 1,   
             }
             const t = this;
             getAllUser(param).then(res => {

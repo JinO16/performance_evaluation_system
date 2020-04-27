@@ -4,7 +4,7 @@ export function createLevel(data) {
     return request({
         url: '/level/add',
         method: 'post',
-        data: Object.assign({}, data, {type: true})
+        data: Object.assign({}, data)
     })
 };
 //获得所有的级别
@@ -20,7 +20,7 @@ export function updateLevel(data) {
     return request({
         url:'/level/update',
         method:'post',
-        data:Object.assign({}, data, {type: true})
+        data:Object.assign({}, data)
     })
 };
 //删除级别

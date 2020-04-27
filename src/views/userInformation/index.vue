@@ -282,10 +282,12 @@ export default {
     methods:{
         //获取个人信息接口
         handleGetPersonData() {
-           this.$store.dispatch('user/getInfo').then(res => {
+            const t = this;
+           t.$store.dispatch('user/getInfo').then(res => {
+            //    console.log('res :>> ', res); 
                if (res.code === 200) {
-                   this.form = res.result;
-               }   
+                    t.form = res.result;
+              }   
            })
         },
         //获取所有级别的接口
@@ -335,6 +337,7 @@ export default {
                         message: res.message,
                         type: 'success'
                     })
+                    this.handleGetPersonData();
                     this.$router.push('/');
                 } else {
                     this.$message({
