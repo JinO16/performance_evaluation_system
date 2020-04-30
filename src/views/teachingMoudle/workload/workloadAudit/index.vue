@@ -57,7 +57,7 @@
 
     </el-table>
      <!-- 审核单弹出框 -->
-    <el-dialog v-el-drag-dialog :visible.sync="dialogTableVisible" title="工作量审核单" @dragDialog="handleDrag">
+    <el-dialog el-drag-dialog :visible.sync="dialogTableVisible" title="工作量审核单" @dragDialog="handleDrag">
       <el-form ref="form" :model="form">
         <el-row>
           <el-col :span="8">

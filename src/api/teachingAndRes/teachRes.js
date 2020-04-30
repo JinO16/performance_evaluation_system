@@ -32,3 +32,11 @@ export function updateTeachRes(data) {
         data: Object.assign({}, data)
     })
 }
+//获取所有的教学教研清单
+export function getAllTeachRes(data) {
+    return request({
+        url: '/teachRes/getAll',
+        method: 'get',
+        params: {data}
+    })
+}

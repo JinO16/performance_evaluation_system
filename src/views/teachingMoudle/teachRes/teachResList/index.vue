@@ -80,17 +80,17 @@
       </el-table-column>
       <el-table-column class-name="status-col" label="状态" align="center" width="100">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.auditStatus | statusFilter">{{ scope.row.auditStatus }}</el-tag>
+          <el-tag :type="scope.row.auditRecord[0]? scope.row.auditRecord[0].auditStatus :'待审核' | statusFilter">{{ scope.row.auditRecord[0] ? scope.row.auditRecord[0].auditStatus : '待审核' }}</el-tag>
         </template>
       </el-table-column>
        <el-table-column width="90px" align="center" label="审核人">
         <template slot-scope="scope">
-          <span>{{ scope.row.auditPerson }}</span>
+          <span>{{ scope.row.auditRecord[0] ? scope.row.auditRecord[0].auditPerson : '暂无' }}</span>
         </template>
       </el-table-column>
        <el-table-column width="140px" align="center" label="审核时间">
         <template slot-scope="scope">
-          <span>{{ scope.row.auditTime  | formateDate }}</span>
+          <span>{{ scope.row.auditRecord[0]? scope.row.auditRecord[0].auditTime :'' | formateDate }}</span>
         </template>
       </el-table-column>
       <!-- <el-table-column width="90px" align="center" label="总分">
@@ -268,7 +268,8 @@ export default {
       const statusMap = {
         "已完成": 'success',
         "draft": 'info',
-        "驳回": 'danger'
+        "驳回": 'danger',
+        '审核中': 'warning'
       }
       return statusMap[status]
     },
@@ -672,10 +673,13 @@ export default {
         name:'',//用户姓名
         jobID:'',//工号
         station:'',//岗位
-        auditStatus:'已完成',//审核状态
-        auditPerson:'暂无',//审核人
-        auditTime:'',//审核时间
-        auditReason:'无',//审核理由
+        auditRecord:[],
+        // auditRecord:[{//审核记录---表格中显示最新的审核记录
+        //   auditStatus:'已完成',//审核状态
+        //   auditPerson:'',//审核人
+        //   auditTime:'',//审核时间
+        //   auditReason:'无',//审核理由
+        // }],
         submitTime:'',//提交时间--取当前提交的时间
         //教学质量评价
         teachQuality:{
@@ -849,7 +853,7 @@ export default {
           deleteData = value.level ? value.level[1] * value.level[2] : 0;
           break;
       }
-       this.$confirm('此操作将永久删除该项目, 是否继续?', '提示', {
+      this.$confirm('此操作将永久删除该项目, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
