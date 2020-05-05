@@ -1,39 +1,44 @@
 <template>
   <div class="app-container">
     <el-table v-loading="listLoading" :data="list" highlight-current-row style="width: 100%">
-      <el-table-column align="center" label="序号" width="80">
+      <el-table-column align="center" label="姓名" width="80">
         <template slot-scope="scope">
-          <span>{{ scope.row.id }}</span>
+          <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column width="120px" align="center" label="教师姓名">
+      <el-table-column width="120px" align="center" label="工号">
         <template slot-scope="scope">
-          <span>{{ scope.row.timestamp}}</span>
+          <span>{{ scope.row.jobID}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="120px" align="center" label="部门">
+      <el-table-column width="120px" align="center" label="岗位">
         <template slot-scope="scope">
-          {{sum}}
+          {{ scope.row.station}}
         </template>
       </el-table-column>
-      <el-table-column width="80px" align="center" label="职称">
+      <el-table-column width="120px" align="center" label="教学工作量合计">
         <template slot-scope="scope">
-          <span>{{ scope.row.author }}</span>
+          <span>{{ scope.row.workLoad.teachWorkSum }}</span>
         </template>
       </el-table-column>
-      <el-table-column width="150px" align="center" label="工资号">
+      <el-table-column width="150px" align="center" label="用于计分的工作量">
         <template slot-scope="scope">
-          <svg-icon v-for="n in +scope.row.importance" :key="n" icon-class="star" class="meta-item__icon"/>
+          {{scope.row.workLoad.scoreSum}}
+        </template>
+      </el-table-column>
+      <el-table-column width="150px" align="center" label="个人逐项计分">
+        <template slot-scope="scope">
+          {{scope.row.workLoad.itemScore}}
         </template>
       </el-table-column>
       <el-table-column class-name="status-col" align="center" label="状态" width="80">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.status | statusFilter">{{ scope.row.status }}</el-tag>
+          <el-tag :type="scope.row.auditRecord[0] ? scope.row.auditRecord[0].auditStatus : '待审核' | statusFilter">{{ scope.row.auditRecord[0] ? scope.row.auditRecord[0].auditStatus : '待审核' }}</el-tag>
         </template>
       </el-table-column>
        <el-table-column width="100px" align="center" label="总分数">
         <template slot-scope="scope">
-          <span>{{ scope.row.author }}</span>
+          <span>{{ scope.row.workLoad.itemScore }}</span>
         </template>
       </el-table-column>
        <el-table-column
@@ -45,7 +50,7 @@
           <el-button
             size="mini"
             type="primary"
-            @click="handleSubmit(scope.row)"
+            @click="handleAudit(scope.row)"
           >审核</el-button>
           <el-button
             size="mini"
@@ -57,279 +62,210 @@
 
     </el-table>
      <!-- 审核单弹出框 -->
-    <el-dialog el-drag-dialog :visible.sync="dialogTableVisible" title="工作量审核单" @dragDialog="handleDrag">
-      <el-form ref="form" :model="form">
-        <el-row>
-          <el-col :span="8">
-              <el-form-item label="姓名">             
-                    {{"form.name"}}
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="部门">
-                  {{"部门"}}
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="学位">         
-                    {{"form.weight"}}
-              </el-form-item>
-            </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="8">
-              <el-form-item label="职称">             
-                    {{"职称"}}
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="工资号">
-                  {{"工资号"}}
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="状态">         
-                    {{"状态"}}
-              </el-form-item>
-            </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="8">
-              <el-form-item label="审核人">             
-                    {{"审核人"}}
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="审核时间">
-                  {{"审核时间"}}
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="审核理由">         
-                    {{"审核理由"}}
-              </el-form-item>
-            </el-col>
-        </el-row>
-        <el-collapse  @change="handleChange">
-          <el-row>
-            <el-col :span="8">
-              <el-collapse-item title="上课教学工作量">
-               <div><span class="item">权重：</span>{{'权重'}}</div>
-               <div><span class="item">数据：</span>{{'数据'}}</div>
-               <div><span class="item">总分：</span>{{'总分'}}</div>
-              </el-collapse-item>
-            </el-col>
-            <el-col :span="8">
-              <el-collapse-item title="辅导员带班工作量">
-                <div><span class="item">权重：</span>{{'权重'}}</div>
-                <div><span class="item">数据：</span>{{'数据'}}</div>
-                <div><span class="item">总分：</span>{{'总分'}}</div>
-              </el-collapse-item>
-            </el-col>
-            <el-col :span="8">
-              <el-collapse-item title="实验教学工作量">
-                <div><span class="item">权重：</span>{{'权重'}}</div>
-                <div><span class="item">数据：</span>{{'数据'}}</div>
-                <div><span class="item">总分：</span>{{'总分'}}</div>
-              </el-collapse-item>
-            </el-col>
-          </el-row>
-        </el-collapse>
-        <el-row>
-          <el-col :span="12">
-              <el-form-item label="折抵教学工作量的科研经费金额">             
-                    {{100}}
-              </el-form-item>
-            </el-col>
-            <el-col :span="12">
-              <el-form-item label="完成本部门人均工作量的三分之一">
-                {{'是'}}
-              </el-form-item>
-            </el-col>
-        </el-row>
-         <el-row>
-          <el-col :span="8">
-            <el-form-item label="教学工作量合计">
-              {{100}}
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="用于计分的工作量">
-              {{100}}
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="总分">
-              {{100}}
-            </el-form-item>
-          </el-col>
-        </el-row>
-         <!-- 审核理由 -->
-        <el-form-item label="不通过理由(必填)" v-show="showReason">
-          <el-input type="textarea" :rows="2" placeholder="请输入审核理由" v-model="failedReason"></el-input>
+    <el-dialog el-drag-dialog :visible.sync="dialogTableVisible" title="工作量审核单">
+      <el-form ref="form" :inline="true" :model="form" class="demo-form-inline">
+        <el-form-item label="姓名">
+          <el-input v-model="form.name" disabled></el-input>
         </el-form-item>
-        <el-form-item align="center">
-          <el-button type="primary" @click="handlePass">审核通过</el-button>
-          <el-button type="danger" @click="handleFailed">审核不通过</el-button>
+        <el-form-item label="工号">
+          <el-input v-model="form.jobID" disabled></el-input>
         </el-form-item>
-      </el-form> 
+        <el-form-item label="岗位">
+          <el-input v-model="form.station" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="提交时间">
+          <el-input v-model="form.submitTime" disabled></el-input>
+        </el-form-item>
+        <el-collapse>
+          <el-collapse-item title="工作量数据">
+              <div class="collapse-item"><strong>上课教学工作量：</strong>{{form.workLoad ? form.workLoad.classWork : 0}}</div>
+              <div class="collapse-item"><strong>辅导员带班工作量折算：</strong>{{form.workLoad ? form.workLoad.instructorWork : 0}}</div>
+              <div class="collapse-item"><strong>实验教学工作量折算：</strong>{{form.workLoad ? form.workLoad.experimentWork : 0}}</div>
+              <div class="collapse-item" v-if="visibleItem"><strong>折抵教学工作量的科研经费金额：</strong>{{form.workLoad ? form.workLoad.scienceFunds :0}}</div>
+              <div class="collapse-item" v-if="visibleItem"><strong>科研经费折抵的教学工作量：</strong>{{form.workLoad ? form.workLoad.scienceFundsWork :0}}</div>
+              <div class="collapse-item"><strong>是否完成本部门人均相应工作量的三分之二：</strong>{{form.workLoad ? (form.workLoad.isFinish ? '是' :'否'):''}}</div>
+              <div class="collapse-item"><strong>教学工作量合计:</strong>{{form.workLoad ? form.workLoad.teachWorkSum :0}}</div>
+              <div class="collapse-item"><strong>用于计分的工作量：</strong>{{form.workLoad ? form.workLoad.scoreSum :0}}</div>
+              <div class="collapse-item"><strong>个人逐项计分：</strong>{{form.workLoad ? 28 * form.workLoad.scoreSum / stationBase  : 0}}</div>
+            </el-collapse-item>
+          <el-collapse-item title="审核记录">
+              <div v-for="(item,key) in form.auditRecord">
+                <span class="collapse-item"><strong>审核人：</strong>{{item.auditPerson}}</span>
+                <span class="collapse-item"><strong>审核时间：</strong>{{item.auditTime | formateDate}}</span>
+                <span class="collapse-item"><strong>审核状态：</strong>{{item.auditStatus}}</span>
+                <span class="collapse-item"><strong>审核理由：</strong>{{item.auditReason}}</span>
+              </div>
+            </el-collapse-item>
+        </el-collapse>     
+        <div class="audit-block">
+          <!-- 审核理由 -->
+          <el-form-item label="不通过理由(必填)" v-if="showReason" required>
+            <el-input type="textarea" :rows="2" placeholder="请输入审核理由" v-model="failedReason"></el-input>
+          </el-form-item>
+          <el-form-item style="display:flex;justify-content:center">
+            <el-button type="primary" @click="handlePass">审核通过</el-button>
+            <el-button type="danger" @click="handleFailed">审核不通过</el-button>
+          </el-form-item>
+        </div>
+      </el-form>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { fetchList } from '@/api/article'
 import router from '../../../../router'
-
+import dayjs from 'dayjs'
+import { getAllTeachWorkload, updateTeachWorkload } from '@/api/teachingAndRes/teachWorkload'
+import { getAllLevel } from '@/api/setting'
 export default {
   name: 'InlineEditTable',
-  filters: {
+ inject: ['reload'],
+   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
+        "已完成": 'success',
+        "draft": 'info',
+        "驳回": 'danger',
+        '审核中': 'warning'
       }
       return statusMap[status]
+    },
+    //格式化时间
+    formateDate(date) {
+      return dayjs(date).format('YYYY-MM-DD HH:mm')
     }
-  },
+   },
   data() {
     return {
       dialogTableVisible:false,
       failedReason:'',//审核不通过理由
-      showReason:false,//显示审核理由输入框
       list: null,
       listLoading: true,
       listQuery: {
         page: 1,
         limit: 10
       },
-      form: {
-      name: '',
-      weight: 4.55,
-      date1: '',
-      date2: '',
-      delivery: false,
-      type: [],
-      resource: '',
-      desc: ''
-    }
+      stationBase:350,//不同岗位对应算法的基数不同
+      visibleItem: false,//当岗位为非科研岗时隐藏的项
+      failedReason:'',//审核不通过理由
+      showReason:false,//显示审核理由输入框
+      form: {}
     }
   },
-  created() {
-    this.getList()
+  mounted() {
+    this.getList();
   },
   methods: {
-    getList() {
-      this.listLoading = true;
-      this.list = [
-        { 
-          id: 1,
-          timestamp: 622708727027,
-          author: "Deborah",
-          reviewer: "Ronald",
-          title: "Wfeevmqwub Mfvfxt Strkoggg Bdur Wfhjx Aiqd Dnwvju Uhxqh Pxsyd",
-          content_short: "我是测试数据",
-          forecast: 7.17,
-          importance: 2,
-          type: "US",
-          status: "draft",
-          display_time: "1988-01-05 04:26:31",
-          comment_disabled: true,
-          pageviews: 3518,
-          image_uri: "https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3"
-        },
-         { 
-          id: 2,
-          timestamp: 622708727027,
-          author: "Deborah",
-          reviewer: "Ronald",
-          title: "Wfeevmqwub Mfvfxt Strkoggg Bdur Wfhjx Aiqd Dnwvju Uhxqh Pxsyd",
-          content_short: "我是测试数据",
-          forecast: 6.66,
-          importance: 2,
-          type: "US",
-          status: "draft",
-          display_time: "1988-01-05 04:26:31",
-          comment_disabled: true,
-          pageviews: 3518,
-          image_uri: "https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3"
+    //获取所有级别岗位要求的接口
+    getStationInfo(value) {
+      console.log('value :>> ', value);
+      const userStation = value.station;
+      // console.log('userStation :>> ', userStation);
+      getAllLevel().then(res => {
+        console.log('res :>> ', res);
+        if (res.code == 200) {
+          switch (userStation) {
+            case '教学岗' : 
+              this.stationBase = res.result[0].teaching.teachWork;
+              break;
+            case '科研岗' :
+              this.stationBase = res.result[0].science.teachWork;
+              this.visibleItem = true;
+              break;
+            case '教学科研并重岗' :
+              this.stationBase = res.result[0].teachAndScience.teachWork;
+              break;
+            default:
+              this.$router.push('/user')
+          }
+          console.log('this.stationBase :>> ', this.stationBase);
         }
-      ];
-       this.listLoading = false
-      // fetchList(this.listQuery).then(response => {
-      //   const items = response.data.items
-      //   console.log('items--->',items)
-      //   this.list = items.map(v => {
-      //     this.$set(v, 'edit', false) // https://vuejs.org/v2/guide/reactivity.html
-      //     v.originalTitle = v.title //  will be used when user click the cancel botton
-      //     return v
-      //   })
-      //   this.listLoading = false
-      // })
+        
+      })
     },
-     // v-el-drag-dialog onDrag callback function
-    handleDrag() {
-      this.$refs.select.blur()
+    //获取所有工作量数据清单
+    getList() {
+      getAllTeachWorkload().then(res => {
+        console.log('res-------- :>> ', res);
+        if (res.code === 200) {
+          this.list = res.result;
+          this.listLoading = false;
+        } else {
+          this.$message({
+            type:'error',
+            message:res.message
+          })
+        }
+      })
     },
     //审核
-    handleSubmit(row) {
+    handleAudit(row) {
       console.log('row :', row);
+      this.form = row;
       this.dialogTableVisible = true;
+      this.getStationInfo(row)
     },
     //删除
     handleDelete(row) {
       console.log('row :', row);
     },
+    //审核提交接口
+    handleSubmit (params) {
+      this.form.auditRecord.unshift(params);
+      console.log('this.form :>> ', this.form);
+      updateTeachWorkload(this.form).then(res => {
+        console.log('res :>> ', res);
+         if (res.code === 200) {
+          this.$message({
+            type:'success',
+            message:'提交审核成功！'
+          })
+          this.dialogTableVisible = false;
+          this.reload();
+        } else {
+          this.$message({
+            type:'error',
+            message:res.message
+          })
+        }
+      })
+    },
     //审核通过
     handlePass() {
       this.showReason = false;
+      const params = {
+        auditPerson:this.$store.state.user.name,
+        auditReason:this.failedReason,
+        auditStatus:'审核中',
+        auditTime:new Date()
+      }
+     this.handleSubmit(params);
     },
     //审核不通过
     handleFailed() {
       this.showReason = true;
       //审核不通过弹出文本框,必填
+      if (!this.failedReason) {
+       this.$message({
+         type:'error',
+         message:'请填写不通过理由！'
+       })
+     } else {
+        const params = {
+          auditPerson:this.$store.state.user.name,
+          auditReason:this.failedReason,
+          auditStatus:'驳回',
+          auditTime:new Date()
+        }
+        this.handleSubmit(params);
+      }
     }
   }
 }
 </script>
 
 <style scoped>
-.edit-input {
-  padding-right: 100px;
-}
-.cancel-btn {
-  position: absolute;
-  right: 15px;
-  top: 10px;
-}
-.data-items {
-  margin: 20px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #909399;
-}
-.el-col {
-  border-radius: 4px;
-}
-.el-row {
-  margin-left: 14px;
-}
-.label-items {
-  border-bottom: 1px solid #606266;
-  padding: 10px;
-  margin-bottom: 10px;
-  color: #606266;
-  font-weight: 700;
-  font-size: 16px;
-}
-.el-input {
-  width: auto;
-  position: absolute;
-  margin-right: 10px;
-}
-.item {
-  font-size: 14px;
-  font-weight: 700;
+.audit-block {
+  margin-top: 20px;
 }
 </style>

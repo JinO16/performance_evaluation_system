@@ -45,7 +45,7 @@
     <el-row>
         <el-card class="box-card">
             <div slot="header" class="clearfix">
-                <span>设定级别</span>
+                <span>设定级别及岗位要求</span>
             </div>
             <el-alert
                 title="注：点击级别标签可以查看和编辑级别信息！"
@@ -87,6 +87,11 @@
                 <el-tooltip class="item" effect="dark" content="最佳填写实例：四级或五至六级" placement="top-start">
                     <el-input v-model="levelSubmit.name" placeholder="请输入级别名称"></el-input>
                 </el-tooltip>
+            </el-form-item>
+            <el-form-item label="学院分配科研经费任务">
+                <!-- <el-tooltip class="item" effect="dark" content="最佳填写实例：四级或五至六级" placement="top-start"> -->
+                    <el-input v-model="levelSubmit.distribScienceFund" placeholder="请输入学院分配科研经费任务"></el-input>
+                <!-- </el-tooltip> -->
             </el-form-item>
             <div class="label-items">教学岗</div>
             <el-form-item label="完成教学工作量下限:">     
@@ -183,6 +188,7 @@ export default {
             //添加并提交级别
             levelSubmit: {
                 name: '',
+                distribScienceFund:'',//学院分配的科研经费任务
                 //教学岗
                 teaching: {
                     teachWork: null,//教学工作量完成的标准学时
@@ -234,44 +240,45 @@ export default {
         },
         //删除级别标签
         handleLevelClose(tag) {
-            const t = this;
-            t.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
-            }).then(() => {
-                 deleteLevel({ _id: tag._id })
-                 .then(res => {
-                    console.log('res :', res);
-                    if (res.code === 200) {
-                        t.handleGetAllLevelData();
-                        this.$message({
-                            type: 'success',
-                            message: res.message
-                        });
-                    } else {
-                        this.$message({
-                            type: 'error',
-                            message: res.message
-                        });
-                    }
-                })
+            console.log('该功能暂不支持！');
+            // const t = this;
+            // t.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+            //     confirmButtonText: '确定',
+            //     cancelButtonText: '取消',
+            //     type: 'warning'
+            // }).then(() => {
+            //      deleteLevel({ _id: tag._id })
+            //      .then(res => {
+            //         console.log('res :', res);
+            //         if (res.code === 200) {
+            //             t.handleGetAllLevelData();
+            //             this.$message({
+            //                 type: 'success',
+            //                 message: res.message
+            //             });
+            //         } else {
+            //             this.$message({
+            //                 type: 'error',
+            //                 message: res.message
+            //             });
+            //         }
+            //     })
                 
                
-                // this.levelData.splice(this.levelData.indexOf(tag), 1);
-            }).catch(() => {
-                this.$message({
-                    type: 'info',
-                    message: '已取消删除'
-                });          
-            });  
+            //     // this.levelData.splice(this.levelData.indexOf(tag), 1);
+            // }).catch(() => {
+            //     this.$message({
+            //         type: 'info',
+            //         message: '已取消删除'
+            //     });          
+            // });  
         },       
         //添加级别标签
         handleLevelAdd() {
-            console.log('添加标签');
-            this.dialogLevelVisible = true;
-            this.addLevelVisible = true;
-            this.dialogLevelTitle = this.levelTitle.addLevel;
+            console.log('该功能暂不支持！');
+            // this.dialogLevelVisible = true;
+            // this.addLevelVisible = true;
+            // this.dialogLevelTitle = this.levelTitle.addLevel;
         },
         //确认添加级别
         handleLevelAddSubmit() {

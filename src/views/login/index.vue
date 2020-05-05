@@ -79,17 +79,17 @@ export default {
       },
       loading: false,
       passwordType: 'password',
-      redirect: undefined
+      // redirect: undefined
     }
   },
-  watch: {
-    $route: {
-      handler: function(route) {
-        this.redirect = route.query && route.query.redirect;
-      },
-      immediate: true
-    }
-  },
+  // watch: {
+  //   $route: {
+  //     handler: function(route) {
+  //       this.redirect = route.query && route.query.redirect;
+  //     },
+  //     immediate: true
+  //   }
+  // },
   methods: {
     showPwd() {
       if (this.passwordType === 'password') {
@@ -107,12 +107,24 @@ export default {
         if (valid) {
           const t = this;
           t.$store.dispatch('user/login', t.loginForm).then((res) => {
+            console.log('登录res :>> ', res);
             if (res.code === 200) {
               t.$message({
                 type:'success',
                 message:res.message
               })
-              this.$router.push({ path: this.redirect || '/' })
+              console.log('判断用户信息 :>> ', this.$store.state.user);
+              if (!res.result.station) {
+                this.$router.push({ path:'./user'})
+                this.$message({
+                  type:'warning',
+                  message:'请先完善个人信息！'
+                })
+              } else {
+                // this.$router.push({ path: this.redirect || '/' })
+                this.$router.push({ path:'/'})
+                
+              }
             }
             this.loading = false
           }).catch(() => {
