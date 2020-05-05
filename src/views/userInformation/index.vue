@@ -125,7 +125,7 @@
             </div>
         </el-row>
         <el-row>    
-            <div class="row-item" >
+            <!-- <div class="row-item" >
                 <el-col :span="2">
                     <span class="data-item">级别:</span>
                 </el-col>
@@ -136,14 +136,13 @@
                     :key="item._id"
                     :label="item.name"
                     :value="item.name">
-                    <!-- {{item._id}} -->
                     </el-option>
                     </el-select>
                 </el-col>
-            </div>
+            </div> -->
             <div class="row-item" >
                 <el-col :span="2">
-                    <span class="data-item">岗位:</span>
+                    <span class="data-item station">岗位:</span>
                 </el-col>
                 <el-col :span="6"> 
                     <el-select v-model="form.station" placeholder="请选择岗位">
@@ -194,6 +193,18 @@
 import { createUser, getInfo,updateUser} from '@/api/user';
 import {getAllLevel} from '@/api/setting';
 export default {
+    beforeRouteLeave (to, from, next) {
+        if (!this.form.station) {
+            this.$message({
+                type:'warning',
+                message:'必须选择所属岗位！'
+            })
+            next(false);
+        } else {
+            this.handleSubmit();
+            next();
+        }
+    },
     data() {
         //原密码的校验方式
         var validatePass = (rule, value, callback) => {
@@ -294,6 +305,7 @@ export default {
         handleGetAllLevelData() {
             const t = this;
             getAllLevel().then(res => {
+                console.log('res :>> ', res);
                 this.level_options = res.result;
             })
         },
@@ -331,7 +343,14 @@ export default {
         },
         //提交函数
         handleSubmit() {
-            updateUser(this.form).then(res => {
+            console.log('this.form :>> ', this.form);
+            if(!this.form.station) {
+                this.$message({
+                    type:'warning',
+                    message:'必须选择所属岗位！'
+                })
+            } else {
+                updateUser(this.form).then(res => {
                 if(res.code === 200) {
                     this.$message({
                         message: res.message,
@@ -339,13 +358,15 @@ export default {
                     })
                     this.handleGetPersonData();
                     this.$router.push('/');
-                } else {
-                    this.$message({
-                        message: res.message,
-                        type: 'error'
-                    })
-                } 
-            })
+                    } else {
+                        this.$message({
+                            message: res.message,
+                            type: 'error'
+                        })
+                    } 
+                })
+            }
+            
         }
 
     }
@@ -382,6 +403,11 @@ export default {
 .grid-content {
 border-radius: 4px;
 min-height: 36px;
+}
+.data-item.station::before {
+    content:'*';
+    color: #F56C6C;
+    margin-left: 4px;
 }
 </style>>
 

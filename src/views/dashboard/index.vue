@@ -13,6 +13,12 @@ export default {
     ...mapGetters([
       'name'
     ])
+  },
+  mounted() {
+    console.log('判断用户基本信息 :>> ', this.$store.state.user);
+  },
+  methods: {
+
   }
 }
 </script>

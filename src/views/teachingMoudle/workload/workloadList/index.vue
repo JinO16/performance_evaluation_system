@@ -13,75 +13,77 @@
       <el-table-column type="expand">
         <template slot-scope="scope" > 
           <el-form label-position="left" inline class="demo-table-expand">
-            <el-form-item label="上课教学工作量:">
-              <span class="data-items">权重: {{scope.row.forecast}}</span>
-              <span class="data-items">数据: {{90}}</span>
-              <span class="data-items">总分: {{45}}</span>
-            </el-form-item>
-             <el-form-item label="辅导员带班工作量:">
-              <span class="data-items">权重: {{scope.row.forecast}}</span>
-              <span class="data-items">数据: {{90}}</span>
-              <span class="data-items">总分: {{45}}</span>
-            </el-form-item>
-             <el-form-item label="实验教学工作量:">
-              <span class="data-items">权重: {{scope.row.forecast}}</span>
-              <span class="data-items">数据: {{90}}</span>
-              <span class="data-items">总分: {{45}}</span>
-            </el-form-item>
-             <el-form-item label="折抵教学工作量的科研经费金额:">
-              <span class="data-items">{{90}}</span>
-             </el-form-item>
-             <el-form-item label="科研经费折抵的教学工作量:">
-              <span class="data-items">权重: {{scope.row.forecast}}</span>
-              <span class="data-items">数据: {{90}}</span>
-              <span class="data-items">总分: {{45}}</span>
-             </el-form-item>
-             <el-form-item label="是否完成本部门人均相应工作量的三分之二:">
-              <span class="data-items">{{"是"}}</span>
-             </el-form-item>
-             <el-form-item label="教学工作量合计:">
-              <span class="data-items">{{45}}</span>
-             </el-form-item>
-             <el-form-item label="用于计分的工作量:">
-              <span class="data-items">{{45}}</span>
-             </el-form-item>
+              <el-form-item label="上课教学工作量:">
+                {{scope.row.workLoad.classWork ? scope.row.workLoad.classWork : 0}}
+              </el-form-item>
+              <el-form-item label="辅导员带班工作量折算:">
+                {{scope.row.workLoad.instructorWork ? scope.row.workLoad.instructorWork : 0}}
+              </el-form-item>
+              <el-form-item label="实验教学工作量折算:">
+                {{scope.row.workLoad.experimentWork ? scope.row.workLoad.experimentWork : 0}}
+              </el-form-item>
+              <el-form-item label="是否完成本部门人均相应工作量的三分之二:">
+                {{scope.row.workLoad.isFinish ? '是' : '否'}}
+              </el-form-item>
+              <el-form-item label="折抵教学工作量的科研经费金额:" v-if="visibleItem">
+                {{scope.row.workLoad.scienceFunds ? scope.row.workLoad.scienceFunds : 0}}
+              </el-form-item>
+              <el-form-item label="科研经费折抵的教学工作量:" v-if="visibleItem">
+                {{scope.row.workLoad.scienceFundsWork ? scope.row.workLoad.scienceFundsWork : 0}}
+              </el-form-item>
+              <el-form-item label="教学工作量合计:">
+                {{scope.row.workLoad.teachWorkSum ? scope.row.workLoad.teachWorkSum : 0}}
+              </el-form-item>
+              <el-form-item label="用于计分的工作量:">
+                {{scope.row.workLoad.scoreSum ? scope.row.workLoad.scoreSum : 0}}
+              </el-form-item>
+              <el-form-item label="个人逐项计分:">
+                {{scope.row.workLoad.itemScore ? scope.row.workLoad.itemScore : 0}}
+              </el-form-item>
+              
+            
           </el-form>
         </template>
       </el-table-column>
       <!-- 表格信息开始 -->
-      <el-table-column align="center" label="序号" width="60">
+      <el-table-column width="135px" align="center" label="提交时间">
         <template slot-scope="scope">
-          <span>{{ scope.row.id }}</span>
+          <span>{{ scope.row.submitTime | | formateDate  }}</span>
         </template>
       </el-table-column>
-      <el-table-column width="125px" align="center" label="提交时间">
+      <el-table-column width="120px" align="center" label="上课教学工作量">
         <template slot-scope="scope">
-          <span>{{ scope.row.timestamp | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+          {{scope.row.workLoad.classWork}}
         </template>
       </el-table-column>
-      <el-table-column width="120px" label="教学工作量合计">
+      <el-table-column width="120px" align="center" label="教学工作量合计">
         <template slot-scope="scope">
-          {{sum}}
+          {{scope.row.workLoad.teachWorkSum}}
         </template>
       </el-table-column>
-      <el-table-column width="135px" label="用于计分的工作量">
+      <el-table-column width="135px" align="center" label="用于计分的工作量">
         <template slot-scope="scope">
-          <svg-icon v-for="n in +scope.row.importance" :key="n" icon-class="star" class="meta-item__icon"/>
+          {{scope.row.workLoad.scoreSum}}
         </template>
       </el-table-column>
-      <el-table-column class-name="status-col" label="状态" width="80">
+       <el-table-column width="120px" align="center" label="个人逐项计分">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.status | statusFilter">{{ scope.row.status }}</el-tag>
+          {{scope.row.workLoad.itemScore}}
+        </template>
+      </el-table-column>
+      <el-table-column class-name="status-col" align="center" label="状态" width="80">
+        <template slot-scope="scope">
+          <el-tag :type="scope.row.auditRecord[0] ? scope.row.auditRecord[0].auditStatus :'待审核' | statusFilter">{{ scope.row.auditRecord[0] ? scope.row.auditRecord[0].auditStatus :'待审核'}}</el-tag>
         </template>
       </el-table-column>
       <el-table-column width="70px" align="center" label="审核人">
         <template slot-scope="scope">
-          <span>{{ scope.row.author }}</span>
+          <span>{{ scope.row.auditRecord[0] ? scope.row.auditRecord[0].auditPerson : '暂无' }}</span>
         </template>
       </el-table-column>
-      <el-table-column width="125px" align="center" label="审核时间">
+      <el-table-column width="135px" align="center" label="审核时间">
         <template slot-scope="scope">
-          <span>{{ scope.row.timestamp | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+          <span>{{ scope.row.auditRecord[0]? scope.row.auditRecord[0].auditTime :'' | formateDate }}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -105,99 +107,39 @@
 
     </el-table>
     <!-- 创建数据单弹出框 -->
-    <el-dialog v-el-drag-dialog :visible.sync="dialogTableVisible" title="创建工作量数据单" @dragDialog="handleDrag">
-      <el-form ref="form" :model="form">
-        <div class="label-items">上课教学工作量</div>
-        <el-row>
-          <el-col :span="8">
-              <el-form-item label="权重">             
-                    {{form.weight}}
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="数据">
-                  <el-input v-model="form.desc" />
-              </el-form-item>
-            </el-col>
-            <!-- <span class="data-items">数据：</span> <el-input v-model="form.name" /> -->
-            <el-col :span="8">
-              <el-form-item label="总分">         
-                    {{form.weight}}
-              </el-form-item>
-            </el-col>
-        </el-row>
-        <div class="label-items">辅导员带班工作量</div>
-        <el-row>
-          <el-col :span="8">
-              <el-form-item label="权重">             
-                    {{form.weight}}
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="数据">
-                  <el-input v-model="form.desc" />
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-            <el-form-item label="总分">         
-                  {{form.weight}}
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <div class="label-items">实验教学工作量</div>
-        <el-row>
-          <el-col :span="8">
-              <el-form-item label="权重">             
-                    {{form.weight}}
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="数据">
-                  <el-input v-model="form.desc" />
-              </el-form-item>
-            </el-col>
-            <!-- <span class="data-items">数据：</span> <el-input v-model="form.name" /> -->
-            <el-col :span="8">
-              <el-form-item label="总分">         
-                    {{form.weight}}
-              </el-form-item>
-            </el-col>
-        </el-row>
-        <div class="label-items">折抵教学工作量的科研经费金额</div>
-        <el-form-item label="金额">
-            <el-input v-model="form.desc" />
+    <el-dialog el-drag-dialog :visible.sync="dialogTableVisible" :title="dialogTitle">
+      <el-form ref="form" :inline="true" :model="form" class="demo-form-inline">
+        <el-form-item label="上课教学工作量">
+          <el-input v-model="form.workLoad.classWork"></el-input>
         </el-form-item>
-        <div class="label-items">科研经费折抵的工作量</div>
-        <el-row>
-          <el-col :span="8">
-              <el-form-item label="权重">             
-                    {{form.weight}}
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="数据">
-                  <el-input v-model="form.desc" />
-              </el-form-item>
-            </el-col>
-            <!-- <span class="data-items">数据：</span> <el-input v-model="form.name" /> -->
-            <el-col :span="8">
-              <el-form-item label="总分">         
-                    {{form.weight}}
-              </el-form-item>
-            </el-col>
-        </el-row>
-        <el-form-item label="是否完成本部门人均相应工作量的三分之一">
-          <el-switch v-model="form.delivery" />
+        <el-form-item label="辅导员带班工作量折算">
+          <el-input v-model="form.workLoad.instructorWork" ></el-input>
+        </el-form-item>
+         <el-form-item label="实验教学工作量折算">
+          <el-input v-model="form.workLoad.experimentWork"></el-input>
+        </el-form-item>
+        <el-form-item label="折抵教学工作量的科研经费金额" v-if="visibleItem">
+          <el-input v-model="form.workLoad.scienceFunds"></el-input>
+        </el-form-item>
+        <el-form-item label="科研经费折抵的教学工作量" v-if="visibleItem">
+          <el-input v-model="form.workLoad.scienceFundsWork"></el-input>
+        </el-form-item>
+        <el-form-item label="是否完成本部门人均相应工作量的三分之二">
+          <el-switch v-model="form.workLoad.isFinish"></el-switch>
         </el-form-item>
         <el-form-item label="教学工作量合计">
-          {{100}}
+          <el-input v-model="form.workLoad.teachWorkSum"></el-input>
         </el-form-item>
-        <el-form-item label="用于计分的工作量">
-          {{100}}
+        <el-form-item label="用于计分的工作量" required>
+          <el-input v-model="form.workLoad.scoreSum"></el-input>
         </el-form-item>
-        <el-form-item align="center">
-          <el-button type="primary" @click="handleSubmit">提交</el-button>
-           <el-button type="success" @click="handleSave">保存</el-button>
+        <el-form-item label="个人逐项计分">
+          {{form.workLoad.scoreSum ? 28 * form.workLoad.scoreSum / stationBase  : 0}}
+        </el-form-item>
+        <el-form-item style="display:flex;justify-content:center;margin-top:20px">
+          <el-button type="primary" v-if="dialogTitle === '创建工作量数据单'" @click="handleSubmit">提交</el-button>
+          <el-button type="success" v-else @click="UpdateSubmit('form')">确认修改</el-button>
+              
           <el-button @click="handleCancel">取消</el-button>
         </el-form-item>
       </el-form> 
@@ -206,161 +148,239 @@
 </template>
 
 <script>
-import { fetchList } from '@/api/article'
+// import { fetchList } from '@/api/article'
+import dayjs from 'dayjs'
 import router from '../../../../router'
-
+import { getAllLevel } from '@/api/setting'
+import { createTeachWorkload, getOwnTeachWorkload, updateTeachWorkload, deleteTeachWorkload } from '@/api/teachingAndRes/teachWorkload'
 export default {
   name: 'InlineEditTable',
-  filters: {
+  inject: ['reload'],
+   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
+        "已完成": 'success',
+        "draft": 'info',
+        "驳回": 'danger',
+        '审核中': 'warning'
       }
       return statusMap[status]
+    },
+    //格式化时间
+    formateDate(date) {
+      return dayjs(date).format('YYYY-MM-DD HH:mm')
     }
   },
   data() {
     return {
       dialogTableVisible: false,
+      dialogTitle:'',
+      dialogTitleItem: {
+        create:'创建工作量数据单',
+        update:'修改工作量数据单'
+      },
       list: null,
       listLoading: true,
       listQuery: {
         page: 1,
         limit: 10
       },
+      visibleItem: false,//当岗位为非科研岗时隐藏的项
+      stationBase:350,//不同岗位对应算法的基数不同
       form: {
-      name: '',
-      weight: 4.55,
-      date1: '',
-      date2: '',
-      delivery: false,
-      type: [],
-      resource: '',
-      desc: ''
-    }
+        name: this.$store.state.user.name,//用户姓名
+        jobID: this.$store.state.user.jobID,//用户工号
+        station: this.$store.state.user.station,//用户岗位
+        auditRecord:[],//审核记录
+        submitTime: new Date(),//提交时间
+        workLoad: {
+          classWork: null,//上课教学工作量
+          instructorWork: null,//辅导员带班工作量
+          experimentWork: null,//实验教学工作量
+          scienceFunds: null,//折抵教学工作量的科研经费金额（科研为主岗填写）
+          scienceFundsWork: null,//科研经费折抵的教学工作量（科研为主岗填写）
+          isFinish:true,//是否完成本部门人均相应工作量的三分之二
+          teachWorkSum:null,//教学工作量合计
+          scoreSum:null,//用于计分的工作量
+          itemScore:null,//个人逐项计分
+        }
+      }
     }
   },
-  created() {
+  mounted() {
     this.getList()
+    this.getStationInfo();
   },
   methods: {
+    //获取所有级别岗位要求的接口
+    getStationInfo() {
+      const userStation = this.$store.state.user.station;
+      // console.log('userStation :>> ', userStation);
+      getAllLevel().then(res => {
+        console.log('res :>> ', res);
+        if (res.code == 200) {
+          switch (userStation) {
+            case '教学岗' : 
+              this.stationBase = res.result[0].teaching.teachWork;
+              break;
+            case '科研岗' :
+              this.stationBase = res.result[0].science.teachWork;
+              this.visibleItem = true;
+              break;
+            case '教学科研并重岗' :
+              this.stationBase = res.result[0].teachAndScience.teachWork;
+              break;
+            default:
+              this.$router.push('/user')
+          }
+          console.log('this.stationBase :>> ', this.stationBase);
+        }
+        
+      })
+    },
+    //获取所有工作量数据清单接口
     getList() {
       this.listLoading = true;
-      this.list = [
-        { 
-          id: 1,
-          timestamp: 622708727027,
-          author: "张丹丹",
-          reviewer: "Ronald",
-          title: "Wfeevmqwub Mfvfxt Strkoggg Bdur Wfhjx Aiqd Dnwvju Uhxqh Pxsyd",
-          content_short: "我是测试数据",
-          forecast: 7.17,
-          importance: 2,
-          type: "US",
-          status: "draft",
-          display_time: "1988-01-05 04:26:31",
-          comment_disabled: true,
-          pageviews: 3518,
-          image_uri: "https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3"
-        },
-         { 
-          id: 2,
-          timestamp: 622708727027,
-          author: "Deborah",
-          reviewer: "Ronald",
-          title: "Wfeevmqwub Mfvfxt Strkoggg Bdur Wfhjx Aiqd Dnwvju Uhxqh Pxsyd",
-          content_short: "我是测试数据",
-          forecast: 6.66,
-          importance: 2,
-          type: "US",
-          status: "draft",
-          display_time: "1988-01-05 04:26:31",
-          comment_disabled: true,
-          pageviews: 3518,
-          image_uri: "https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3"
+      console.log('this.$store.state.user.jobID :>> ', this.$store.state.user.jobID);
+      getOwnTeachWorkload(this.$store.state.user.jobID).then(res => {
+        console.log('获取工作量数据清单res -----:>> ', res);
+        if (res.code == 200) {
+          this.list = res.result;
+          this.listLoading = false;
+        } else {
+          this.$message({
+            type:'error',
+            message:res.message
+          })
         }
-      ];
-       this.listLoading = false
-      // fetchList(this.listQuery).then(response => {
-      //   const items = response.data.items
-      //   console.log('items--->',items)
-      //   this.list = items.map(v => {
-      //     this.$set(v, 'edit', false) // https://vuejs.org/v2/guide/reactivity.html
-      //     v.originalTitle = v.title //  will be used when user click the cancel botton
-      //     return v
-      //   })
-      //   this.listLoading = false
-      // })
+      })
+       
     },
     //创建新数据
     handleCreate() {
-      this.dialogTableVisible = true
-      console.log('创建新数据 :');
-      // this.$router.push('createList')
-    },
-     // v-el-drag-dialog onDrag callback function
-    handleDrag() {
-      this.$refs.select.blur()
+      this.dialogTableVisible = true;
+      this.dialogTitle = this.dialogTitleItem.create;
     },
     //修改
     handleUpdate(row) {
       console.log('row :', row);
+      this.dialogTableVisible = true;
+      this.dialogTitle = this.dialogTitleItem.update;
+      this.form = row;
+    },
+    //提交修改
+    UpdateSubmit() {
+      this.form.workLoad.itemScore = this.form.workLoad.scoreSum ? this.form.workLoad.scoreSum * 28 / this.stationBase : 0;
+       console.log('this.form :>> ', this.form);
+      if (!this.form.workLoad.scoreSum) {
+         this.$message({
+           type:'warning',
+           message:'用于计分的工作量是必填选项！！！'
+         })
+       } else {
+         updateTeachWorkload(this.form).then(res => {
+           console.log('res ====:>> ', res);
+           if(res.code == 200) {
+             this.$message({
+               type:'success',
+               message:res.message
+             });
+             this.dialogTableVisible = false;
+             this.reload(); 
+           } else {
+             this.$message({
+               type:'error',
+               message:res.message
+             });
+           }
+         })
+       }
     },
     //删除
     handleDelete(row) {
       console.log('row :', row);
+      this.$confirm('此操作将永久删除该项目, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          deleteTeachWorkload(row).then(res => {
+              console.log('res :>> ', res);
+              if (res.code === 200) {
+                this.$message({
+                  type:'success',
+                  message:res.message
+                })
+                this.getList();
+              } else {
+                this.$message({
+                  type:'error',
+                  message: res.message
+                })
+              }
+          })
+        }).catch((err) => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });          
+      }); 
     },
-     handleSubmit() {
-      this.$message('submit!')
-    },
-    //暂存
-    handleSave() {
-      //暂存数据
+    handleSubmit() {
+       this.form.workLoad.itemScore = this.form.workLoad.scoreSum ? this.form.workLoad.scoreSum * 28 / this.stationBase : 0;
+       console.log('this.form :>> ', this.form);
+       if (!this.form.workLoad.scoreSum) {
+         this.$message({
+           type:'warning',
+           message:'用于计分的工作量是必填选项！！！'
+         })
+       } else {
+        createTeachWorkload(this.form).then(res => {
+          console.log('res :>> ', res);
+          if (res.code === 200) {
+            this.$message({
+              type:'success',
+              message:res.message
+            })
+            this.reload();
+            this.dialogTableVisible = false;
+          } else {
+            this.$message({
+              type:'error',
+              message:res.message
+            })
+          }
+        })
+       }
+       
+
     },
     handleCancel() {
-      this.$message({
-        message: 'cancel!',
+      const t = this;
+      t.$confirm('此操作将不会保留您的修改, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
         type: 'warning'
-      })
+      }).then(() => {
+          this.dialogTableVisible = false;
+            t.reload();
+      }).catch(() => {
+          t.$message({
+              type: 'info',
+              message: '已取消'
+          });          
+      }); 
     }
   }
 }
 </script>
 
 <style scoped>
-.edit-input {
-  padding-right: 100px;
-}
-.cancel-btn {
-  position: absolute;
-  right: 15px;
-  top: 10px;
-}
 .data-items {
   margin: 20px;
   font-size: 14px;
   font-weight: 500;
   color: #909399;
 }
-.el-col {
-  border-radius: 4px;
-}
-.el-row {
-  margin-left: 14px;
-}
-.label-items {
-  border-bottom: 1px solid #606266;
-  padding: 10px;
-  margin-bottom: 10px;
-  color: #606266;
-  font-weight: 700;
-  font-size: 16px;
-}
-.el-input {
-  width: auto;
-  position: absolute;
-  margin-right: 10px;
-}
+
 </style>
