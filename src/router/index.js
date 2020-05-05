@@ -133,6 +133,112 @@ export const constantRoutes = [
       }
     ]
   },
+  //科研考评
+  {
+    path: '/scienceModule',
+    component: Layout,
+    redirect: '/scienceModule/sciFunds/sciFundsList',
+    name: 'ScienceModule',
+    meta: {
+      title: '科研考评模块',
+      icon: 'example'
+    },
+    children: [
+      {
+        path: 'sciFunds',
+        component: () => import('@/views/scienceMoudle/sciFunds/index'), // Parent router-view
+        name: 'scienceFunds',
+        meta: { title: '科研经费模块', icon: 'clipboard' },
+        children: [
+          {
+            path:'sciFundsList',
+            name:'sciFundsList',
+            component: () => import('@/views/scienceMoudle/sciFunds/sciFundsList'),
+            meta: {title: '科研经费List',icon:'list'}
+          },
+          {
+            path:'sciFundsAudit',
+            name:'sciFundsAudit',
+            component: () => import('@/views/scienceMoudle/sciFunds/sciFundsAudit'),
+            meta: {title: '科研经费审核单',icon:'list'}
+          }
+        ]
+      },
+      {
+        path: 'sciPapers',
+        name: 'sciPapers',
+        component: () => import('@/views/scienceMoudle/sciPapers/index'),
+        meta: { title: '科研论文模块', icon: 'nested' },
+        children: [
+          {
+            path:'sciPapersList',
+            name:'sciPapersList',
+            component: () => import('@/views/scienceMoudle/sciPapers/sciPapersList'),
+            meta: {title: '科研论文List',icon:'list'}
+          },
+          {
+            path:'sciPapersAudit',
+            name:'sciPapersAudit',
+            component: () => import('@/views/scienceMoudle/sciPapers/sciPapersAudit'),
+            meta: {title: '科研论文审核单',icon:'list'}
+          }
+        ]
+      },
+      {
+        path: 'sciProjects',
+        name: 'sciProjects',
+        component: () => import('@/views/scienceMoudle/sciProjects'),
+        meta: { title: '科研立项模块', icon: 'component' },
+        children: [
+          {
+            path:'sciProjectsList',
+            name:'sciProjectsList',
+            component: () => import('@/views/scienceMoudle/sciProjects/sciProjectsList'),
+            meta: {title: '科研立项List',icon:'list'}
+          },
+          {
+            path:'sciProjectsAudit',
+            name:'sciProjectsAudit',
+            component: () => import('@/views/scienceMoudle/sciProjects/sciProjectsAudit'),
+            meta: {title: '科研立项审核单',icon:'list'}
+          }
+        ]
+      },
+      {
+        path: 'sciAchievement',
+        name: 'sciAchievement',
+        component: () => import('@/views/scienceMoudle/sciAchievement'),
+        meta: { title: '科研成果奖励模块', icon: 'drag' },
+        children: [
+          {
+            path:'sciAchievementList',
+            name:'sciAchievementList',
+            component: () => import('@/views/scienceMoudle/sciAchievement/sciAchievementList'),
+            meta: {title: '科研成果奖励模块List',icon:'list'}
+          },
+          {
+            path:'sciAchievementAudit',
+            name:'sciAchievementAudit',
+            component: () => import('@/views/scienceMoudle/sciAchievement/sciAchievementAudit'),
+            meta: {title: '科研成果奖励模块审核单',icon:'list'}
+          }
+        ]
+      },
+      {
+        path:'sciDataStatistics',
+        name:'sciDataStatistics',
+        component:() => import('@/views/scienceMoudle/sciDataStatistic'),
+        meta:{title:'数据统计',icon:'chart'}
+      },
+      {
+        path:'scienceSumAudit',
+        name:'scienceSumAudit',
+        component:() => import('@/views/scienceMoudle/scienceSumAudit'),
+        meta:{title:'科研考评审核单',icon:'example'}
+      }
+    ]
+  },
+
   //个人信息页面路由定义
   {
     path:'/user',
