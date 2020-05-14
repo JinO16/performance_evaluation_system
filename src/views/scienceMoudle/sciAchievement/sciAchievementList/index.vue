@@ -18,10 +18,10 @@
                 <span class="data-items">证书/专利/专著名称: {{item.name}}</span>
                 <span class="data-items">获得日期: {{item.date | formateDate}}</span>
                 <span class="data-items">获奖级别: {{item.level ? item.level[0] : ''}}</span>
-                <span class="data-items">个人逐项计分: {{item.level ? item.level[1] * item.level[2]: 0}}</span>
+                <span class="data-items">个人逐项计分: {{item.level ? item.level[1] * item.level[2] : 0}}</span>
                 <div class="data-items">附件: <a style="color:blue" id="fileDown" @click.once="handleDownload(item)">{{item.uploadFiles[0] ? item.uploadFiles[0].originalname : ''}}</a></div>          
               </div>
-              <span class="data-items">总分: {{scope.row.scienceAward.sum}}</span>
+              <span class="data-items">总分: {{scope.row.sciAchievement.sum}}</span>
               </el-form-item> 
              
           </el-form>
@@ -35,7 +35,7 @@
 
       <el-table-column align="center" label="科研成果奖励总分" width="100">
         <template slot-scope="scope">
-          <span>{{ scope.row.scienceAward.sum }}</span>
+          <span>{{ scope.row.sciAchievement.sum }}</span>
         </template>
       </el-table-column> 
       <el-table-column class-name="status-col" label="状态" align="center" width="100">
@@ -84,7 +84,7 @@
          <el-tabs v-model="activeName">
 
           <el-tab-pane label="科研成果奖励" name="fourth">
-            <div v-for="(item,key) in form.scienceAward.item" style="position:relative">
+            <div v-for="(item,key) in form.sciAchievement.item" style="position:relative">
               <el-button type="text" @click="deleteSciAward(item)" style="position:absolute;left:76%;top:-30px">删除该项目</el-button>
               <div class="block" style="border-bottom:1px dashed;margin-top:20px">
                 <el-form-item label="证书/专利/专著名称" prop="name">
@@ -100,7 +100,7 @@
                 <el-form-item label="获奖级别" prop="level">  
                   <el-cascader
                     v-model="item.level"
-                    :options="scienceAward_options"
+                    :options="sciAchievement_options"
                     placeholder="请输入获奖级别"
                     :props="{ expandTrigger: 'hover' }"
                     @change="handleAwardChange">
@@ -110,13 +110,13 @@
                   {{item.level? item.level[1] * item.level[2] : 0}} 
                 </el-form-item>
                 <el-form-item label="上传附件">
-                  <input type="file" @change="fileSelect(item)" ref="scienceAwardfile">
+                  <input type="file" @change="fileSelect(item)" ref="sciAchievementfile">
                   <el-button type="primary" plain size="mini" @click="submitFile(item)">上传</el-button>
                 </el-form-item>
               </div>
             </div>
             <el-form-item label="总分" style="margin-bottom:-20px">         
-              {{form.scienceAward.sum}} 
+              {{form.sciAchievement.sum}} 
             </el-form-item>
             <el-button type="text" @click="AddSciAward" style="position:relative;left:70%">添加科研成果</el-button>
             <el-form-item align="center">
@@ -137,7 +137,7 @@
 <script>
 import dayjs from 'dayjs'
 import router from '../../../../router'
-import { createScienceRes, getOwnScienceRes, deleteScienceRes, updateScienceRes} from '@/api/scienceAndRes/scienceRes'
+import { createSciAchievement, getOwnSciAchievement, deleteSciAchievement, updateSciAchievement} from '@/api/scienceAndRes/sciAchievement'
 import { getToken } from '../../../../utils/auth'
 
 export default {
@@ -159,7 +159,7 @@ export default {
   },
   data() {
     return {
-      activeName:'first',//标签管理
+      activeName:'fourth',//标签管理
       dialogTableVisible: false,//弹出框
       dialogTitle: '',
       dialogTitleItem: {
@@ -171,7 +171,7 @@ export default {
       listLoading: true,
 
       //科研成果奖励获奖级别
-      scienceAward_options: [        
+      sciAchievement_options: [        
         {
           value:'省部级',
           label: '省部级',
@@ -284,52 +284,59 @@ export default {
             }
           ]
         },{
-          value: '专利',
-          label: '专利',
+          value: '其它',
+          label: '其它',
           children:[
             {
-              value: 10,
+            value: 10,
+            label: '专利',
+            children:[
+              {
+              value: 1,
               label: '发明专利'
-            },{
-              value: 5,
+              },{
+              value: 0.5,
               label: '实用新型专利'
-            },{
-              value: 5,
+              },{
+              value: 0.5,
               label: '软件著作权'
-            },{
-              value: 2,
+              },{
+              value: 0.2,
               label: '技术转让'
             }
           ]
         },{
-          value: '专著',
+          value: 10,
           label: '专著',
           children: [
             {
-              value: 10,
+              value: 1,
               label: '第一作者'
             },{
-              value: 5,
+              value: 0.5,
               label: '第二作者'
             }
           ]
+          }]
         }
+        
       ],
       form: {
         name:'',//用户姓名
         jobID:'',//工号
         station:'',//岗位
-        auditStatus:'已完成',//审核状态
-        auditPerson:'暂无',//审核人
-        auditTime:'',//审核时间
-        auditReason:'无',//审核理由
+        auditRecord:[],
+        // auditStatus:'已完成',//审核状态
+        // auditPerson:'暂无',//审核人
+        // auditTime:'',//审核时间
+        // auditReason:'无',//审核理由
         submitTime:'',//提交时间--取当前提交的时间
         
         //科研成果奖励
-        scienceAward: {
+        sciAchievement: {
           sum:0,
           item:[{
-            sign: 'scienceAward',
+            sign: 'sciAchievement',
             name:'',//证书名称
             date:'',//发证日期
             level:'',//获奖级别与名次
@@ -346,7 +353,7 @@ export default {
     //获取表单数据
     getList() {
       const u = this.$store.state.user;
-      getOwnScienceRes(u.jobID).then(res => {
+      getOwnSciAchievement(u.jobID).then(res => {
         console.log('res :>> ', res);
         if ( res.code === 200) {
           this.list = res.result;
@@ -379,7 +386,7 @@ export default {
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          deleteScienceRes(row).then(res => {
+          deleteSciAchievement(row).then(res => {
               console.log('res :>> ', res);
               if (res.code === 200) {
                 this.$message({
@@ -406,9 +413,9 @@ export default {
     
     //选择科研成果奖励获奖级别触发函数
     handleAwardChange(value) {
-      this.form.scienceAward.sum = 0;
-      for (let i of this.form.scienceAward.item) {
-        this.form.scienceAward.sum += i.level ? i.level[1] *i.level[2] : 0;
+      this.form.sciAchievement.sum = 0;
+      for (let i of this.form.sciAchievement.item) {
+        this.form.sciAchievement.sum += i.level ? i.level[1] *i.level[2] : 0;
       }
 
     },
@@ -418,8 +425,8 @@ export default {
       let target = null;
       let deleteData = 0;
       switch (value.sign) {
-        case 'scienceAward': 
-          target = this.form.scienceAward;
+        case 'sciAchievement': 
+          target = this.form.sciAchievement;
           deleteData = value.level ? value.level[1] * value.level[2] : 0;
           break;
       }
@@ -443,8 +450,8 @@ export default {
     },
     //添加科研成果奖励
     AddSciAward() {
-       this.form.scienceAward.item.push({
-            sign:'scienceAward',
+       this.form.sciAchievement.item.push({
+            sign:'sciAchievement',
             name:'',
             date:'',
             level:'',
@@ -455,8 +462,8 @@ export default {
     fileSelect(item) {
       let fileSign = null;
       switch (item.sign) {
-        case 'scienceAward': 
-          fileSign = this.$refs.scienceAwardfile;
+        case 'sciAchievement': 
+          fileSign = this.$refs.sciAchievementfile;
       }
       let file = [];
       for (let i of fileSign) {
@@ -514,7 +521,7 @@ export default {
       this.form.station = userInfo.station;
       this.form.submitTime = new Date();
       console.log('this.form :>> ', this.form);
-      createScienceRes(this.form).then(res => {
+      createSciAchievement(this.form).then(res => {
         if (res.code === 200) {
           this.$message({
             type:"success",
@@ -538,7 +545,7 @@ export default {
       console.log('修改提交');
       console.log('this.form :>> ', this.form);
       this.form.submitTime = new Date();
-      updateScienceRes(this.form).then(res => {
+      updateSciAchievement(this.form).then(res => {
         console.log('res :>> ', res);
         if (res.code === 200) {
           this.$message({

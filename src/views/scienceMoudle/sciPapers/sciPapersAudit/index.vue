@@ -18,7 +18,7 @@
       </el-table-column>
       <el-table-column  align="center" label="科研论文总分" width="120px">
         <template slot-scope="scope">
-          <span>{{ scope.row.sciencePaper.sum }}</span>
+          <span>{{ scope.row.sciPapers.sum }}</span>
         </template>
       </el-table-column>
       <el-table-column class-name="status-col" align="center" label="状态" width="80px">
@@ -28,7 +28,7 @@
       </el-table-column>
        <el-table-column width="100px" align="center" label="总分数">
         <template slot-scope="scope">
-          <span>{{scope.row.sciencePaper.sum}}</span>
+          <span>{{scope.row.sciPapers.sum}}</span>
         </template>
       </el-table-column>
        <el-table-column
@@ -68,14 +68,14 @@
         <el-collapse>
 
              <el-collapse-item title="科研论文">
-              <div v-for="(item,key) in form.sciencePaper ? form.sciencePaper.item : []">
+              <div v-for="(item,key) in form.sciPapers ? form.sciPapers.item : []">
                 <span class="collapse-item"><strong>论文类型: </strong>{{item.type[0]}}</span>
                 <span class="collapse-item"><strong>个人逐项计分：</strong>{{item.type[1]}}</span>
                 <div class="collapse-item"><strong>附件：</strong>
                   <a style="color:blue" id="fileDown" @click.once="handleDownload(item)">{{item.uploadFiles[0]?item.uploadFiles[0].originalname : ''}}</a>
                 </div>
               </div>
-              <span class="collapse-item"><strong>总分：</strong>{{form.sciencePaper ? form.sciencePaper.sum : 0}}</span>
+              <span class="collapse-item"><strong>总分：</strong>{{form.sciPapers ? form.sciPapers.sum : 0}}</span>
             </el-collapse-item>
             <el-collapse-item title="审核记录">
               <div v-for="(item,key) in form.auditRecord">
@@ -103,7 +103,7 @@
 
 <script>
 import dayjs from 'dayjs'
-import { getAllScienceRes, updateScienceRes } from '@/api/scienceAndRes/scienceRes'
+import { getAllSciPapers, updateSciPapers } from '@/api/scienceAndRes/sciPapers'
 import { getToken } from '../../../../utils/auth'
 export default {
   inject:["reload"],
@@ -138,7 +138,7 @@ export default {
   methods: {
     //获取表格数据
     getAllData() {
-      getAllScienceRes().then(res => {
+      getAllSciPapers().then(res => {
         if (res.code === 200) {
           this.list = res.result;
           this.listLoading = false;
@@ -153,7 +153,7 @@ export default {
     //审核提交接口调用
     handleSubmit(params) {
       this.form.auditRecord.unshift(params);
-      updateScienceRes(this.form).then(res => {
+      updateSciPapers(this.form).then(res => {
         console.log('res :>> ', res);
         if (res.code === 200) {
           this.$message({

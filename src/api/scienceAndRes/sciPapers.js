@@ -1,44 +1,44 @@
 //科研考评模块接口
 import request from '@/utils/request'
 //添加科研考评数据
-export function createScienceRes(data) {
+export function createSciPapers(data) {
     return request({
-        url: '/scienceRes/add',
+        url: '/sciPapers/add',
         method: 'post',
         data: Object.assign({}, data)
     })
 }
 //用户获取自己的科研考评模块清单
-export function getOwnScienceRes(jobID) {
+export function getOwnSciPapers(jobID) {
     return request({
-        url:'/scienceRes/getOwn',
+        url:'/sciPapers/getOwn',
         method:'get',
         params:{ jobID }
     })
 }
 //删除某一条科研考评清单
-export function deleteScienceRes(data) {
+export function deleteSciPapers(data) {
     return request({
-        url:'/scienceRes/delete',
+        url:'/sciPapers/delete',
         method:'delete',
         data
     })
 }
 //修改某条数据
-export function updateScienceRes(data) {
+export function updateSciPapers(data) {
     return request({
-        url: '/scienceRes/update',
+        url: '/sciPapers/update',
         method: 'put',
         data: Object.assign({}, data)
     })
 }
 //获取所有的科研考评清单
 
-export function getAllScienceRes(data) {
+export function getAllSciPapers(data) {
 
     return request({
 
-        url: '/scienceRes/getAll',
+        url: '/sciPapers/getAll',
 
         method: 'get',
 

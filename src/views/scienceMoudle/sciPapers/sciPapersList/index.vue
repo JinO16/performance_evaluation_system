@@ -16,12 +16,12 @@
            
              <el-form-item label="科研论文:">
                <!-- {{scope.row}} -->
-               <div v-for="(item,key) in scope.row.sciencePaper.item">
+               <div v-for="(item,key) in scope.row.sciPapers.item">
                 <span class="data-items">论文类型: {{item.type? item.type[0] : ''}}</span>
-                <span class="data-items">个人逐项计分: {{item.type ? item.type[1] : 0}}</span>
+                <span class="data-items">个人逐项计分: {{item.type ? item.type[0] : 0}}</span>
                 <span class="data-items">附件: <a id="fileDown" style="color:blue"  @click.once="handleDownload(item)">{{ item.uploadFiles[0] ? item.uploadFiles[0].originalname : ''}}</a></span>
                 </div>
-                <span class="data-items">总分: {{scope.row.sciencePaper.sum}}</span>
+                <span class="data-items">总分: {{scope.row.sciPapers.sum}}</span>
             </el-form-item>
           </el-form>
         </template>
@@ -34,7 +34,7 @@
       
       <el-table-column align="center" label="科研论文总分" width="100">
         <template slot-scope="scope">
-          <span>{{ scope.row.sciencePaper.sum }}</span>
+          <span>{{ scope.row.sciPapers.sum }}</span>
         </template>
       </el-table-column>
       
@@ -84,31 +84,36 @@
          <el-tabs v-model="activeName">
           
           <el-tab-pane label="科研论文" name="second">  
-            <div v-for="(item,key) in form.sciencePaper.item" style="position:relative">
+            <div v-for="(item,key) in form.sciPapers.item" style="position:relative">
               <el-button type="text" @click="deleteSciPaper(item)" style="position:absolute;left:76%;top:-30px">删除该项目</el-button>
               <div class="block" style="border-bottom:1px dashed;margin-top:20px">
                 <el-form-item label="论文类型" prop="type">  
                   <el-cascader
                     v-model="item.type"
-                    :options="sciencePaper_options"
+                    :options="sciPapers_options"
                     placeholder="请选择论文类型"
                     :props="{ expandTrigger: 'hover' }"
                     @change="handleChange">
                   </el-cascader>           
                 </el-form-item>
                 <el-form-item label="个人逐项计分">         
-                  {{item.type ? item.type[1] : 0}} 
+                  {{item.type ? item.type[0] : 0}} 
                 </el-form-item>
                 <el-form-item label="上传附件">
-                  <input type="file" @change="fileSelect(item)" ref="sciencePaperfile">
+                  <input type="file" @change="fileSelect(item)" ref="sciPapersfile">
                   <el-button type="primary" plain size="mini" @click="submitFile(item)">上传</el-button>
                 </el-form-item>
               </div>
             </div>
             <el-form-item label="总分" style="margin-bottom:-20px">         
-                {{form.sciencePaper.sum}} 
+                {{form.sciPapers.sum}} 
             </el-form-item>
-            <el-button type="text" @click="AddSciPaper" style="position:relative;left:70%;top:-30px">添加教学论文</el-button>  
+            <el-button type="text" @click="AddSciPaper" style="position:relative;left:70%;top:-30px">添加科研论文</el-button>  
+            <el-form-item align="center">
+              <el-button type="primary" v-if="dialogTitle == '新建科研论文数据单'" @click="handleSubmit('form')">提 交</el-button>
+              <el-button type="success" v-else @click="UpdateSubmit('form')">确认修改</el-button>
+              <el-button @click="handleCancel">取消</el-button>
+            </el-form-item>
           </el-tab-pane>
         </el-tabs>      
       </el-form> 
@@ -119,7 +124,7 @@
 <script>
 import dayjs from 'dayjs'
 import router from '../../../../router'
-import { createScienceRes, getOwnScienceRes, deleteScienceRes, updateScienceRes} from '@/api/scienceAndRes/scienceRes'
+import { createSciPapers, getOwnSciPapers, deleteSciPapers, updateSciPapers} from '@/api/scienceAndRes/sciPapers'
 import { getToken } from '../../../../utils/auth'
 
 export default {
@@ -141,7 +146,7 @@ export default {
   },
   data() {
     return {
-      activeName:'first',//标签管理
+      activeName:'second',//标签管理
       dialogTableVisible: false,//弹出框
       dialogTitle: '',
       dialogTitleItem: {
@@ -153,7 +158,7 @@ export default {
       listLoading: true,
      
       //论文类型选项
-      sciencePaper_options:[{
+      sciPapers_options:[{
         value:20,
         label: 'SCI、SSCI期刊',        
       },{
@@ -171,16 +176,17 @@ export default {
         name:'',//用户姓名
         jobID:'',//工号
         station:'',//岗位
-        auditStatus:'已完成',//审核状态
-        auditPerson:'暂无',//审核人
-        auditTime:'',//审核时间
-        auditReason:'无',//审核理由
+        auditRecord:[],
+        // auditStatus:'已完成',//审核状态
+        // auditPerson:'暂无',//审核人
+        // auditTime:'',//审核时间
+        // auditReason:'无',//审核理由
         submitTime:'',//提交时间--取当前提交的时间
       
-        sciencePaper:{ 
+        sciPapers:{ 
           sum:0,
           item:[{
-            sign:'sciencePaper',
+            sign:'sciPapers',
             type:'',
             uploadFiles:[]
             }
@@ -195,7 +201,7 @@ export default {
     //获取表单数据
     getList() {
       const u = this.$store.state.user;
-      getOwnScienceRes(u.jobID).then(res => {
+      getOwnSciPapers(u.jobID).then(res => {
         console.log('res :>> ', res);
         if ( res.code === 200) {
           this.list = res.result;
@@ -228,7 +234,7 @@ export default {
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          deleteScienceRes(row).then(res => {
+          deleteSciPapers(row).then(res => {
               console.log('res :>> ', res);
               if (res.code === 200) {
                 this.$message({
@@ -256,29 +262,29 @@ export default {
     //选择科研论文类型的触发函数
     handleChange(value) {
       console.log('value :>> ', value);
-      this.form.sciencePaper.sum = 0
-      for (let i of this.form.sciencePaper.item){
-        this.form.sciencePaper.sum += i.type ? i.type[1] : 0;
+      this.form.sciPapers.sum = 0
+      for (let i of this.form.sciPapers.item){
+        this.form.sciPapers.sum += i.type ? i.type[0] : 0;
       } 
     },
     //添加科研论文项目
     AddSciPaper() {
       console.log('添加科研论文项目');
-      this.form.sciencePaper.item.push({
-          sign:"sciencePaper",
+      this.form.sciPapers.item.push({
+          sign:"sciPapers",
           type:'',
           uploadFiles:[]
         });
     },
    
     //删除项目
-    deleteSciAward(value) {
+    deleteSciPaper(value) {
       console.log('value :>> ', value);
       let target = null;
       let deleteData = 0;
       switch (value.sign) {
-         case 'sciencePaper': 
-          target =  this.form.sciencePaper;
+         case 'sciPapers': 
+          target =  this.form.sciPapers;
           deleteData = value.type ? value.type[1] : 0;
           break;
       }
@@ -304,8 +310,8 @@ export default {
     fileSelect(item) {
       let fileSign = null;
       switch (item.sign) {
-        case 'sciencePaper': 
-          fileSign = this.$refs.sciencePaperfile;
+        case 'sciPapers': 
+          fileSign = this.$refs.sciPapersfile;
           break;
       }
       let file = [];
@@ -364,7 +370,7 @@ export default {
       this.form.station = userInfo.station;
       this.form.submitTime = new Date();
       console.log('this.form :>> ', this.form);
-      createScienceRes(this.form).then(res => {
+      createSciPapers(this.form).then(res => {
         if (res.code === 200) {
           this.$message({
             type:"success",
@@ -388,7 +394,7 @@ export default {
       console.log('修改提交');
       console.log('this.form :>> ', this.form);
       this.form.submitTime = new Date();
-      updateScienceRes(this.form).then(res => {
+      updateSciPapers(this.form).then(res => {
         console.log('res :>> ', res);
         if (res.code === 200) {
           this.$message({

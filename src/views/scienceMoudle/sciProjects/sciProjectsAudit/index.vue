@@ -23,7 +23,7 @@
       </el-table-column> -->
       <el-table-column align="center" label="科研项目总分" width="120px">
         <template slot-scope="scope">
-          <span>{{ scope.row.scienceProgrom.sum }}</span>
+          <span>{{ scope.row.sciProjects.sum }}</span>
         </template>
       </el-table-column>
       <!-- <el-table-column align="center" label="科研成果奖励总分" width="140px">
@@ -38,7 +38,7 @@
       </el-table-column>
        <el-table-column width="100px" align="center" label="总分数">
         <template slot-scope="scope">
-          <span>{{scope.row.scienceProgrom.sum}}</span>
+          <span>{{scope.row.sciProjects.sum}}</span>
         </template>
       </el-table-column>
        <el-table-column
@@ -87,7 +87,7 @@
               <span class="collapse-item"><strong>总分：</strong>{{form.sciencePaper ? form.sciencePaper.sum : 0}}</span>
             </el-collapse-item> -->
             <el-collapse-item title="科研项目">
-              <div v-for="(item,key) in form.teachProgrom ? form.scienceProgrom.item : []">
+              <div v-for="(item,key) in form.sciProjects ? form.sciProjects.item : []">
                 <span class="collapse-item"><strong>项目名称：</strong>{{item.name}}</span>
                 <span class="collapse-item"><strong>项目编号：</strong>{{item.id}}</span>
                 <span class="collapse-item"><strong>批准日期：</strong>{{item.date | formateDate}}</span>
@@ -97,7 +97,7 @@
                   <a style="color:blue" id="fileDown" @click.once="handleDownload(item)">{{item.uploadFiles[0] ? item.uploadFiles[0].originalname : ''}}</a>
                 </div>
               </div>
-              <span class="collapse-item"><strong>总分：</strong>{{form.scienceProgrom ? form.scienceProgrom.sum : 0}}</span>
+              <span class="collapse-item"><strong>总分：</strong>{{form.sciProjects ? form.sciProjects.sum : 0}}</span>
             </el-collapse-item>
             <!-- <el-collapse-item title="科研成果奖励">
               <div v-for="(item,key) in form.scienceAward ? form.scienceAward.item : []">
@@ -137,7 +137,7 @@
 
 <script>
 import dayjs from 'dayjs'
-import { getAllScienceRes, updateScienceRes } from '@/api/scienceAndRes/scienceRes'
+import { getAllSciProjects, updateSciProjects } from '@/api/scienceAndRes/sciProjects'
 import { getToken } from '../../../../utils/auth'
 export default {
   inject:["reload"],
@@ -172,7 +172,7 @@ export default {
   methods: {
     //获取表格数据
     getAllData() {
-      getAllScienceRes().then(res => {
+      getAllSciProjects().then(res => {
         if (res.code === 200) {
           this.list = res.result;
           this.listLoading = false;
@@ -187,7 +187,7 @@ export default {
     //审核提交接口调用
     handleSubmit(params) {
       this.form.auditRecord.unshift(params);
-      updateScienceRes(this.form).then(res => {
+      updateSciProjects(this.form).then(res => {
         console.log('res :>> ', res);
         if (res.code === 200) {
           this.$message({
