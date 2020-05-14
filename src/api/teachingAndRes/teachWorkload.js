@@ -40,3 +40,11 @@ export function getAllTeachWorkload(data) {
         params: {data}
     })
 }
+//获取某一条数据单的基本数据
+export function getBaseFormData(_id) {
+    return request({
+        url: '/teachWorkload/getBase',
+        method:'get',
+        params:{_id}
+    })
+}

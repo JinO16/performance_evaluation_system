@@ -18,27 +18,30 @@
       </el-table-column>
       <el-table-column width="120px" align="center" label="教学工作量合计">
         <template slot-scope="scope">
-          <span>{{ scope.row.workLoad.teachWorkSum }}</span>
+          <span>{{ scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.teachWorkSum : 0}}</span>
         </template>
       </el-table-column>
       <el-table-column width="150px" align="center" label="用于计分的工作量">
         <template slot-scope="scope">
-          {{scope.row.workLoad.scoreSum}}
+          {{scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.scoreSum : 0}}
         </template>
       </el-table-column>
       <el-table-column width="150px" align="center" label="个人逐项计分">
         <template slot-scope="scope">
-          {{scope.row.workLoad.itemScore}}
+          {{scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.itemScore : 0}}
         </template>
       </el-table-column>
       <el-table-column class-name="status-col" align="center" label="状态" width="80">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.auditRecord[0] ? scope.row.auditRecord[0].auditStatus : '待审核' | statusFilter">{{ scope.row.auditRecord[0] ? scope.row.auditRecord[0].auditStatus : '待审核' }}</el-tag>
+          <el-tag :type="scope.row.finalAuditRecord[0] ? scope.row.finalAuditRecord[0].auditStatus : (scope.row.teachingMoudle.teaMoudelAuditRecord[0] ? scope.row.teachingMoudle.teaMoudelAuditRecord[0].auditStatus: (scope.row.teachingMoudle.workLoad ? (scope.row.teachingMoudle.workLoad.auditRecord[0] ? scope.row.teachingMoudle.workLoad.auditRecord[0].auditStatus : '待审核' ): '待审核' ))  | statusFilter">
+            {{ scope.row.finalAuditRecord[0] ? scope.row.finalAuditRecord[0].auditStatus : (scope.row.teachingMoudle.teaMoudelAuditRecord[0] ? scope.row.teachingMoudle.teaMoudelAuditRecord[0].auditStatus: (scope.row.teachingMoudle.workLoad ? (scope.row.teachingMoudle.workLoad.auditRecord[0] ? scope.row.teachingMoudle.workLoad.auditRecord[0].auditStatus :'待审核' ): '待审核') ) }}
+            
+          </el-tag>
         </template>
       </el-table-column>
        <el-table-column width="100px" align="center" label="总分数">
         <template slot-scope="scope">
-          <span>{{ scope.row.workLoad.itemScore }}</span>
+          <span>{{ scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.itemScore : 0 }}</span>
         </template>
       </el-table-column>
        <el-table-column
@@ -54,15 +57,15 @@
           >审核</el-button>
           <el-button
             size="mini"
-            type="danger"
-            @click="handleDelete(scope.row)"
-          >删除</el-button>
+            plain
+            @click="handleDetail(scope.row)"
+          >查看详情</el-button>
         </template>
       </el-table-column>
 
     </el-table>
      <!-- 审核单弹出框 -->
-    <el-dialog el-drag-dialog :visible.sync="dialogTableVisible" title="工作量审核单">
+    <el-dialog el-drag-dialog :visible.sync="dialogTableVisible" :title="dialogTitle">
       <el-form ref="form" :inline="true" :model="form" class="demo-form-inline">
         <el-form-item label="姓名">
           <el-input v-model="form.name" disabled></el-input>
@@ -78,26 +81,38 @@
         </el-form-item>
         <el-collapse>
           <el-collapse-item title="工作量数据">
-              <div class="collapse-item"><strong>上课教学工作量：</strong>{{form.workLoad ? form.workLoad.classWork : 0}}</div>
-              <div class="collapse-item"><strong>辅导员带班工作量折算：</strong>{{form.workLoad ? form.workLoad.instructorWork : 0}}</div>
-              <div class="collapse-item"><strong>实验教学工作量折算：</strong>{{form.workLoad ? form.workLoad.experimentWork : 0}}</div>
-              <div class="collapse-item" v-if="visibleItem"><strong>折抵教学工作量的科研经费金额：</strong>{{form.workLoad ? form.workLoad.scienceFunds :0}}</div>
-              <div class="collapse-item" v-if="visibleItem"><strong>科研经费折抵的教学工作量：</strong>{{form.workLoad ? form.workLoad.scienceFundsWork :0}}</div>
-              <div class="collapse-item"><strong>是否完成本部门人均相应工作量的三分之二：</strong>{{form.workLoad ? (form.workLoad.isFinish ? '是' :'否'):''}}</div>
-              <div class="collapse-item"><strong>教学工作量合计:</strong>{{form.workLoad ? form.workLoad.teachWorkSum :0}}</div>
-              <div class="collapse-item"><strong>用于计分的工作量：</strong>{{form.workLoad ? form.workLoad.scoreSum :0}}</div>
-              <div class="collapse-item"><strong>个人逐项计分：</strong>{{form.workLoad ? 28 * form.workLoad.scoreSum / stationBase  : 0}}</div>
+              <div class="collapse-item"><strong>上课教学工作量：</strong>{{form.teachingMoudle ? (form.teachingMoudle.workLoad ? form.teachingMoudle.workLoad.classWork : 0) : 0}}</div>
+              <div class="collapse-item"><strong>辅导员带班工作量折算：</strong>{{form.teachingMoudle ? (form.teachingMoudle.workLoad ? form.teachingMoudle.workLoad.instructorWork : 0) : 0}}</div>
+              <div class="collapse-item"><strong>实验教学工作量折算：</strong>{{form.teachingMoudle ? (form.teachingMoudle.workLoad ? form.teachingMoudle.workLoad.experimentWork : 0) : 0}}</div>
+              <div class="collapse-item" v-if="visibleItem"><strong>折抵教学工作量的科研经费金额：</strong>{{form.teachingMoudle ? (form.teachingMoudle.workLoad ? form.teachingMoudle.workLoad.scienceFunds :0) : 0}}</div>
+              <div class="collapse-item" v-if="visibleItem"><strong>科研经费折抵的教学工作量：</strong>{{form.teachingMoudle ? (form.teachingMoudle.workLoad ? form.teachingMoudle.workLoad.scienceFundsWork :0 ) : 0}}</div>
+              <div class="collapse-item"><strong>是否完成本部门人均相应工作量的三分之二：</strong>{{form.teachingMoudle ? (form.teachingMoudle.workLoad ? (form.teachingMoudle.workLoad.isFinish ? '是' :'否'):'') : ''}}</div>
+              <div class="collapse-item"><strong>教学工作量合计:</strong>{{form.teachingMoudle ? (form.teachingMoudle.workLoad ? form.teachingMoudle.workLoad.teachWorkSum :0) : 0}}</div>
+              <div class="collapse-item"><strong>用于计分的工作量：</strong>{{form.teachingMoudle ? (form.teachingMoudle.workLoad ? form.teachingMoudle.workLoad.scoreSum : 0 ) : 0}}</div>
+              <div class="collapse-item"><strong>个人逐项计分：</strong>{{form.teachingMoudle ? (form.teachingMoudle.workLoad ? 28 * form.teachingMoudle.workLoad.scoreSum / stationBase  : 0) : 0}}</div>
             </el-collapse-item>
           <el-collapse-item title="审核记录">
-              <div v-for="(item,key) in form.auditRecord">
-                <span class="collapse-item"><strong>审核人：</strong>{{item.auditPerson}}</span>
-                <span class="collapse-item"><strong>审核时间：</strong>{{item.auditTime | formateDate}}</span>
-                <span class="collapse-item"><strong>审核状态：</strong>{{item.auditStatus}}</span>
-                <span class="collapse-item"><strong>审核理由：</strong>{{item.auditReason}}</span>
-              </div>
-            </el-collapse-item>
+            <div v-for="(item,key) in form.finalAuditRecord">
+              <span class="collapse-item"><strong>审核人：</strong>{{item.auditPerson}}</span>
+              <span class="collapse-item"><strong>审核时间：</strong>{{item.auditTime | formateDate}}</span>
+              <span class="collapse-item"><strong>审核状态：</strong>{{item.auditStatus}}</span>
+              <span class="collapse-item"><strong>审核理由：</strong>{{item.auditReason}}</span>
+            </div>
+            <div v-for="(item,key) in form.teachingMoudle ? form.teachingMoudle.teaMoudelAuditRecord : []">
+                <span class="data-items">审核人: {{item.auditPerson ? item.auditPerson :'暂无'}}</span>
+                <span class="data-items">审核时间: {{item.auditTime ? item.auditTime : 0 | formateDate}}</span>
+                <span class="data-items">状态: {{item.auditStatus ? item.auditStatus : '待审核'}}</span>
+                <span class="data-items">审核理由: {{item.auditReason ? item.auditReason : '暂无'}}</span>
+            </div>
+            <div v-for="(item,key) in form.teachingMoudle ? (form.teachingMoudle.workLoad ? form.teachingMoudle.workLoad.auditRecord : []) :[]">
+              <span class="data-items">审核人: {{item.auditPerson ? item.auditPerson :'暂无'}}</span>
+              <span class="data-items">审核时间: {{item.auditTime ? item.auditTime : 0 | formateDate}}</span>
+              <span class="data-items">状态: {{item.auditStatus ? item.auditStatus : '待审核'}}</span>
+              <span class="data-items">审核理由: {{item.auditReason ? item.auditReason : '暂无'}}</span>
+            </div>           
+          </el-collapse-item>
         </el-collapse>     
-        <div class="audit-block">
+        <div class="audit-block" v-if="dialogTitle == '审核单'">
           <!-- 审核理由 -->
           <el-form-item label="不通过理由(必填)" v-if="showReason" required>
             <el-input type="textarea" :rows="2" placeholder="请输入审核理由" v-model="failedReason"></el-input>
@@ -149,7 +164,12 @@ export default {
       visibleItem: false,//当岗位为非科研岗时隐藏的项
       failedReason:'',//审核不通过理由
       showReason:false,//显示审核理由输入框
-      form: {}
+      form: {},
+      dialogTitle:'',
+      dialogTitleItem: {
+        audit:'审核单',
+        detail:'查看详情'
+      }
     }
   },
   mounted() {
@@ -188,7 +208,13 @@ export default {
       getAllTeachWorkload().then(res => {
         console.log('res-------- :>> ', res);
         if (res.code === 200) {
-          this.list = res.result;
+          const resultArr = [];
+          for (let i of res.result) {
+            if (i.teachingMoudle.workLoad) {
+              resultArr.unshift(i)
+            }
+          }
+          this.list = resultArr;
           this.listLoading = false;
         } else {
           this.$message({
@@ -198,44 +224,55 @@ export default {
         }
       })
     },
+    //查看详情
+    handleDetail(row) {
+      console.log('row :>> ', row);
+      this.dialogTableVisible = true;
+      this.dialogTitle = this.dialogTitleItem.detail;
+      this.form = row;
+    },
     //审核
     handleAudit(row) {
       console.log('row :', row);
-      this.form = row;
-      this.dialogTableVisible = true;
-      this.getStationInfo(row)
-    },
-    //删除
-    handleDelete(row) {
-      console.log('row :', row);
+      if (row.teachingMoudle.workLoad.auditRecord.length == 0) {
+        this.form = row;
+        this.dialogTableVisible = true;
+        this.dialogTitle = this.dialogTitleItem.audit;
+        this.getStationInfo(row)  
+      } else {
+        this.$message({
+          type:'warning',
+          message:'该状态下无法重新审核！'
+        })
+      }
     },
     //审核提交接口
     handleSubmit (params) {
-      this.form.auditRecord.unshift(params);
-      console.log('this.form :>> ', this.form);
-      updateTeachWorkload(this.form).then(res => {
-        console.log('res :>> ', res);
-         if (res.code === 200) {
-          this.$message({
-            type:'success',
-            message:'提交审核成功！'
-          })
-          this.dialogTableVisible = false;
-          this.reload();
-        } else {
-          this.$message({
-            type:'error',
-            message:res.message
-          })
-        }
-      })
+        this.form.teachingMoudle.workLoad.auditRecord.unshift(params);
+        console.log('this.form :>> ', this.form);
+        updateTeachWorkload(this.form).then(res => {
+          console.log('res :>> ', res);
+          if (res.code === 200) {
+            this.$message({
+              type:'success',
+              message:'提交审核成功！'
+            })
+            this.dialogTableVisible = false;
+            this.reload();
+          } else {
+            this.$message({
+              type:'error',
+              message:res.message
+            })
+          }
+     })
     },
     //审核通过
     handlePass() {
       this.showReason = false;
       const params = {
         auditPerson:this.$store.state.user.name,
-        auditReason:this.failedReason,
+        auditReason:'工作量模块审核通过！',
         auditStatus:'审核中',
         auditTime:new Date()
       }

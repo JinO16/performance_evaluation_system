@@ -83,39 +83,19 @@ export const constantRoutes = [
         path: 'teachProcess',
         name: 'teachProcess',
         component: () => import('@/views/teachingMoudle/teachProcess'),
-        meta: { title: '教学工程模块', icon: 'component' },
+        meta: { title: '教学工程及其他模块', icon: 'component' },
         children: [
           {
             path:'teachProcessList',
             name:'teachProcessList',
             component: () => import('@/views/teachingMoudle/teachProcess/teachProcessList'),
-            meta: {title: '教学工程List',icon:'list'}
+            meta: {title: '模块List',icon:'list'}
           },
           {
             path:'teachProcessAudit',
             name:'teachProcessAudit',
             component: () => import('@/views/teachingMoudle/teachProcess/teachProcessAudit'),
-            meta: {title: '教学工程审核单',icon:'list'}
-          }
-        ]
-      },
-      {
-        path: 'other',
-        name: 'other',
-        component: () => import('@/views/teachingMoudle/other'),
-        meta: { title: '其他模块', icon: 'drag' },
-        children: [
-          {
-            path:'otherList',
-            name:'otherList',
-            component: () => import('@/views/teachingMoudle/other/otherList'),
-            meta: {title: '其他模块List',icon:'list'}
-          },
-          {
-            path:'otherAudit',
-            name:'otherAudit',
-            component: () => import('@/views/teachingMoudle/other/otherAudit'),
-            meta: {title: '其他模块审核单',icon:'list'}
+            meta: {title: '模块审核单',icon:'list'}
           }
         ]
       },
