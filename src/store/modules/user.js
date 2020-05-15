@@ -7,7 +7,8 @@ const getDefaultState = () => {
     token: getToken(),
     jobID: '',
     name: '',
-    station:''
+    station:'',
+    _id: ''
     // avatar: ''
   }
 }
@@ -36,6 +37,10 @@ const mutations = {
   SET_STATION: (state, station) => {
     sessionStorage.setItem('station',station);
     state.station = station;
+  },
+  SET_ID: (state, _id) => {
+    sessionStorage.setItem('_id',_id);
+    state._id = _id;
   }
 }
 
