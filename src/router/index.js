@@ -109,7 +109,7 @@ export const constantRoutes = [
         path:'teachingAudit',
         name:'teachingAudit',
         component:() => import('@/views/teachingMoudle/teachingSumAudit'),
-        meta:{title:'教学教研考评审核单',icon:'example'}
+        meta:{title:'教学教研考评审核单',icon:'form'}
       }
     ]
   },
@@ -200,6 +200,18 @@ export const constantRoutes = [
         meta: { title: 'External Link', icon: 'link' }
       }
     ]
+  },
+  {
+    path: '/generalAudit',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'generalAudit',
+        component: () => import('@/views/generalAudit/index'),
+        meta: { title: '终极审核单', icon: 'form' }
+      }
+    ] 
   },
   {
     path: '/setting',

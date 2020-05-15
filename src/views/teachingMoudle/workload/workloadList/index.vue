@@ -92,12 +92,18 @@
       </el-table-column>
       <el-table-column class-name="status-col" align="center" label="状态" width="80">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.finalAuditRecord[0] ? scope.row.finalAuditRecord[0].auditStatus 
+          <!-- <el-tag :type="scope.row.finalAuditRecord[0] ? scope.row.finalAuditRecord[0].auditStatus 
           : (scope.row.teachingMoudle.teaMoudelAuditRecord[0] ? scope.row.teachingMoudle.teaMoudelAuditRecord[0].auditStatus
           : (scope.row.teachingMoudle.workLoad ? (scope.row.teachingMoudle.workLoad.auditRecord[0] ? scope.row.teachingMoudle.workLoad.auditRecord[0].auditStatus :'待审核') : '')) | statusFilter">
             {{ scope.row.finalAuditRecord[0] ? scope.row.finalAuditRecord[0].auditStatus 
           : (scope.row.teachingMoudle.teaMoudelAuditRecord[0] ? scope.row.teachingMoudle.teaMoudelAuditRecord[0].auditStatus
           : (scope.row.teachingMoudle.workLoad ? (scope.row.teachingMoudle.workLoad.auditRecord[0] ? scope.row.teachingMoudle.workLoad.auditRecord[0].auditStatus :'待审核') : ''))}}
+          </el-tag> -->
+          <!-- <el-tag :type="scope.row.finalStatus !== '待审核' ? scope.row.finalStatus : (scope.row.teachingMoudle.teaStatus ? scope.row.teachingMoudle.teaStatus : scope.row.teachingMoudle.workLoad.status) | statusFilter ">
+            {{scope.row.finalStatus !== '待审核' ? scope.row.finalStatus : (scope.row.teachingMoudle.teaStatus ? scope.row.teachingMoudle.teaStatus : scope.row.teachingMoudle.workLoad.status)}}
+          </el-tag> -->
+          <el-tag :type="scope.row.teachingMoudle.workLoad.status | statusFilter">
+            {{scope.row.teachingMoudle.workLoad.status}}
           </el-tag>
         </template>
       </el-table-column>
@@ -113,9 +119,7 @@
       <el-table-column width="135px" align="center" label="审核时间">
         <template slot-scope="scope">
           <span>
-            <!-- {{ scope.row.teachingMoudle.workLoad ? (scope.row.teachingMoudle.workLoad.auditRecord[0] 
-                ? scope.row.teachingMoudle.workLoad.auditRecord[0].auditTime :'') : '' | formateDate }} -->
-          {{ scope.row.finalAuditRecord[0] ? scope.row.finalAuditRecord[0].auditTime 
+            {{ scope.row.finalAuditRecord[0] ? scope.row.finalAuditRecord[0].auditTime 
           : (scope.row.teachingMoudle.teaMoudelAuditRecord[0] ? scope.row.teachingMoudle.teaMoudelAuditRecord[0].auditTime
           : (scope.row.teachingMoudle.workLoad ? (scope.row.teachingMoudle.workLoad.auditRecord[0] ? scope.row.teachingMoudle.workLoad.auditRecord[0].auditTime :'') : '')) | formateDate}}  
           
@@ -228,6 +232,7 @@ export default {
         jobID: this.$store.state.user.jobID,//用户工号
         station: this.$store.state.user.station,//用户岗位
         finalAuditRecord:[],//最终审核记录
+        finalStatus:'待审核',//总审核状态
         submitTime: new Date(),//提交时间
         teachingMoudle: {
             workLoad: {
@@ -241,10 +246,11 @@ export default {
               scoreSum:null,//用于计分的工作量
               itemScore:null,//个人逐项计分
               auditRecord:[],//工作量模块审核记录
+              status:'待审核',//工作量模块审核状态
           },
+          teaStatus:'待审核',//教学教研考评模块审核状态
           teaMoudelAuditRecord: [],//教学教研模块审核记录
-        }
-        
+        }   
       }
     }
   },
@@ -350,10 +356,7 @@ export default {
     //修改
     handleUpdate(row) {
       console.log('row :', row);
-      if (row.teachingMoudle.workLoad.auditRecord.length === 0 
-      || row.teachingMoudle.workLoad.auditRecord[0].auditStatus == '驳回' 
-      || (row.teachingMoudle.teaMoudelAuditRecord[0] ? row.teachingMoudle.teaMoudelAuditRecord[0].auditStatus == '驳回' : undefined) 
-      || (row.finalAuditRecord[0] ? row.finalAuditRecord[0].auditStatus == '驳回': undefined)) {
+      if (row.teachingMoudle.workLoad.status == '待审核' || row.teachingMoudle.workLoad.status == '驳回') {
         this.dialogTableVisible = true;
         this.dialogTitle = this.dialogTitleItem.update;
         this.formParams = row;
@@ -376,6 +379,7 @@ export default {
          })
        } else {
          console.log('this.formParams :>> ', this.formParams);
+         this.formParams.teachingMoudle.workLoad.status = '待审核';
          updateTeachWorkload(this.formParams).then(res => {
            console.log('res ====:>> ', res);
            if(res.code == 200) {
@@ -397,7 +401,7 @@ export default {
     //删除
     handleDelete(row) {
       console.log('row :', row);
-      if (row.teachingMoudle.workLoad.auditRecord.length === 0 || (row.finalAuditRecord[0] ? row.finalAuditRecord[0].auditStatus == '已完成' : undefined)) {
+      if (row.teachingMoudle.workLoad.status == '待审核' || row.teachingMoudle.workLoad.status == '已完成') {
          this.$confirm('此操作将永久删除该整条数据(包括其他模块提交的本条数据), 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -435,6 +439,7 @@ export default {
     handleSubmit() {
       const id = this.$store.state.user._id;
       this.formParams.teachingMoudle.workLoad.itemScore = this.formParams.teachingMoudle.workLoad.scoreSum ? this.formParams.teachingMoudle.workLoad.scoreSum * 28 / this.stationBase : 0;
+      console.log('this.formParams :>> ', this.formParams);
       if (!this.formParams.teachingMoudle.workLoad.scoreSum) {
          this.$message({
             type:'warning',

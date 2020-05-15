@@ -105,8 +105,11 @@
       </el-table-column>
       <el-table-column class-name="status-col" label="状态" align="center" width="80">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.finalAuditRecord[0]? scope.row.finalAuditRecord[0].auditStatus: (scope.row.teachingMoudle.teaMoudelAuditRecord[0] ? scope.row.teachingMoudle.teaMoudelAuditRecord[0].auditStatus :(scope.row.teachingMoudle.teaProAndOther ? (scope.row.teachingMoudle.teaProAndOther.auditRecord[0] ? scope.row.teachingMoudle.teaProAndOther.auditRecord[0].auditStatus : '待审核') : '待审核')) | statusFilter">
+          <!-- <el-tag :type="scope.row.finalAuditRecord[0]? scope.row.finalAuditRecord[0].auditStatus: (scope.row.teachingMoudle.teaMoudelAuditRecord[0] ? scope.row.teachingMoudle.teaMoudelAuditRecord[0].auditStatus :(scope.row.teachingMoudle.teaProAndOther ? (scope.row.teachingMoudle.teaProAndOther.auditRecord[0] ? scope.row.teachingMoudle.teaProAndOther.auditRecord[0].auditStatus : '待审核') : '待审核')) | statusFilter">
             {{ scope.row.finalAuditRecord[0]? scope.row.finalAuditRecord[0].auditStatus: (scope.row.teachingMoudle.teaMoudelAuditRecord[0] ? scope.row.teachingMoudle.teaMoudelAuditRecord[0].auditStatus :(scope.row.teachingMoudle.teaProAndOther ? (scope.row.teachingMoudle.teaProAndOther.auditRecord[0] ? scope.row.teachingMoudle.teaProAndOther.auditRecord[0].auditStatus : '待审核') : '待审核'))}}
+          </el-tag> -->
+           <el-tag :type="scope.row.teachingMoudle.teaProAndOther.status | statusFilter">
+            {{scope.row.teachingMoudle.teaProAndOther.status}}
           </el-tag>
         </template>
       </el-table-column>
@@ -759,6 +762,7 @@ export default {
         jobID: this.$store.state.user.jobID,//用户工号
         station: this.$store.state.user.station,//用户岗位
         finalAuditRecord:[],//最终审核记录
+        finalStatus:'待审核',//总审核状态
         submitTime: new Date(),//提交时间
         teachingMoudle: {
           teaProAndOther: {
@@ -808,9 +812,12 @@ export default {
                   uploadFiles:[]//附件
                 }]
               },
+              status:'待审核',//教学工程及其他模块审核状态
               auditRecord:[],//教学工程及其他模块审核记录
+              teaProScoreSum: 0,//教学工程及其他模块总分
           },
-        teaMoudelAuditRecord: [],//教学教研模块审核记录
+          teaStatus:'待审核',//教学教研考评模块审核状态
+          teaMoudelAuditRecord: [],//教学教研模块审核记录
         }
         
       }
@@ -888,11 +895,7 @@ export default {
     //修改
     handleUpdate(row) {
       console.log('row :', row);
-      if (row.teachingMoudle.teaProAndOther.auditRecord.length === 0 
-      || row.teachingMoudle.teaProAndOther.auditRecord[0].auditStatus == '驳回' 
-      || (row.teachingMoudle.teaMoudelAuditRecord[0] ? row.teachingMoudle.teaMoudelAuditRecord[0].auditStatus == '驳回' : undefined)
-      || (row.finalAuditRecord[0] ? row.finalAuditRecord[0].auditStatus == '驳回': undefined)
-      ) {
+      if (row.teachingMoudle.teaProAndOther.status == '待审核' || row.teachingMoudle.teaProAndOther.status == '驳回') {
       this.formParams = row;
       this.dialogTableVisible = true;
       this.dialogTitle = this.dialogTitleItem.update;
@@ -906,8 +909,7 @@ export default {
     //删除
     handleDelete(row) {
       console.log('row :', row);
-      if (row.teachingMoudle.teaProAndOther.auditRecord.length === 0 
-      || (row.finalAuditRecord[0] ? row.finalAuditRecord[0].auditStatus == '已完成': undefined)) {
+      if (row.teachingMoudle.teaProAndOther.status == '待审核' || row.teachingMoudle.teaProAndOther.status == '已完成') {
         this.$confirm('此操作将永久删除该整条数据(包括其他模块提交的本条数据), 是否继续?', '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
@@ -1125,6 +1127,11 @@ export default {
     //创建提交弹出框数据
     handleSubmit(formName) {
       const id = this.$store.state.user._id;
+      this.formParams.teachingMoudle.teaProAndOther.teaProScoreSum = 
+      this.formParams.teachingMoudle.teaProAndOther.excellentCourses.sum +
+      this.formParams.teachingMoudle.teaProAndOther.famousTeachers.sum +
+      this.formParams.teachingMoudle.teaProAndOther.teachCompetition.sum +
+      this.formParams.teachingMoudle.teaProAndOther.teachProcess.sum ;
       console.log('this.formParams :>> ', this.formParams);
       if (!id) {
         createTeachWorkload(this.formParams).then(res => {
@@ -1147,9 +1154,6 @@ export default {
           })
       } else {
         this.form.teachingMoudle.teaProAndOther = this.formParams.teachingMoudle.teaProAndOther;
-        // this.form.teachingMoudle.teachCompetition = this.formParams.teachingMoudle.teachCompetition;
-        // this.form.teachingMoudle.excellentCourses = this.formParams.teachingMoudle.excellentCourses;
-        // this.form.teachingMoudle.famousTeachers = this.formParams.teachingMoudle.famousTeachers;
         console.log('this.form :>> ', this.form);
         updateTeachWorkload(this.form).then(res => {
           console.log('res :>> ', res);
@@ -1172,6 +1176,7 @@ export default {
     //修改提交弹出框数据
     UpdateSubmit(formName) {
      this.formParams.submitTime = new Date();
+     this.formParams.teachingMoudle.teaProAndOther.status = '待审核';
       updateTeachWorkload(this.formParams).then(res => {
         console.log('res :>> ', res);
         if (res.code === 200) {

@@ -38,9 +38,10 @@
       </el-table-column>
       <el-table-column class-name="status-col" align="center" label="状态" width="80px">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.finalAuditRecord[0]? scope.row.finalAuditRecord[0].auditStatus: (scope.row.teachingMoudle.teaMoudelAuditRecord[0] ? scope.row.teachingMoudle.teaMoudelAuditRecord[0].auditStatus :(scope.row.teachingMoudle.teachResChild.auditRecord ? (scope.row.teachingMoudle.teachResChild.auditRecord[0] ? scope.row.teachingMoudle.teachResChild.auditRecord[0].auditStatus : '待审核') : '待审核'))| statusFilter">
+          <!-- <el-tag :type="scope.row.finalAuditRecord[0]? scope.row.finalAuditRecord[0].auditStatus: (scope.row.teachingMoudle.teaMoudelAuditRecord[0] ? scope.row.teachingMoudle.teaMoudelAuditRecord[0].auditStatus :(scope.row.teachingMoudle.teachResChild.auditRecord ? (scope.row.teachingMoudle.teachResChild.auditRecord[0] ? scope.row.teachingMoudle.teachResChild.auditRecord[0].auditStatus : '待审核') : '待审核'))| statusFilter">
             {{scope.row.finalAuditRecord[0]? scope.row.finalAuditRecord[0].auditStatus: (scope.row.teachingMoudle.teaMoudelAuditRecord[0] ? scope.row.teachingMoudle.teaMoudelAuditRecord[0].auditStatus :(scope.row.teachingMoudle.teachResChild.auditRecord ? (scope.row.teachingMoudle.teachResChild.auditRecord[0] ? scope.row.teachingMoudle.teachResChild.auditRecord[0].auditStatus : '待审核') : '待审核'))}}
-          </el-tag>
+          </el-tag> -->
+          <el-tag :type="scope.row.teachingMoudle.teachResChild.status |statusFilter">{{scope.row.teachingMoudle.teachResChild.status}}</el-tag>
         </template>
       </el-table-column>
        <el-table-column width="100px" align="center" label="总分数">
@@ -72,16 +73,16 @@
     <el-dialog el-drag-dialog :visible.sync="dialogTableVisible" :title="dialogTitle">
       <el-form ref="form" :inline="true" :model="form" class="demo-form-inline">
         <el-form-item label="姓名">
-          <el-input v-model="form.name" disabled></el-input>
+          {{form.name}}
         </el-form-item>
         <el-form-item label="工号">
-          <el-input v-model="form.jobID" disabled></el-input>
+          {{form.jobID}}
         </el-form-item>
         <el-form-item label="岗位">
-          <el-input v-model="form.station" disabled></el-input>
+          {{form.station}}
         </el-form-item>
         <el-form-item label="提交时间">
-          <el-input v-model="form.submitTime" disabled></el-input>
+          {{form.submitTime | formateDate}}
         </el-form-item>
         <el-collapse>
             <el-collapse-item title="教学质量评价">
@@ -93,7 +94,7 @@
                 {{form.teachingMoudle ? (form.teachingMoudle.teachResChild ? (form.teachingMoudle.teachResChild.teachQuality ? form.teachingMoudle.teachResChild.teachQuality.sum : 0 ) : 0) :0 }}
               </span>
             </el-collapse-item>
-             <el-collapse-item title="教研论文">
+            <el-collapse-item title="教研论文">
               <div v-for="(item,key) in form.teachingMoudle ? (form.teachingMoudle.teachResChild ? (form.teachingMoudle.teachResChild.teachPaper ? form.teachingMoudle.teachResChild.teachPaper.item : []) : []) : []">
                 <span class="collapse-item"><strong>获奖级别：</strong>{{item.type[0]}}</span>
                 <span class="collapse-item"><strong>个人逐项计分：</strong>{{item.type[1]}}</span>
@@ -225,7 +226,7 @@ export default {
     //审核
     handleAudit(value) {
       console.log('value :>> ', value);
-      if (value.teachingMoudle.teachResChild.auditRecord.length == 0) {
+      if (value.teachingMoudle.teachResChild.status = '待审核') {
         this.dialogTableVisible = true;
         this.dialogTitle = this.dialogTitleItem.audit;
         this.form = value;
@@ -240,6 +241,7 @@ export default {
     //审核提交接口调用
     handleSubmit(params) {
       this.form.teachingMoudle.teachResChild.auditRecord.unshift(params);
+      this.form.teachingMoudle.teachResChild.status = params.auditStatus;
       updateTeachWorkload(this.form).then(res => {
         console.log('res :>> ', res);
         if (res.code === 200) {

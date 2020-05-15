@@ -33,10 +33,10 @@
       </el-table-column>
       <el-table-column class-name="status-col" align="center" label="状态" width="80">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.finalAuditRecord[0] ? scope.row.finalAuditRecord[0].auditStatus : (scope.row.teachingMoudle.teaMoudelAuditRecord[0] ? scope.row.teachingMoudle.teaMoudelAuditRecord[0].auditStatus: (scope.row.teachingMoudle.workLoad ? (scope.row.teachingMoudle.workLoad.auditRecord[0] ? scope.row.teachingMoudle.workLoad.auditRecord[0].auditStatus : '待审核' ): '待审核' ))  | statusFilter">
-            {{ scope.row.finalAuditRecord[0] ? scope.row.finalAuditRecord[0].auditStatus : (scope.row.teachingMoudle.teaMoudelAuditRecord[0] ? scope.row.teachingMoudle.teaMoudelAuditRecord[0].auditStatus: (scope.row.teachingMoudle.workLoad ? (scope.row.teachingMoudle.workLoad.auditRecord[0] ? scope.row.teachingMoudle.workLoad.auditRecord[0].auditStatus :'待审核' ): '待审核') ) }}
-            
-          </el-tag>
+          <!-- <el-tag :type="scope.row.finalStatus !== '待审核' ? scope.row.finalStatus : (scope.row.teachingMoudle.teaStatus ? scope.row.teachingMoudle.teaStatus : scope.row.teachingMoudle.workLoad.status) | statusFilter ">
+            {{scope.row.finalStatus !== '待审核' ? scope.row.finalStatus : (scope.row.teachingMoudle.teaStatus ? scope.row.teachingMoudle.teaStatus : scope.row.teachingMoudle.workLoad.status)}}
+          </el-tag> -->
+          <el-tag :type="scope.row.teachingMoudle.workLoad.status | statusFilter">{{scope.row.teachingMoudle.workLoad.status}}</el-tag>
         </template>
       </el-table-column>
        <el-table-column width="100px" align="center" label="总分数">
@@ -68,16 +68,16 @@
     <el-dialog el-drag-dialog :visible.sync="dialogTableVisible" :title="dialogTitle">
       <el-form ref="form" :inline="true" :model="form" class="demo-form-inline">
         <el-form-item label="姓名">
-          <el-input v-model="form.name" disabled></el-input>
+          {{form.name}}
         </el-form-item>
         <el-form-item label="工号">
-          <el-input v-model="form.jobID" disabled></el-input>
+          {{form.jobID}}
         </el-form-item>
         <el-form-item label="岗位">
-          <el-input v-model="form.station" disabled></el-input>
+          {{form.station}}
         </el-form-item>
         <el-form-item label="提交时间">
-          <el-input v-model="form.submitTime" disabled></el-input>
+          {{form.submitTime | formateDate}}
         </el-form-item>
         <el-collapse>
           <el-collapse-item title="工作量数据">
@@ -90,7 +90,7 @@
               <div class="collapse-item"><strong>教学工作量合计:</strong>{{form.teachingMoudle ? (form.teachingMoudle.workLoad ? form.teachingMoudle.workLoad.teachWorkSum :0) : 0}}</div>
               <div class="collapse-item"><strong>用于计分的工作量：</strong>{{form.teachingMoudle ? (form.teachingMoudle.workLoad ? form.teachingMoudle.workLoad.scoreSum : 0 ) : 0}}</div>
               <div class="collapse-item"><strong>个人逐项计分：</strong>{{form.teachingMoudle ? (form.teachingMoudle.workLoad ? 28 * form.teachingMoudle.workLoad.scoreSum / stationBase  : 0) : 0}}</div>
-            </el-collapse-item>
+          </el-collapse-item>
           <el-collapse-item title="审核记录">
             <div v-for="(item,key) in form.finalAuditRecord">
               <span class="collapse-item"><strong>审核人：</strong>{{item.auditPerson}}</span>
@@ -134,8 +134,8 @@ import { getAllTeachWorkload, updateTeachWorkload } from '@/api/teachingAndRes/t
 import { getAllLevel } from '@/api/setting'
 export default {
   name: 'InlineEditTable',
- inject: ['reload'],
-   filters: {
+  inject: ['reload'],
+  filters: {
     statusFilter(status) {
       const statusMap = {
         "已完成": 'success',
@@ -234,7 +234,7 @@ export default {
     //审核
     handleAudit(row) {
       console.log('row :', row);
-      if (row.teachingMoudle.workLoad.auditRecord.length == 0) {
+      if (row.teachingMoudle.workLoad.status == '待审核') {
         this.form = row;
         this.dialogTableVisible = true;
         this.dialogTitle = this.dialogTitleItem.audit;
@@ -249,6 +249,7 @@ export default {
     //审核提交接口
     handleSubmit (params) {
         this.form.teachingMoudle.workLoad.auditRecord.unshift(params);
+        this.form.teachingMoudle.workLoad.status = params.auditStatus;
         console.log('this.form :>> ', this.form);
         updateTeachWorkload(this.form).then(res => {
           console.log('res :>> ', res);
@@ -265,7 +266,7 @@ export default {
               message:res.message
             })
           }
-     })
+        })
     },
     //审核通过
     handlePass() {

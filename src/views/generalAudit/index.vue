@@ -16,37 +16,17 @@
           {{ scope.row.station}}
         </template>
       </el-table-column>
-      <el-table-column width="120px" align="center" label="工作量计分">
+       <el-table-column width="120px" align="center" label="教研考评岗位权重计分">
         <template slot-scope="scope">
-          {{ scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.itemScore : 0}}
-        </template>
-      </el-table-column>
-      <el-table-column width="120px" align="center" label="教学教研计分">
-        <template slot-scope="scope">
-          {{ scope.row.teachingMoudle.teachResChild ? scope.row.teachingMoudle.teachResChild.teachResScoreSum : 0}}
-        </template>
-      </el-table-column>
-      <el-table-column width="120px" align="center" label="教学工程及其他计分">
-        <template slot-scope="scope">
-          {{ scope.row.teachingMoudle.teaProAndOther ? scope.row.teachingMoudle.teaProAndOther.teaProScoreSum : 0}}
-        </template>
-      </el-table-column>
-      <el-table-column width="120px" align="center" label="教研项目奖项总分">
-        <template slot-scope="scope">
-          {{scope.row.teachingMoudle.teachProScoreSum }}
-        </template>
-      </el-table-column>
-      <el-table-column width="120px" align="center" label="岗位权重计分">
-        <template slot-scope="scope">
-         {{scope.row.teachingMoudle.weightScore}}
+          {{ scope.row.teachingMoudle.weightScore}}
         </template>
       </el-table-column>
       <el-table-column width="120px" align="center" label="状态">
         <template slot-scope="scope">
-         <el-tag :type="scope.row.teachingMoudle.teaStatus | statusFilter">{{scope.row.teachingMoudle.teaStatus}}</el-tag>
+         <el-tag :type="scope.row.finalStatus | statusFilter">{{scope.row.finalStatus}}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column
+       <el-table-column
         label="操作"
         align="center"
         class-name="small-padding fixed-width"
@@ -68,17 +48,17 @@
      <!-- 审核单弹窗 -->
     <el-dialog el-drag-dialog :visible.sync="dialogTableVisible" :title="dialogTitle">
       <el-form ref="form" :inline="true" :model="form" class="demo-form-inline">
-        <el-form-item label="姓名：">
-          {{form.name}}
+        <el-form-item label="姓名">
+            {{form.name}}
         </el-form-item>
-        <el-form-item label="工号：">
-          {{form.jobID}}
+        <el-form-item label="工号">
+            {{form.jobID}}
         </el-form-item>
-        <el-form-item label="岗位：">
-          {{form.station}}
+        <el-form-item label="岗位">
+            {{form.station}}
         </el-form-item>
-        <el-form-item label="提交时间：">
-          {{form.submitTime | formateDate}}
+        <el-form-item label="提交时间">
+            {{form.submitTime | formateDate}}
         </el-form-item>
         <el-collapse>
           <el-collapse-item title="工作量数据">
@@ -255,100 +235,79 @@ export default {
   inject: ['reload'],
   filters: {
     statusFilter(status) {
-      const statusMap = {
-        "已完成": 'success',
-        "draft": 'info',
-        "驳回": 'danger',
-        '审核中': 'warning'
-      }
-      return statusMap[status]
+        const statusMap = {
+            "已完成": 'success',
+            "draft": 'info',
+            "驳回": 'danger',
+            '审核中': 'warning'
+        }
+        return statusMap[status]
     },
     //格式化时间
     formateDate(date) {
       return dayjs(date).format('YYYY-MM-DD HH:mm')
     }
-   },
- data() {
-   return {
-     list:[],//表格中数据
-     listLoading:true,
-     form: {},
-     dialogTableVisible: false,
-     dialogTitle:'',
-     dialogTitleItem: {
-       audit:'审核单',
-       detail:'查看详情'
-     },
-     showReason: false,
-     failedReason:'',
-     visibleItem: false,//当岗位为非科研岗时隐藏的项---
-   }
- },
- mounted() {
-   this.getAllData();
- },
- methods:{
-   //获取所有的数据单
-   getAllData() {
-     getAllTeachWorkload().then(res => {
-       console.log('res :>> ', res);
-       for (let i of res.result) {
-         console.log('i :>> ', i);
-         //教研项目总分
-         i.teachingMoudle.teachProScoreSum = (i.teachingMoudle.teaProAndOther ? i.teachingMoudle.teaProAndOther.teaProScoreSum : 0)  + (i.teachingMoudle.teachResChild ? i.teachingMoudle.teachResChild.teachResScoreSum : 0) 
-         > 40 ? 40 :(i.teachingMoudle.teaProAndOther ? i.teachingMoudle.teaProAndOther.teaProScoreSum : 0)  + (i.teachingMoudle.teachResChild ? i.teachingMoudle.teachResChild.teachResScoreSum : 0) ;
-         //岗位权重计分
-         switch (i.station) {
-           case '教学岗' : 
-              i.teachingMoudle.weightScore = ((i.teachingMoudle.workLoad ? i.teachingMoudle.workLoad.itemScore : 0) + i.teachingMoudle.teachProScoreSum) * 0.6;
-              break;
-            case '科研岗' :
-              i.teachingMoudle.weightScore = ((i.teachingMoudle.workLoad ? i.teachingMoudle.workLoad.itemScore : 0) + i.teachingMoudle.teachProScoreSum) * 0.05;
-              this.visibleItem = true;
-              break;
-            case '教学科研并重岗':
-              i.teachingMoudle.weightScore = ((i.teachingMoudle.workLoad ? i.teachingMoudle.workLoad.itemScore : 0) + i.teachingMoudle.teachProScoreSum) * 0.25;       
-         }
-         //教学教研审核状态
-        if(i.teachingMoudle.workLoad && i.teachingMoudle.workLoad.status == '驳回' 
-        || i.teachingMoudle.teachResChild && i.teachingMoudle.teachResChild.status =='驳回'
-        || i.teachingMoudle.teaProAndOther && i.teachingMoudle.teaProAndOther.status == '驳回') {
-          i.teachingMoudle.teaStatus = '驳回';
-        } else if (i.teachingMoudle.workLoad && i.teachingMoudle.workLoad.status == '待审核' 
-        ||i.teachingMoudle.teachResChild && i.teachingMoudle.teachResChild.status =='待审核' 
-        ||  i.teachingMoudle.teaProAndOther && i.teachingMoudle.teaProAndOther.status == '待审核') {
-          i.teachingMoudle.teaStatus = '待审核';
-        } else if(i.finalStatus == '已完成') {
-          i.teachingMoudle.teaStatus = '已完成'
-        } else {
-          i.teachingMoudle.teaStatus = '审核中'
-        }
-       }
-       this.list = res.result.reverse();
-       console.log('this.list :>> ', this.list);
-       this.listLoading = false;
-     })
-   },
-   //审核
-   handleAudit(row) {
-     console.log('row :>> ', row);
-     if (row.teachingMoudle.teaStatus == '待审核') {
-        this.form = row;
-        this.dialogTableVisible = true;
-        this.dialogTitle = this.dialogTitleItem.audit;
-     } else {
-        this.$message({
-            type:'warning',
-            message:'该状态下无法重新审核！'
+  },
+  data() {
+    return {
+      listLoading:true,
+      list:[],
+      form:{},
+      dialogTableVisible: false,
+      dialogTitle:'',
+      dialogTitleItem: {
+        audit:'审核单',
+        detail:'查看详情'
+      },
+      showReason: false,
+      failedReason:'',
+      visibleItem: false,//当岗位为非科研岗时隐藏的项
+    }
+  },
+  mounted() {
+    this.getAllData();
+  },
+  methods:{
+    //获取所有的数据单
+    getAllData() {
+        getAllTeachWorkload().then(res => {
+            console.log('res :>> ', res);
+            if (res.code == 200) {
+                for (let i of res.result) {
+                    //总审核状态
+                    if (i.teachingMoudle.teaStatus == '审核中') {
+                         i.finalStatus = '待审核';
+                    } else if (i.teachingMoudle.teaStatus == '待审核'){
+                        res.result.pop(i);
+                    } else {
+                        i.finalStatus = i.teachingMoudle.teaStatus;
+                    }
+                }
+                this.list = res.result;
+                this.listLoading = false;
+            }
         })
-     }
-   },
-   //审核通过
+    },
+    //审核
+    handleAudit(row) {
+        console.log('row :>> ', row);
+        if (row.finalStatus == '待审核') {
+            this.form = row;
+            this.dialogTableVisible = true;
+            this.dialogTitle = this.dialogTitleItem.audit;
+        } else {
+            this.$message({
+                type:'warning',
+                message:'该状态下无法重新审核！'
+            })
+        }
+    },
+    //审核通过
    handlePass() {
      const params = {
         auditPerson:this.$store.state.user.name,
-        auditReason:'二级审核——教学教研考评模块审核通过！',
-        auditStatus:'审核中',
+        auditReason:'终极审核——总审核通过！',
+        auditStatus:'已完成',
         auditTime:new Date()
       }
      this.handleSubmit(params);
@@ -375,15 +334,16 @@ export default {
    //审核提交接口
    handleSubmit(params) {
     console.log('params :>> ', params);
+    this.form.finalStatus = params.auditStatus;
     this.form.teachingMoudle.teaStatus = params.auditStatus; 
     this.form.teachingMoudle.workLoad ? this.form.teachingMoudle.workLoad.status = params.auditStatus : '';
     this.form.teachingMoudle.teachResChild ? this.form.teachingMoudle.teachResChild.status = params.auditStatus : '';
     this.form.teachingMoudle.teaProAndOther ? this.form.teachingMoudle.teaProAndOther.status = params.auditStatus :'';
-    this.form.teachingMoudle.teaMoudelAuditRecord.unshift(params);
+    this.form.finalAuditRecord.unshift(params);
     console.log('this.form :>> ', this.form);
     localStorage.removeItem('_id');
     console.log(' :>> ', localStorage.getItem('_id'));
-    updateTeachWorkload(this.form).then(res => {
+     updateTeachWorkload(this.form).then(res => {
        console.log('res :>> ', res);
        if (res.code === 200) {
           this.$message({
@@ -400,35 +360,34 @@ export default {
         }
      })
    },
-   //查看详情
+    //查看详情
    handleDetail(row) {
      console.log('row :>> ', row);
      this.form = row;
      this.dialogTableVisible = true;
      this.dialogTitle = this.dialogTitleItem.detail;
    },
-   //下载文件
-  handleDownload(item) {
-    const fileId = item.uploadFiles[0].filename;
-    let xhr = new XMLHttpRequest();
-      xhr.open('GET',`http://127.0.0.1:3000/downLoad?fileId=${fileId}`);
-      xhr.onload = function (a,b) {
-        let blob = this.response;
-        let reader = new FileReader();
-        reader.readAsDataURL(blob);
-        reader.onload = function(e) {
-          let a = document.getElementById('fileDown');
-          a.download = item.uploadFiles[0].originalname;
-          a.href = e.target.result;
-          a.click()
+     //下载文件
+    handleDownload(item) {
+        const fileId = item.uploadFiles[0].filename;
+        let xhr = new XMLHttpRequest();
+        xhr.open('GET',`http://127.0.0.1:3000/downLoad?fileId=${fileId}`);
+        xhr.onload = function (a,b) {
+            let blob = this.response;
+            let reader = new FileReader();
+            reader.readAsDataURL(blob);
+            reader.onload = function(e) {
+            let a = document.getElementById('fileDown');
+            a.download = item.uploadFiles[0].originalname;
+            a.href = e.target.result;
+            a.click()
+            }
         }
+        xhr.responseType = 'blob';
+        xhr.setRequestHeader('token',getToken())
+        xhr.send();
     }
-    xhr.responseType = 'blob';
-    xhr.setRequestHeader('token',getToken())
-    xhr.send();
   }
-
- }
 }
 </script>
 
@@ -437,5 +396,4 @@ export default {
   font-size: 14px;
   font-weight: 600;
 }
-
 </style>
