@@ -4,33 +4,9 @@
     <el-row>
       <el-card>
         <div slot="header" class="clearfix">
-          <span>指定审核员与管理员</span>
+          <span>指定用户管理员</span>
         </div>
         <div>
-          <el-col :span="8" class="item-card">
-              <el-card shadow="hover">
-                {{teaching.title}}
-                <div class="bottom clearfix">
-                <el-button type="text" class="button" @click="handleEdit(teaching)">编辑</el-button>
-                </div>
-              </el-card>  
-          </el-col>
-          <el-col :span="8" class="item-card">
-            <el-card shadow="hover">
-                {{science.title}}
-                <div class="bottom clearfix">
-                <el-button type="text" class="button" @click="handleEdit(science)">编辑</el-button>
-                </div>
-              </el-card>  
-          </el-col>
-          <el-col :span="8" class="item-card">
-            <el-card shadow="hover">
-                {{subject.title}}
-                <div class="bottom clearfix">
-                <el-button type="text" class="button" @click="handleEdit(subject)">编辑</el-button>
-                </div>
-              </el-card>  
-          </el-col>
           <el-col :span="8" class="item-card">
             <el-card shadow="hover">
                 {{person.title}}
@@ -76,9 +52,20 @@
         closable
         :disable-transitions="false"
         @close="handleAuditorClose(tag)">
-        {{tag}}
+        {{tag.name}}
         </el-tag>
-        <el-button class="button-new-tag" size="small" @click="handleAuditorAdd">+ 添加审核员</el-button>
+        <el-dropdown @command="handleSelectUser">
+            <el-button class="button-new-tag" size="small" @click="handleAuditorAdd(userData)">+ 添加审核员</el-button>
+            <el-dropdown-menu slot="dropdown">
+                <div v-for="(item,key) in userData">
+                    <el-dropdown-item :command="item" :disabled='item.Isdisabled'>{{item.name}}</el-dropdown-item>
+                </div>
+            </el-dropdown-menu>
+        </el-dropdown>
+        <span slot="footer" class="dialog-footer">
+            <el-button @click='handleCancel'>取 消</el-button>
+            <el-button type="primary" @click="handleComfirm">确 定</el-button>
+        </span>
     </el-dialog>
     <!-- 级别弹出框 -->
     <el-dialog :title="dialogLevelTitle" :visible.sync="dialogLevelVisible">
@@ -98,7 +85,7 @@
                 <el-tooltip class="item" effect="dark" content="请输入完成标准学时数量，如600" placement="top-start">
                     <el-input v-model="levelSubmit.teaching.teachWork"/>
                 </el-tooltip>        
-                </el-form-item>
+            </el-form-item>
             <el-form-item label="课堂教学质量评价">
                 <el-select v-model="levelSubmit.teaching.evaluate" placeholder="请设定评价级别">
                     <el-option label="省级优秀" value="provincialLevel"></el-option>
@@ -139,6 +126,7 @@
                     <el-input v-model="levelSubmit.teachAndScience.sciencePay" />
                 </el-tooltip>
             </el-form-item>
+            
         </el-form>
         <div slot="footer" class="dialog-footer">
             <el-button @click="handleLevelCancle">取 消</el-button>
@@ -153,25 +141,14 @@
 
 <script>
 import {createLevel, getAllLevel, updateLevel, deleteLevel} from '@/api/setting'
+import { getAllUser, updateUser, getUserByRole } from '@/api/user'
 export default {
     inject: ['reload'],
     data() {
         return {
-            teaching: {
-                title: '教学办公室',
-                data: ['标签一', '标签二', '标签三']
-            },
-            science: {
-                title: '科研办公室',
-                data: ['标签一', '标签二', '标签三']
-            },
-            subject: {
-                title: '学科建设与研究生教育办公室',
-                data: ['标签一', '标签二', '标签三']
-            },
             person: {
-                title: '用户信息管理员',
-                data:['张三']
+                title: '用户管理员',
+                data:[]
             },
             dialogTitle: '',
             dialogAuditorVisible: false,//审核员弹出框
@@ -183,6 +160,7 @@ export default {
                 editLevel: '编辑级别'
             },
             auditorData: [],
+            userData:[],
             //获取的所有级别数组
             levelData:[],
             //添加并提交级别
@@ -206,7 +184,8 @@ export default {
                     evaluate:'',
                     sciencePay: '',
                 }
-            }
+            },
+           
         }
     },
     mounted (){
@@ -223,24 +202,126 @@ export default {
                 }
             })
         },
+        //获取所有用户接口函数
+        getUser() {
+            return new Promise((resolve,reject) => {
+                getAllUser().then(res => {
+                    console.log('res :>> ', res);
+                    if (res.code == 200) {
+                         const resultArr = []
+                        for(let i of res.result) {
+                            if (i.role !== '领导' && i.role !== '系统管理员' ) {
+                                resultArr.push(i)
+                            }
+                        }
+                        resolve(resultArr);
+                    } else {
+                        reject(res.message);
+                    }
+                })
+            })
+        },
+        //通过用户角色获取用户
+        getUserByRole(params) {
+            return new Promise((resolve,reject) => {
+                getUserByRole(params).then(res => {
+                    if (res.code === 200) {
+                        resolve(res);
+                    } else {
+                        reject(res.message);
+                    }
+                })
+            })
+        },
         //编辑审核员与管理员信息
-        handleEdit(value) {
+        async handleEdit(value) {
             console.log('value :', value);
             this.dialogTitle = value.title;
-            this.auditorData = value.data
-            this.dialogAuditorVisible = true
+            this.dialogAuditorVisible = true;
+            //获取所有已选择用户管理员
+            getUserByRole(value.title).then(res => {
+                console.log('res :>> ', res);
+                this.auditorData = res.result;
+                console.log(' this.auditorData :>> ',  this.auditorData);
+            })
+            //获取所有用户
+            await this.getUser().then(res => {
+                this.userData = res;
+                console.log('this.userData :>> ', this.userData);
+            })
         },
-        //删除审核员标签
+        //选择审核员
+        handleSelectUser(command){
+            console.log('command :>> ', command);
+            command.Isdisabled = true;
+            console.log('this.dialogTitle :>> ', this.dialogTitle);
+            command.role = this.dialogTitle;
+            this.auditorData.push(command);
+        },
+        //确定提交审核员信息
+        handleComfirm() {
+             if (this.auditorData.length != 0) {
+                //修改用户信息
+                this.auditorData.forEach(item => {
+                    updateUser(item).then(res => {
+                        if (res.code == 200) {
+                            this.dialogAuditorVisible = false;
+                            this.$message({
+                                type:'success',
+                                message:res.message
+                            })
+                        }
+                    })
+                })
+            } else {
+                this.dialogAuditorVisible = false;
+                this.$message({
+                    type:'success',
+                    message:'提交成功'
+                })
+            } 
+        },
+        //取消
+        handleCancel() {
+            this.$confirm('此操作不会保留已选数据。是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                 this.dialogAuditorVisible = false;
+            }).catch(() => {
+                 this.$message({
+                    type: 'info',
+                    message: '已取消'
+                });
+            })
+        },
+        //删除用户管理员标签
         handleAuditorClose(tag) {
+            this.$set(tag,"Isdisabled",false);
+            tag.role = '普通用户';
+            updateUser(tag).then(res => {
+            })
             this.auditorData.splice(this.auditorData.indexOf(tag), 1);
         },
-        //添加审核员标签
-        handleAuditorAdd() {
-            console.log('添加标签');
+        //添加用户管理员标签
+        handleAuditorAdd(value) {
+            console.log('添加标签',value);
+            for (let user of value) {
+                for (let auditor of this.auditorData) {
+                    if (user._id == auditor._id) {
+                        this.$set(user,"Isdisabled",true)
+                    }
+                }
+            }
         },
+        
         //删除级别标签
         handleLevelClose(tag) {
-            console.log('该功能暂不支持！');
+            this.$message({
+                type:'warning',
+                message:'抱歉！该功能暂不支持！'
+            })
             // const t = this;
             // t.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
             //     confirmButtonText: '确定',
@@ -263,9 +344,7 @@ export default {
             //             });
             //         }
             //     })
-                
-               
-            //     // this.levelData.splice(this.levelData.indexOf(tag), 1);
+          //     // this.levelData.splice(this.levelData.indexOf(tag), 1);
             // }).catch(() => {
             //     this.$message({
             //         type: 'info',
@@ -275,7 +354,10 @@ export default {
         },       
         //添加级别标签
         handleLevelAdd() {
-            console.log('该功能暂不支持！');
+             this.$message({
+                type:'warning',
+                message:'抱歉！该功能暂不支持！'
+            })
             // this.dialogLevelVisible = true;
             // this.addLevelVisible = true;
             // this.dialogLevelTitle = this.levelTitle.addLevel;

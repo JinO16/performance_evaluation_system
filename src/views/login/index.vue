@@ -107,14 +107,12 @@ export default {
         if (valid) {
           const t = this;
           t.$store.dispatch('user/login', t.loginForm).then((res) => {
-            console.log('登录res :>> ', res);
             if (res.code === 200) {
               t.$message({
                 type:'success',
                 message:res.message
               })
-              console.log('判断用户信息 :>> ', this.$store.state.user);
-              if (!res.result.station) {
+              if (!res.result.station && !res.result.department) {
                 this.$router.push({ path:'./user'})
                 this.$message({
                   type:'warning',
@@ -123,6 +121,9 @@ export default {
               } else {
                 // this.$router.push({ path: this.redirect || '/' })
                 this.$router.push({ path:'/'})
+                t.$store.dispatch('user/getInfo').then(res => {
+                  console.log('res 获取用户个人信息:>> ', res);
+                })
                 
               }
             }

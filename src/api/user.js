@@ -56,3 +56,11 @@ export function deleteUser(data) {
     data
   })
 }
+//通过用户角色获取用户
+export function getUserByRole(role) {
+  return request({
+    url: '/user/getUserByRole',
+    method:'get',
+    params:{role}
+  })
+}

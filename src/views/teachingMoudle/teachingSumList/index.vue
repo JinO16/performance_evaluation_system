@@ -1,24 +1,9 @@
 <template>
   <div class="app-container">
     <el-table v-loading="listLoading" :data="list" highlight-current-row style="width: 100%">
-      <el-table-column align="center" label="姓名" width="80">
+      <el-table-column align="center" label="提交时间" width="140">
         <template slot-scope="scope">
-          <span>{{ scope.row.name }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column width="120px" align="center" label="工号">
-        <template slot-scope="scope">
-          <span>{{ scope.row.jobID}}</span>
-        </template>
-      </el-table-column>
-      <el-table-column width="120px" align="center" label="岗位">
-        <template slot-scope="scope">
-          {{ scope.row.station}}
-        </template>
-      </el-table-column>
-      <el-table-column width="120px" align="center" label="部门">
-        <template slot-scope="scope">
-          {{ scope.row.department}}
+          <span>{{ scope.row.submitTime | formateDate}}</span>
         </template>
       </el-table-column>
       <el-table-column width="120px" align="center" label="工作量计分">
@@ -31,12 +16,12 @@
           {{ scope.row.teachingMoudle.teachResChild ? scope.row.teachingMoudle.teachResChild.teachResScoreSum : 0}}
         </template>
       </el-table-column>
-      <el-table-column width="100px" align="center" label="教学工程及其他计分">
+      <el-table-column width="150px" align="center" label="教学工程及其他计分">
         <template slot-scope="scope">
           {{ scope.row.teachingMoudle.teaProAndOther ? scope.row.teachingMoudle.teaProAndOther.teaProScoreSum : 0}}
         </template>
       </el-table-column>
-      <el-table-column width="100px" align="center" label="教研项目奖项总分">
+      <el-table-column width="140px" align="center" label="教研项目奖项总分">
         <template slot-scope="scope">
           {{scope.row.teachingMoudle.teachProScoreSum }}
         </template>
@@ -59,20 +44,23 @@
         <template slot-scope="scope">
           <el-button
             size="mini"
-            type="primary"
-            @click="handleAudit(scope.row)"
-          >审核</el-button>
+            type="danger"
+            @click="handleDelete(scope.row)"
+          >删除</el-button>
           <el-button
             size="mini"
             plain
             @click="handleDetail(scope.row)"
           >查看详情</el-button>
+          
         </template>
       </el-table-column>
     </el-table>
-     <!-- 审核单弹窗 -->
-    <el-dialog el-drag-dialog :visible.sync="dialogTableVisible" :title="dialogTitle">
-      <el-form ref="form" :inline="true" :model="form" class="demo-form-inline">
+    <!-- 查看详情弹出框 -->
+    <el-dialog el-drag-dialog :visible.sync="dialogTableVisible" title="查看详情">
+      <el-button type="primary" @click="handleDown">PDF下载</el-button>
+      <el-form id="form" :inline="true" :model="form" class="demo-form-inline">
+        <!-- <el-button type="primary" @click="exportData(form)">导出数据</el-button> -->
         <el-form-item label="姓名：">
           {{form.name}}
         </el-form-item>
@@ -144,7 +132,7 @@
               </div>
               <span class="collapse-item"><strong>总分：</strong>{{form.teachingMoudle ? (form.teachingMoudle.teachResChild ? (form.teachingMoudle.teachResChild.teachAward ? form.teachingMoudle.teachResChild.teachAward.sum : 0) : 0) : 0}}</span>
             </el-collapse-item>
-             <el-collapse-item title="教学工程">
+            <el-collapse-item title="教学工程">
               <div v-for="(item,key) in form.teachingMoudle ? (form.teachingMoudle.teaProAndOther ? form.teachingMoudle.teaProAndOther.teachProcess.item : []) : []">
                 <span class="collapse-item"><strong>项目名称：</strong>{{item.name}}</span>
                 <span class="collapse-item"><strong>项目编号：</strong>{{item.id}}</span>
@@ -241,16 +229,6 @@
               </div>
             </el-collapse-item>
         </el-collapse>
-        <div class="audit-block" v-if="dialogTitle == '审核单'">
-          <!-- 审核理由 -->
-          <el-form-item label="不通过理由(必填)" v-if="showReason" required>
-            <el-input type="textarea" :rows="2" placeholder="请输入审核理由" v-model="failedReason"></el-input>
-          </el-form-item>
-          <el-form-item style="display:flex;justify-content:center">
-            <el-button type="primary" @click="handlePass">审核通过</el-button>
-            <el-button type="danger" @click="handleFailed">审核不通过</el-button>
-          </el-form-item>
-        </div>
       </el-form>
     </el-dialog>
   </div>
@@ -258,10 +236,9 @@
 
 <script>
 import dayjs from 'dayjs'
-import { getAllTeachWorkload,updateTeachWorkload } from '@/api/teachingAndRes/teachWorkload';
-import { getTeaStation } from '@/api/teachingAndRes/teachSetting';
+import htmlToPdf from '@/utils/htmlToPdf'
+import { getOwnTeachWorkload,deleteTeachWorkload } from '@/api/teachingAndRes/teachWorkload'
 export default {
-  inject: ['reload'],
   filters: {
     statusFilter(status) {
       const statusMap = {
@@ -276,194 +253,96 @@ export default {
     formateDate(date) {
       return dayjs(date).format('YYYY-MM-DD HH:mm')
     }
-   },
- data() {
-   return {
-     list:[],//表格中数据
-     listLoading:true,
-     form: {},
-     dialogTableVisible: false,
-     dialogTitle:'',
-     dialogTitleItem: {
-       audit:'审核单',
-       detail:'查看详情'
-     },
-     showReason: false,
-     failedReason:'',
-     visibleItem: false,//当岗位为非科研岗时隐藏的项---
-     stationData:null,
-   }
- },
- mounted() {
-  //  this.getAllData();
-   this.getStation()
-   
- },
- methods:{
-   //获取岗位权重数据：
-  getStation() {
-    return new Promise((resolve,reject) => {
-      getTeaStation().then(res => {
-       if(res.code == 200) {
-         resolve(res)
-       } else {
-         reject(res.message);
-       }
-     })
-    }).then(res => {
-      console.log('res--- promise:>> ', res);
-      this.stationData = res.result[0];
-      this.getAllData();
-    })
-     
-   },
-   //获取所有的数据单
-  getAllData() {
-     console.log('this.$store.state.user.station :>> ', this.$store.state.user.station);
-     console.log('this.stationData :>> ', this.stationData);
-     //判断岗位并赋值权重
-     let staWeight = 0;
-     switch (this.$store.state.user.station) {
-       case '教学岗':
-         staWeight = this.stationData.teaching.weight;
-         break;
-       case '科研岗':
-         staWeight = this.stationData.science.weight;
-         this.visibleItem = true;
-         break;
-       case '教学科研并重岗':
-         staWeight = this.stationData.teachAndScience.weight;
-         break;
-     }
-     getAllTeachWorkload().then(res => {
-       for (let i of res.result) {
-         //教研项目总分
-         i.teachingMoudle.teachProScoreSum = (i.teachingMoudle.teaProAndOther ? i.teachingMoudle.teaProAndOther.teaProScoreSum : 0)  + (i.teachingMoudle.teachResChild ? i.teachingMoudle.teachResChild.teachResScoreSum : 0) 
-         > 40 ? 40 :(i.teachingMoudle.teaProAndOther ? i.teachingMoudle.teaProAndOther.teaProScoreSum : 0)  + (i.teachingMoudle.teachResChild ? i.teachingMoudle.teachResChild.teachResScoreSum : 0) ;
-         //岗位权重计分
-         i.teachingMoudle.weightScore =Math.floor(((i.teachingMoudle.workLoad ? i.teachingMoudle.workLoad.itemScore : 0) + i.teachingMoudle.teachProScoreSum) * staWeight);
-         //教学教研审核状态
-        if(i.teachingMoudle.workLoad && i.teachingMoudle.workLoad.status == '驳回' 
-          || i.teachingMoudle.teachResChild && i.teachingMoudle.teachResChild.status =='驳回'
-          || i.teachingMoudle.teaProAndOther && i.teachingMoudle.teaProAndOther.status == '驳回') {
-          i.teachingMoudle.teaStatus = '驳回';
-        } else if (i.teachingMoudle.workLoad && i.teachingMoudle.workLoad.status == '待审核' 
-          || i.teachingMoudle.teachResChild && i.teachingMoudle.teachResChild.status =='待审核' 
-          ||  i.teachingMoudle.teaProAndOther && i.teachingMoudle.teaProAndOther.status == '待审核'
-          || (i.teachingMoudle.workLoad && i.teachingMoudle.workLoad.status == '审核中' 
-          || i.teachingMoudle.teachResChild && i.teachingMoudle.teachResChild.status =='审核中' 
-          ||  i.teachingMoudle.teaProAndOther && i.teachingMoudle.teaProAndOther.status == '审核中') && i.teachingMoudle.teaStatus !=='审核中' ) {
-          i.teachingMoudle.teaStatus = '待审核';
-        } else if(i.finalStatus == '已完成') {
-          i.teachingMoudle.teaStatus = '已完成'
-        } else {
-          i.teachingMoudle.teaStatus = '审核中'
-        }
-       }
-       this.list = res.result.reverse();
-       this.listLoading = false;
-     })
-   },
-   //审核
-   handleAudit(row) {
-     console.log('row :>> ', row);
-     if (row.teachingMoudle.teaStatus == '待审核') {
-        this.form = row;
-        this.dialogTableVisible = true;
-        this.dialogTitle = this.dialogTitleItem.audit;
-     } else {
-        this.$message({
-            type:'warning',
-            message:'该状态下无法重新审核！'
-        })
-     }
-   },
-   //审核通过
-   handlePass() {
-     const params = {
-        auditPerson:this.$store.state.user.name,
-        auditReason:'二级审核——教学教研考评模块审核通过！',
-        auditStatus:'审核中',
-        auditTime:new Date()
-      }
-     this.handleSubmit(params);
-   },
-   //审核不通过
-   handleFailed() {
-     this.showReason = true;
-      if (!this.failedReason) {
-       this.$message({
-         type:'error',
-         message:'请填写不通过理由！'
-       })
-     } else {
-      //  console.log('审核不通过的this.form :>> ', this.form);
-       const params = {
-        auditPerson:this.$store.state.user.name,
-        auditReason:this.failedReason,
-        auditStatus:'驳回',
-        auditTime:new Date()
-      }
-      this.handleSubmit(params);
-     }
-   },
-   //审核提交接口
-   handleSubmit(params) {
-    console.log('params :>> ', params);
-    this.form.teachingMoudle.teaStatus = params.auditStatus; 
-    this.form.teachingMoudle.workLoad ? this.form.teachingMoudle.workLoad.status = params.auditStatus : '';
-    this.form.teachingMoudle.teachResChild ? this.form.teachingMoudle.teachResChild.status = params.auditStatus : '';
-    this.form.teachingMoudle.teaProAndOther ? this.form.teachingMoudle.teaProAndOther.status = params.auditStatus :'';
-    this.form.teachingMoudle.teaMoudelAuditRecord.unshift(params);
-    console.log('this.form :>> ', this.form);
-    localStorage.removeItem('_id');
-    console.log(' :>> ', localStorage.getItem('_id'));
-    updateTeachWorkload(this.form).then(res => {
-       console.log('res :>> ', res);
-       if (res.code === 200) {
-          this.$message({
-            type:'success',
-            message:'提交审核成功！'
-          })
-          this.dialogTableVisible = false;
-          this.reload();
-        } else {
-          this.$message({
-            type:'error',
-            message:res.message
-          })
-        }
-     })
-   },
-   //查看详情
-   handleDetail(row) {
-     console.log('row :>> ', row);
-     this.form = row;
-     this.dialogTableVisible = true;
-     this.dialogTitle = this.dialogTitleItem.detail;
-   },
-   //下载文件
-  handleDownload(item) {
-    const fileId = item.uploadFiles[0].filename;
-    let xhr = new XMLHttpRequest();
-      xhr.open('GET',`http://127.0.0.1:3000/downLoad?fileId=${fileId}`);
-      xhr.onload = function (a,b) {
-        let blob = this.response;
-        let reader = new FileReader();
-        reader.readAsDataURL(blob);
-        reader.onload = function(e) {
-          let a = document.getElementById('fileDown');
-          a.download = item.uploadFiles[0].originalname;
-          a.href = e.target.result;
-          a.click()
-        }
+  },
+  data() {
+    return {
+      listLoading: true,
+      list:[],
+      dialogTableVisible: false,
+      form: {},
+      visibleItem:false,//当岗位为非科研岗时，隐藏
+      excelData:[],//将要导出的表格数据
     }
-    xhr.responseType = 'blob';
-    xhr.setRequestHeader('token',getToken())
-    xhr.send();
+  },
+  mounted() {
+    this.getAllData()
+  },
+  methods: {
+    //获取该用户的教学教研模块清单
+    getAllData() {
+      const jobID = this.$store.state.user.jobID;
+      console.log('jobID :>> ', jobID);
+      getOwnTeachWorkload(jobID).then(res => {
+        console.log('res :>> ', res);
+        if(res.code == 200) {
+          this.listLoading = false;
+          for(let i of res.result) {
+            console.log('i :>> ', i);
+            if(i.teachingMoudle.teaStatus === '审核中' 
+            || (i.teachingMoudle.workLoad && i.teachingMoudle.workLoad.status == '审核中') 
+            || (i.teachingMoudle.teachResChild && i.teachingMoudle.teachResChild.status == '审核中')
+            || (i.teachingMoudle.teaProAndOther && i.teachingMoudle.teaProAndOther.status == '审核中'))
+            {
+               i.teachingMoudle.teaStatus = '审核中'
+             };
+            if(i.station == '科研岗') {
+              this.visibleItem = true;
+            }
+          };
+          
+          this.list = res.result.reverse();
+        }
+      })
+    },
+    //删除
+    handleDelete(row) {
+      console.log('row :>> ', row);
+      if (row.teachingMoudle.teaStatus == '已完成') {
+        this.$confirm('此操作将永久删除该整条数据(包括其他模块提交的本条数据), 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+          }).then((value) => {
+            deleteTeachWorkload(row).then(res => {
+                console.log('res :>> ', res);
+                if (res.code === 200) {
+                  this.$message({
+                    type:'success',
+                    message:res.message
+                  })
+                  this.getAllData();
+                } else {
+                  this.$message({
+                    type:'error',
+                    message: res.message
+                  })
+                }
+            })
+          }).catch((err) => {
+            this.$message({
+              type: 'info',
+              message: '已取消删除'
+            });          
+          }); 
+      } else {
+        this.$message({
+          type:'warning',
+          message:'该审核状态无法进行删除操作！'
+        })
+      }
+    },
+    //查看详情
+    handleDetail(row) {
+      console.log('row :>> ', row);
+      this.dialogTableVisible = true;
+      this.form = row
+    },
+   //将页面以pdf的形式导出
+   handleDown() {
+     htmlToPdf.downloadPDF(document.querySelector('form'),'教研考评单')
+   }
+   
   }
-
- }
 }
 </script>
 
@@ -472,5 +351,4 @@ export default {
   font-size: 14px;
   font-weight: 600;
 }
-
 </style>

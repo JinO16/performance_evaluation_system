@@ -8,6 +8,7 @@ const getDefaultState = () => {
     jobID: '',
     name: '',
     station:'',
+    department:'',
     _id: ''
     // avatar: ''
   }
@@ -37,6 +38,10 @@ const mutations = {
   SET_STATION: (state, station) => {
     sessionStorage.setItem('station',station);
     state.station = station;
+  },
+  SET_DEPARTMENT: (state, department) => {
+    sessionStorage.setItem('department',department);
+    state.department = department;
   },
   SET_ID: (state, _id) => {
     sessionStorage.setItem('_id',_id);
@@ -69,6 +74,7 @@ const actions = {
         if (response.code !== 200) {
           reject('验证失败，请重新登录!')
         }
+        commit('SET_DEPARTMENT',response.result.department);
         commit('SET_STATION',response.result.station);
         commit('SET_JOBID', response.result.jobID);
         commit('SET_NAME',response.result.name);

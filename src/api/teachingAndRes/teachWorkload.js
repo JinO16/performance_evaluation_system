@@ -48,3 +48,11 @@ export function getBaseFormData(_id) {
         params:{_id}
     })
 }
+//根据部门获取所有本部门的清单
+export function getByDepartment(department) {
+    return request({
+        url: '/teachWorkload/getByDepartment',
+        method: 'get',
+        params: {department}
+    })
+}

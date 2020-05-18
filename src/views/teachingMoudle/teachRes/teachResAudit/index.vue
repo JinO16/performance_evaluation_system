@@ -16,6 +16,11 @@
           <span>{{ scope.row.station }}</span>
         </template>
       </el-table-column>
+      <el-table-column width="80px" align="center" label="部门">
+        <template slot-scope="scope">
+          <span>{{ scope.row.department }}</span>
+        </template>
+      </el-table-column>
       <el-table-column width="140px" align="center" label="教学质量评价总分">
         <template slot-scope="scope">
           <span>{{ scope.row.teachingMoudle.teachResChild ? scope.row.teachingMoudle.teachResChild.teachQuality.sum : 0 }}</span>
@@ -80,6 +85,9 @@
         </el-form-item>
         <el-form-item label="岗位">
           {{form.station}}
+        </el-form-item>
+        <el-form-item label="部门">
+          {{form.department}}
         </el-form-item>
         <el-form-item label="提交时间">
           {{form.submitTime | formateDate}}

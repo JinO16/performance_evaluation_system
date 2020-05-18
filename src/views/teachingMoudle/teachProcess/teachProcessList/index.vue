@@ -761,6 +761,7 @@ export default {
         name: this.$store.state.user.name,//用户姓名
         jobID: this.$store.state.user.jobID,//用户工号
         station: this.$store.state.user.station,//用户岗位
+        department: this.$store.state.user.department,//用户部门
         finalAuditRecord:[],//最终审核记录
         finalStatus:'待审核',//总审核状态
         submitTime: new Date(),//提交时间

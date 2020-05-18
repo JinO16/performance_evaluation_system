@@ -280,7 +280,7 @@
 <script>
 import dayjs from 'dayjs'
 import router from '../../../../router'
-import { getBaseFormData, createTeachWorkload, getOwnTeachWorkload, updateTeachWorkload} from '@/api/teachingAndRes/teachWorkload';
+import { getBaseFormData, createTeachWorkload, getOwnTeachWorkload, updateTeachWorkload,deleteTeachWorkload} from '@/api/teachingAndRes/teachWorkload';
 // import { createTeachRes, getOwnTeachRes, deleteTeachRes, updateTeachRes} from '@/api/teachingAndRes/teachRes'
 import { getToken } from '../../../../utils/auth'
 
@@ -697,6 +697,7 @@ export default {
         name: this.$store.state.user.name,//用户姓名
         jobID: this.$store.state.user.jobID,//用户工号
         station: this.$store.state.user.station,//用户岗位
+        department: this.$store.state.user.department,//用户部门
         finalAuditRecord:[],//最终审核记录
         finalStatus:'待审核',//总审核状态
         submitTime: new Date(),//提交时间
@@ -746,17 +747,14 @@ export default {
           }, 
           teaStatus:'待审核',//教学教研考评模块审核状态
           teaMoudelAuditRecord: [],//教学教研模块审核记录
-        }
-       
+        }   
       }
     }
   },
   created() {
     this.getList();
     this.$store.state.user._id = localStorage.getItem('_id');
-    console.log('this.$store.state.user._id :>> ', this.$store.state.user._id);
-    // console.log("localStorage.getItem('_id') :>> ", localStorage.getItem('_id'));
-              
+    console.log('this.$store.state.user._id :>> ', this.$store.state.user._id);           
   },
   methods: {
     //创建数据单时获取的上一个创建form
@@ -848,7 +846,7 @@ export default {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
-          }).then(() => {
+          }).then((value) => {
             deleteTeachWorkload(row).then(res => {
                 console.log('res :>> ', res);
                 if (res.code === 200) {
@@ -875,8 +873,7 @@ export default {
           type:'warning',
           message:'该审核状态无法进行删除操作！'
         })
-      }
-     
+      }     
     },
     //弹窗内的函数和方法
     //选择教学质量评价学院排名

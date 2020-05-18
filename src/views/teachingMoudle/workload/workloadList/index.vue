@@ -22,9 +22,9 @@
               <el-form-item label="实验教学工作量折算:">
                 {{scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.experimentWork : 0}}
               </el-form-item>
-              <el-form-item label="是否完成本部门人均相应工作量的三分之二:">
+              <!-- <el-form-item label="是否完成本部门人均相应工作量的三分之二:">
                 {{ scope.row.teachingMoudle.workLoad ? (scope.row.teachingMoudle.workLoad.isFinish ? '是' : '否') : ''}}
-              </el-form-item>
+              </el-form-item> -->
               <el-form-item label="折抵教学工作量的科研经费金额:" v-if="visibleItem">
                 {{scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.scienceFunds : 0}}
               </el-form-item>
@@ -92,16 +92,6 @@
       </el-table-column>
       <el-table-column class-name="status-col" align="center" label="状态" width="80">
         <template slot-scope="scope">
-          <!-- <el-tag :type="scope.row.finalAuditRecord[0] ? scope.row.finalAuditRecord[0].auditStatus 
-          : (scope.row.teachingMoudle.teaMoudelAuditRecord[0] ? scope.row.teachingMoudle.teaMoudelAuditRecord[0].auditStatus
-          : (scope.row.teachingMoudle.workLoad ? (scope.row.teachingMoudle.workLoad.auditRecord[0] ? scope.row.teachingMoudle.workLoad.auditRecord[0].auditStatus :'待审核') : '')) | statusFilter">
-            {{ scope.row.finalAuditRecord[0] ? scope.row.finalAuditRecord[0].auditStatus 
-          : (scope.row.teachingMoudle.teaMoudelAuditRecord[0] ? scope.row.teachingMoudle.teaMoudelAuditRecord[0].auditStatus
-          : (scope.row.teachingMoudle.workLoad ? (scope.row.teachingMoudle.workLoad.auditRecord[0] ? scope.row.teachingMoudle.workLoad.auditRecord[0].auditStatus :'待审核') : ''))}}
-          </el-tag> -->
-          <!-- <el-tag :type="scope.row.finalStatus !== '待审核' ? scope.row.finalStatus : (scope.row.teachingMoudle.teaStatus ? scope.row.teachingMoudle.teaStatus : scope.row.teachingMoudle.workLoad.status) | statusFilter ">
-            {{scope.row.finalStatus !== '待审核' ? scope.row.finalStatus : (scope.row.teachingMoudle.teaStatus ? scope.row.teachingMoudle.teaStatus : scope.row.teachingMoudle.workLoad.status)}}
-          </el-tag> -->
           <el-tag :type="scope.row.teachingMoudle.workLoad.status | statusFilter">
             {{scope.row.teachingMoudle.workLoad.status}}
           </el-tag>
@@ -164,9 +154,9 @@
         <el-form-item label="科研经费折抵的教学工作量" v-if="visibleItem">
           <el-input v-model="formParams.teachingMoudle.workLoad.scienceFundsWork"></el-input>
         </el-form-item>
-        <el-form-item label="是否完成本部门人均相应工作量的三分之二">
+        <!-- <el-form-item label="是否完成本部门人均相应工作量的三分之二">
           <el-switch v-model="formParams.teachingMoudle.workLoad.isFinish"></el-switch>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="教学工作量合计">
           <el-input v-model="formParams.teachingMoudle.workLoad.teachWorkSum"></el-input>
         </el-form-item>
@@ -231,6 +221,7 @@ export default {
         name: this.$store.state.user.name,//用户姓名
         jobID: this.$store.state.user.jobID,//用户工号
         station: this.$store.state.user.station,//用户岗位
+        department: this.$store.state.user.department,//用户部门
         finalAuditRecord:[],//最终审核记录
         finalStatus:'待审核',//总审核状态
         submitTime: new Date(),//提交时间

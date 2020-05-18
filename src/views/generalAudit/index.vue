@@ -16,6 +16,11 @@
           {{ scope.row.station}}
         </template>
       </el-table-column>
+      <el-table-column width="120px" align="center" label="部门">
+        <template slot-scope="scope">
+          {{ scope.row.department}}
+        </template>
+      </el-table-column>
        <el-table-column width="120px" align="center" label="教研考评岗位权重计分">
         <template slot-scope="scope">
           {{ scope.row.teachingMoudle.weightScore}}
@@ -56,6 +61,9 @@
         </el-form-item>
         <el-form-item label="岗位">
             {{form.station}}
+        </el-form-item>
+        <el-form-item label="部门">
+            {{form.department}}
         </el-form-item>
         <el-form-item label="提交时间">
             {{form.submitTime | formateDate}}
@@ -283,7 +291,7 @@ export default {
                         i.finalStatus = i.teachingMoudle.teaStatus;
                     }
                 }
-                this.list = res.result;
+                this.list = res.result.reverse();
                 this.listLoading = false;
             }
         })
