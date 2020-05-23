@@ -7,12 +7,12 @@
         @click="handleAdd">
         添加人员
     </el-button>
-    <el-input
+    <!-- <el-input
         placeholder="请输入用户姓名或工号，按回车键查询"
         prefix-icon="el-icon-search"
         v-model="searchPerson"
         style="width:300px">
-    </el-input>
+    </el-input> -->
     <el-table v-loading="listLoading" :data="allPersonData"  fit highlight-current-row style="margin:20px">
       <!-- 表格开始      -->
         <el-table-column width="120px" label="姓名">
@@ -57,13 +57,6 @@
             <template slot-scope="scope">
                 <el-button
                     size="mini"
-                   type="primary" plain
-                    @click="handleDetail(scope.row)"
-                >
-                    查看详情
-                </el-button>
-                <el-button
-                    size="mini"
                     type="primary"
                     @click="handleUpdate(scope.row)"
                 >
@@ -76,11 +69,18 @@
                 >
                     删除
                 </el-button>
+                <el-button
+                    size="mini"
+                    plain
+                    @click="handleDetail(scope.row)"
+                >
+                    查看详情
+                </el-button>
             </template>
         </el-table-column>
     </el-table>
     <!-- 分页 -->
-    <el-pagination
+    <!-- <el-pagination
         background
         layout="prev, pager, next"
         :page-size='10'
@@ -88,7 +88,7 @@
         style="text-align:center"
         @current-change="handleNextPage"
     >
-    </el-pagination>
+    </el-pagination> -->
     <!-- 弹出框 -->
     <el-dialog el-drag-dialog :visible.sync="dialogVisible" :title="dialogTitle">
          <el-form :inline="true" :model="personSubmit" :rules="rules" ref="personSubmit" class="demo-ruleForm">
@@ -216,14 +216,14 @@ export default {
                     value: '领导',
                     label: '领导'
                 },{
-                    value: '教学办公审核员',
-                    label: '教学办公审核员'
+                    value: '教学审核员',
+                    label: '教学审核员'
                 },{
-                    value: '科研办公审核员',
-                    label: '科研办公审核员'
+                    value: '科研审核员',
+                    label: '科研审核员'
                 },{
-                    value: '学科建设办公审核员',
-                label: '学科建设办公审核员'
+                    value: '学科建设审核员',
+                label: '学科建设审核员'
             }],
             searchPerson:'',//搜索人员绑定字段    
             pageTotal:1,   //分页总页数
@@ -249,13 +249,26 @@ export default {
         //修改用户信息
         handleUpdate(value) {
             console.log('value :', value);
-            this.dialogTitle = this.dialogTitleData.editPerson;
-            this.dialogVisible = true;
-            this.personSubmit = value;
+            if (value.role == '系统管理员') {
+                this.$message({
+                    type:'warning',
+                    message:'抱歉！您无修改权限！'
+                })
+            } else {
+                this.dialogTitle = this.dialogTitleData.editPerson;
+                this.dialogVisible = true;
+                this.personSubmit = value;
+            }
         },
         //删除用户信息
         handleDelete(value) {
-            const t = this;
+            if (value.role == '系统管理员') {
+                this.$message({
+                    type:'warning',
+                    message:'抱歉！您无删除权限！'
+                })
+            } else {
+                 const t = this;
              t.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
@@ -274,13 +287,15 @@ export default {
                             message: res.message
                         })
                     }
-            })
-            }).catch(() => {
-                t.$message({
-                    type: 'info',
-                    message: '已取消'
-                });          
-            });
+                })
+                }).catch(() => {
+                    t.$message({
+                        type: 'info',
+                        message: '已取消'
+                    });          
+                });
+            }
+           
            
         },
         //获取所有用户信息列表方法
@@ -382,10 +397,10 @@ export default {
             
         },
         //分页中换页
-        handleNextPage(value) {
-            console.log('-----',value)
-            this.getAllPerson({ skip: 1, limit: 10});
-        }
+        // handleNextPage(value) {
+        //     console.log('-----',value)
+        //     this.getAllPerson({ skip: 1, limit: 10});
+        // }
     }
 
 }

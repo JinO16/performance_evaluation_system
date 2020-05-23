@@ -50,12 +50,14 @@
                     <span class="data-item">部门:</span>
                 </el-col>
                 <el-col :span="6">
-                    <el-input
-                        placeholder="请输入部门"
-                        v-model="form.department"
-                        clearable
-                        >
-                    </el-input>
+                  <el-select v-model="form.department" placeholder="请选择部门">
+                    <el-option
+                    v-for="item in department_options"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
+                    </el-option>
+                  </el-select>
                 </el-col>
             </div>
             <div class="row-item" >
@@ -145,14 +147,14 @@
                     <span class="data-item station">岗位:</span>
                 </el-col>
                 <el-col :span="6"> 
-                    <el-select v-model="form.station" placeholder="请选择岗位">
+                  <el-select v-model="form.station" placeholder="请选择岗位">
                     <el-option
                     v-for="item in station_options"
                     :key="item.value"
                     :label="item.label"
                     :value="item.value">
                     </el-option>
-                    </el-select>
+                  </el-select>
                 </el-col>
             </div>
             <div class="row-item" >
@@ -198,6 +200,12 @@ export default {
             this.$message({
                 type:'warning',
                 message:'必须选择所属岗位！'
+            })
+            next(false);
+        } else if(!this.form.department) {
+            this.$message({
+                type:'warning',
+                message:'必须选择所属部门！'
             })
             next(false);
         } else {
@@ -272,6 +280,7 @@ export default {
             },
             dialogPwdVisible: false,
             level_options:[],//级别
+            //岗位选项
             station_options:[{
                 value:'教学岗',
                 label:'教学岗'
@@ -282,6 +291,34 @@ export default {
                 value:'教学科研并重岗',
                 label:'教学科研并重岗'
             }],
+            //部门选项
+            department_options: [
+              {
+                value:'计算机科学与技术系',
+                label:'计算机科学与技术系'
+              },{
+                  value:'软件工程系',
+                  label:'软件工程系 '
+              },{
+                  value:'电子信息系',
+                  label:'电子信息系'
+              },{
+                  value:'通信工程系',
+                  label:'通信工程系'
+              },{
+                  value:'物联网工程系',
+                  label:'物联网工程系'
+              },{
+                  value:'电气工程系',
+                  label:'电气工程系'
+              },{
+                  value:'自动化系',
+                  label:'自动化系'
+              },{
+                  value:'电工电子教研室',
+                  label:'电工电子教研室'
+              }
+            ]
           
             
         }
@@ -348,6 +385,11 @@ export default {
                 this.$message({
                     type:'warning',
                     message:'必须选择所属岗位！'
+                })
+            } else if (!this.form.department) {
+                this.$message({
+                    type:'warning',
+                    message:'必须选择所属部门！'
                 })
             } else {
                 updateUser(this.form).then(res => {

@@ -35,7 +35,7 @@ export const constantRoutes = [
     redirect: '/teachingModule/workload/workloadList',
     name: 'TeachingModule',
     meta: {
-      title: '教学教研考评模块',
+      title: '教学教研考评',
       icon: 'example'
     },
     children: [
@@ -43,19 +43,19 @@ export const constantRoutes = [
         path: 'workload',
         component: () => import('@/views/teachingMoudle/workload/index'), // Parent router-view
         name: 'workload',
-        meta: { title: '工作量模块', icon: 'clipboard' },
+        meta: { title: '工作量', icon: 'clipboard' },
         children: [
           {
             path:'workloadList',
             name:'workloadList',
             component: () => import('@/views/teachingMoudle/workload/workloadList'),
-            meta: {title: '工作量List',icon:'list'}
+            meta: {title: '数据单',icon:'list'}
           },
           {
             path:'workloadAudit',
             name:'workloadAudit',
             component: () => import('@/views/teachingMoudle/workload/workloadAudit'),
-            meta: {title: '工作量审核单',icon:'list'}
+            meta: {title: '审核单',icon:'list'}
           }
         ]
       },
@@ -63,19 +63,19 @@ export const constantRoutes = [
         path: 'teachRes',
         name: 'teachRes',
         component: () => import('@/views/teachingMoudle/teachRes/index'),
-        meta: { title: '教学教研模块', icon: 'nested' },
+        meta: { title: '教学教研', icon: 'nested' },
         children: [
           {
             path:'teachResList',
             name:'teachResList',
             component: () => import('@/views/teachingMoudle/teachRes/teachResList'),
-            meta: {title: '教学教研List',icon:'list'}
+            meta: {title: '数据单',icon:'list'}
           },
           {
             path:'teachResAudit',
             name:'teachResAudit',
             component: () => import('@/views/teachingMoudle/teachRes/teachResAudit'),
-            meta: {title: '教学教研审核单',icon:'list'}
+            meta: {title: '审核单',icon:'list'}
           }
         ]
       },
@@ -83,33 +83,39 @@ export const constantRoutes = [
         path: 'teachProcess',
         name: 'teachProcess',
         component: () => import('@/views/teachingMoudle/teachProcess'),
-        meta: { title: '教学工程及其他模块', icon: 'component' },
+        meta: { title: '教学工程及其他', icon: 'component' },
         children: [
           {
             path:'teachProcessList',
             name:'teachProcessList',
             component: () => import('@/views/teachingMoudle/teachProcess/teachProcessList'),
-            meta: {title: '模块List',icon:'list'}
+            meta: {title: '数据单',icon:'list'}
           },
           {
             path:'teachProcessAudit',
             name:'teachProcessAudit',
             component: () => import('@/views/teachingMoudle/teachProcess/teachProcessAudit'),
-            meta: {title: '模块审核单',icon:'list'}
+            meta: {title: '审核单',icon:'list'}
           }
         ]
       },
       {
-        path:'dataStatistics',
-        name:'dataStatistics',
-        component:() => import('@/views/teachingMoudle/dataStatistic'),
-        meta:{title:'数据统计',icon:'chart'}
+        path:'teachingSumList',
+        name:'teachingSumList',
+        component:() => import('@/views/teachingMoudle/teachingSumList'),
+        meta:{title:'教研考评汇总单',icon:'chart'}
       },
       {
         path:'teachingAudit',
         name:'teachingAudit',
         component:() => import('@/views/teachingMoudle/teachingSumAudit'),
-        meta:{title:'教学教研考评审核单',icon:'form'}
+        meta:{title:'教研考评审核单',icon:'form'}
+      },
+      {
+        path:'teaSetting',
+        name:'teaSetting',
+        component:() => import('@/views/teachingMoudle/teaSetting'),
+        meta:{title:'教研考评设置中心',icon:'guide'}
       }
     ]
   },

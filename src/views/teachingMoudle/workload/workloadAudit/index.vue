@@ -16,6 +16,11 @@
           {{ scope.row.station}}
         </template>
       </el-table-column>
+      <el-table-column width="120px" align="center" label="部门">
+        <template slot-scope="scope">
+          {{ scope.row.department}}
+        </template>
+      </el-table-column>
       <el-table-column width="120px" align="center" label="教学工作量合计">
         <template slot-scope="scope">
           <span>{{ scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.teachWorkSum : 0}}</span>
@@ -31,6 +36,11 @@
           {{scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.itemScore : 0}}
         </template>
       </el-table-column>
+      <el-table-column width="160px" align="center" label="是否完成本部门人均相应工作量的三分之二">
+        <template slot-scope="scope">
+          {{scope.row.teachingMoudle.workLoad ? (scope.row.teachingMoudle.workLoad.isFinish ? '是' :'否') : ''}}
+        </template>
+      </el-table-column>
       <el-table-column class-name="status-col" align="center" label="状态" width="80">
         <template slot-scope="scope">
           <!-- <el-tag :type="scope.row.finalStatus !== '待审核' ? scope.row.finalStatus : (scope.row.teachingMoudle.teaStatus ? scope.row.teachingMoudle.teaStatus : scope.row.teachingMoudle.workLoad.status) | statusFilter ">
@@ -39,11 +49,11 @@
           <el-tag :type="scope.row.teachingMoudle.workLoad.status | statusFilter">{{scope.row.teachingMoudle.workLoad.status}}</el-tag>
         </template>
       </el-table-column>
-       <el-table-column width="100px" align="center" label="总分数">
+       <!-- <el-table-column width="100px" align="center" label="总分数">
         <template slot-scope="scope">
           <span>{{ scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.itemScore : 0 }}</span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
        <el-table-column
         label="操作"
         align="center"
@@ -75,6 +85,9 @@
         </el-form-item>
         <el-form-item label="岗位">
           {{form.station}}
+        </el-form-item>
+        <el-form-item label="部门">
+          {{form.department}}
         </el-form-item>
         <el-form-item label="提交时间">
           {{form.submitTime | formateDate}}
@@ -130,7 +143,7 @@
 <script>
 import router from '../../../../router'
 import dayjs from 'dayjs'
-import { getAllTeachWorkload, updateTeachWorkload } from '@/api/teachingAndRes/teachWorkload'
+import { getAllTeachWorkload, updateTeachWorkload, getByDepartment } from '@/api/teachingAndRes/teachWorkload'
 import { getAllLevel } from '@/api/setting'
 export default {
   name: 'InlineEditTable',
@@ -169,11 +182,12 @@ export default {
       dialogTitleItem: {
         audit:'审核单',
         detail:'查看详情'
-      }
+      },
+      averageWorkload:0,//本部门人均工作量的三分之二
     }
   },
   mounted() {
-    this.getList();
+    this.getData()
   },
   methods: {
     //获取所有级别岗位要求的接口
@@ -203,25 +217,56 @@ export default {
         
       })
     },
+    //根据部门获取本部门所有数据单
+    getDepartmentData() {
+      return new Promise((resolve, reject) => {
+        const department = this.$store.state.user.department;
+        getByDepartment(department).then(res => {
+          if (res.code == 200) {
+            resolve(res)
+          } else {
+            reject(res.message)
+          }
+          
+        })
+      })
+    },
     //获取所有工作量数据清单
     getList() {
-      getAllTeachWorkload().then(res => {
-        console.log('res-------- :>> ', res);
-        if (res.code === 200) {
-          const resultArr = [];
-          for (let i of res.result) {
-            if (i.teachingMoudle.workLoad) {
-              resultArr.unshift(i)
+      return new Promise((resolve,reject) => {
+         getAllTeachWorkload().then(res => {
+            if (res.code === 200) {
+              resolve(res);
+            } else {
+              reject(res.message)
             }
+        })
+      })
+    },
+    //处理获取的工作量数据
+    async getData() {
+      await this.getDepartmentData().then(res => {
+        let sum = 0;//部门所有的教学工作量合计
+          for (let i of res.result) {
+            sum += parseInt(i.teachingMoudle.workLoad.teachWorkSum) 
           }
-          this.list = resultArr;
-          this.listLoading = false;
-        } else {
-          this.$message({
-            type:'error',
-            message:res.message
-          })
+        this.averageWorkload = Math.floor (2 * (sum / res.result.length) / 3);
+            
+      });
+      await this.getList().then(res => {
+        const resultArr = [];
+        for (let i of res.result) {
+          if (i.teachingMoudle.workLoad) {
+            if(i.teachingMoudle.workLoad.teachWorkSum >= this.averageWorkload) {
+              i.teachingMoudle.workLoad.isFinish = true;
+            } else {
+              i.teachingMoudle.workLoad.isFinish = false;
+            }
+            resultArr.unshift(i)
+          }
         }
+        this.list = resultArr;
+        this.listLoading = false;
       })
     },
     //查看详情
