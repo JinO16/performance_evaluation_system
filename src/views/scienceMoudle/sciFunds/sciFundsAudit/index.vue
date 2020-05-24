@@ -126,13 +126,13 @@
                 <div><span class="item">总分：</span>{{'总分'}}</div>
               </el-collapse-item>
             </el-col>
-            <el-col :span="8">
+            <!-- <el-col :span="8">
               <el-collapse-item title="实验教学工作量">
                 <div><span class="item">权重：</span>{{'权重'}}</div>
                 <div><span class="item">数据：</span>{{'数据'}}</div>
                 <div><span class="item">总分：</span>{{'总分'}}</div>
               </el-collapse-item>
-            </el-col>
+            </el-col> -->
           </el-row>
         </el-collapse>
         <el-row>
@@ -142,19 +142,19 @@
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="完成本部门人均工作量的三分之一">
+              <el-form-item label="折抵科研经费的教学工作量上限40%">
                 {{'是'}}
               </el-form-item>
             </el-col>
         </el-row>
          <el-row>
           <el-col :span="8">
-            <el-form-item label="教学工作量合计">
+            <el-form-item label="折抵后科研经费完成金额">
               {{100}}
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="用于计分的工作量">
+            <el-form-item label="科研经费完成比例">
               {{100}}
             </el-form-item>
           </el-col>

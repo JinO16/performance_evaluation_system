@@ -28,7 +28,7 @@
 
           <el-form label-position="left" inline class="demo-table-expand">
 
-            <el-form-item label="上课教学工作量:">
+            <el-form-item label="年额定科研经费金额:">
 
               <span class="data-items">权重: {{scope.row.forecast}}</span>
 
@@ -38,7 +38,7 @@
 
             </el-form-item>
 
-             <el-form-item label="辅导员带班工作量:">
+             <el-form-item label="年科研经费实际到账金额:">
 
               <span class="data-items">权重: {{scope.row.forecast}}</span>
 
@@ -48,7 +48,7 @@
 
             </el-form-item>
 
-             <el-form-item label="实验教学工作量:">
+             <el-form-item label="折抵科研经费的教学工作量:">
 
               <span class="data-items">权重: {{scope.row.forecast}}</span>
 
@@ -58,13 +58,13 @@
 
             </el-form-item>
 
-             <el-form-item label="折抵教学工作量的科研经费金额:">
+             <el-form-item label="折抵科研经费的教学工作量对应科研经费金额:">
 
               <span class="data-items">{{90}}</span>
 
              </el-form-item>
 
-             <el-form-item label="科研经费折抵的教学工作量:">
+             <!-- <el-form-item label="折抵后科研经费完成金额:">
 
               <span class="data-items">权重: {{scope.row.forecast}}</span>
 
@@ -72,21 +72,21 @@
 
               <span class="data-items">总分: {{45}}</span>
 
-             </el-form-item>
+             </el-form-item> -->
 
-             <el-form-item label="是否完成本部门人均相应工作量的三分之二:">
+             <el-form-item label="折抵科研经费的教学工作量上限:">
 
               <span class="data-items">{{"是"}}</span>
 
              </el-form-item>
 
-             <el-form-item label="教学工作量合计:">
+             <el-form-item label="折抵后科研经费完成金额:">
 
               <span class="data-items">{{45}}</span>
 
              </el-form-item>
 
-             <el-form-item label="用于计分的工作量:">
+             <el-form-item label="科研经费完成比例:">
 
               <span class="data-items">{{45}}</span>
 
@@ -120,7 +120,7 @@
 
       </el-table-column>
 
-      <el-table-column width="120px" label="教学工作量合计">
+      <el-table-column width="120px" label="年额定科研经费金额">
 
         <template slot-scope="scope">
 
@@ -130,7 +130,7 @@
 
       </el-table-column>
 
-      <el-table-column width="135px" label="用于计分的工作量">
+      <el-table-column width="135px" label="年科研经费实际到账金额">
 
         <template slot-scope="scope">
 
@@ -212,11 +212,11 @@
 
     <!-- 创建数据单弹出框 -->
 
-    <el-dialog v-el-drag-dialog :visible.sync="dialogTableVisible" title="创建工作量数据单" @dragDialog="handleDrag">
+    <el-dialog v-el-drag-dialog :visible.sync="dialogTableVisible" title="创建科研经费数据单" @dragDialog="handleDrag">
 
       <el-form ref="form" :model="form">
 
-        <div class="label-items">上课教学工作量</div>
+        <div class="label-items">额定研经费金额</div>
 
         <el-row>
 
@@ -254,7 +254,7 @@
 
         </el-row>
 
-        <div class="label-items">辅导员带班工作量</div>
+        <div class="label-items">实际到账科研经费金额</div>
 
         <el-row>
 
@@ -290,7 +290,7 @@
 
         </el-row>
 
-        <div class="label-items">实验教学工作量</div>
+        <div class="label-items">折抵科研经费的教学工作量</div>
 
         <el-row>
 
@@ -328,7 +328,7 @@
 
         </el-row>
 
-        <div class="label-items">折抵教学工作量的科研经费金额</div>
+        <div class="label-items">折抵科研经费的教学工作量对应科研经费金额</div>
 
         <el-form-item label="金额">
 
@@ -336,7 +336,7 @@
 
         </el-form-item>
 
-        <div class="label-items">科研经费折抵的工作量</div>
+        <div class="label-items">折抵后科研经费完成金额</div>
 
         <el-row>
 
@@ -374,19 +374,19 @@
 
         </el-row>
 
-        <el-form-item label="是否完成本部门人均相应工作量的三分之一">
+        <el-form-item label="折抵科研经费的教学工作量上限40%">
 
           <el-switch v-model="form.delivery" />
 
         </el-form-item>
 
-        <el-form-item label="教学工作量合计">
+        <el-form-item label="折抵后科研经费完成金额">
 
           {{100}}
 
         </el-form-item>
 
-        <el-form-item label="用于计分的工作量">
+        <el-form-item label="科研经费完成比例">
 
           {{100}}
 
