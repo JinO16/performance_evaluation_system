@@ -55,7 +55,7 @@
         {{tag.name}}
         </el-tag>
         <el-dropdown @command="handleSelectUser">
-            <el-button class="button-new-tag" size="small" @click="handleAuditorAdd(userData)">+ 添加审核员</el-button>
+            <el-button class="button-new-tag" size="small" @click="handleAuditorAdd(userData)">+ 添加用户管理员</el-button>
             <el-dropdown-menu slot="dropdown">
                 <div v-for="(item,key) in userData">
                     <el-dropdown-item :command="item" :disabled='item.Isdisabled'>{{item.name}}</el-dropdown-item>

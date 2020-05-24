@@ -26,7 +26,7 @@
           {{ scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.itemScore : 0}}
         </template>
       </el-table-column>
-      <el-table-column width="120px" align="center" label="教学教研计分">
+      <el-table-column width="80px" align="center" label="教学教研计分">
         <template slot-scope="scope">
           {{ scope.row.teachingMoudle.teachResChild ? scope.row.teachingMoudle.teachResChild.teachResScoreSum : 0}}
         </template>
@@ -41,12 +41,12 @@
           {{scope.row.teachingMoudle.teachProScoreSum }}
         </template>
       </el-table-column>
-      <el-table-column width="120px" align="center" label="岗位权重计分">
+      <el-table-column width="80px" align="center" label="岗位权重计分">
         <template slot-scope="scope">
          {{scope.row.teachingMoudle.weightScore}}
         </template>
       </el-table-column>
-      <el-table-column width="120px" align="center" label="状态">
+      <el-table-column width="80px" align="center" label="状态">
         <template slot-scope="scope">
          <el-tag :type="scope.row.teachingMoudle.teaStatus | statusFilter">{{scope.row.teachingMoudle.teaStatus}}</el-tag>
         </template>
@@ -338,27 +338,30 @@ export default {
      getAllTeachWorkload().then(res => {
        for (let i of res.result) {
          //教研项目总分
-         i.teachingMoudle.teachProScoreSum = (i.teachingMoudle.teaProAndOther ? i.teachingMoudle.teaProAndOther.teaProScoreSum : 0)  + (i.teachingMoudle.teachResChild ? i.teachingMoudle.teachResChild.teachResScoreSum : 0) 
-         > 40 ? 40 :(i.teachingMoudle.teaProAndOther ? i.teachingMoudle.teaProAndOther.teaProScoreSum : 0)  + (i.teachingMoudle.teachResChild ? i.teachingMoudle.teachResChild.teachResScoreSum : 0) ;
-         //岗位权重计分
-         i.teachingMoudle.weightScore =Math.floor(((i.teachingMoudle.workLoad ? i.teachingMoudle.workLoad.itemScore : 0) + i.teachingMoudle.teachProScoreSum) * staWeight);
-         //教学教研审核状态
-        if(i.teachingMoudle.workLoad && i.teachingMoudle.workLoad.status == '驳回' 
-          || i.teachingMoudle.teachResChild && i.teachingMoudle.teachResChild.status =='驳回'
-          || i.teachingMoudle.teaProAndOther && i.teachingMoudle.teaProAndOther.status == '驳回') {
-          i.teachingMoudle.teaStatus = '驳回';
-        } else if (i.teachingMoudle.workLoad && i.teachingMoudle.workLoad.status == '待审核' 
-          || i.teachingMoudle.teachResChild && i.teachingMoudle.teachResChild.status =='待审核' 
-          ||  i.teachingMoudle.teaProAndOther && i.teachingMoudle.teaProAndOther.status == '待审核'
-          || (i.teachingMoudle.workLoad && i.teachingMoudle.workLoad.status == '审核中' 
-          || i.teachingMoudle.teachResChild && i.teachingMoudle.teachResChild.status =='审核中' 
-          ||  i.teachingMoudle.teaProAndOther && i.teachingMoudle.teaProAndOther.status == '审核中') && i.teachingMoudle.teaStatus !=='审核中' ) {
-          i.teachingMoudle.teaStatus = '待审核';
-        } else if(i.finalStatus == '已完成') {
-          i.teachingMoudle.teaStatus = '已完成'
-        } else {
-          i.teachingMoudle.teaStatus = '审核中'
-        }
+         if(i.teachingMoudle.workLoad || i.teachingMoudle.teachResChild || i.teachingMoudle.teaProAndOther) {
+            i.teachingMoudle.teachProScoreSum = (i.teachingMoudle.teaProAndOther ? i.teachingMoudle.teaProAndOther.teaProScoreSum : 0)  + (i.teachingMoudle.teachResChild ? i.teachingMoudle.teachResChild.teachResScoreSum : 0) 
+          > 40 ? 40 :(i.teachingMoudle.teaProAndOther ? i.teachingMoudle.teaProAndOther.teaProScoreSum : 0)  + (i.teachingMoudle.teachResChild ? i.teachingMoudle.teachResChild.teachResScoreSum : 0) ;
+          //岗位权重计分
+          i.teachingMoudle.weightScore =Math.floor(((i.teachingMoudle.workLoad ? i.teachingMoudle.workLoad.itemScore : 0) + i.teachingMoudle.teachProScoreSum) * staWeight);
+          //教学教研审核状态
+            if(i.teachingMoudle.workLoad && i.teachingMoudle.workLoad.status == '驳回' 
+              || i.teachingMoudle.teachResChild && i.teachingMoudle.teachResChild.status =='驳回'
+              || i.teachingMoudle.teaProAndOther && i.teachingMoudle.teaProAndOther.status == '驳回') {
+              i.teachingMoudle.teaStatus = '驳回';
+            } else if (i.teachingMoudle.workLoad && i.teachingMoudle.workLoad.status == '待审核' 
+              || i.teachingMoudle.teachResChild && i.teachingMoudle.teachResChild.status =='待审核' 
+              ||  i.teachingMoudle.teaProAndOther && i.teachingMoudle.teaProAndOther.status == '待审核'
+              || (i.teachingMoudle.workLoad && i.teachingMoudle.workLoad.status == '审核中' 
+              || i.teachingMoudle.teachResChild && i.teachingMoudle.teachResChild.status =='审核中' 
+              ||  i.teachingMoudle.teaProAndOther && i.teachingMoudle.teaProAndOther.status == '审核中') && i.teachingMoudle.teaStatus !=='审核中' ) {
+              i.teachingMoudle.teaStatus = '待审核';
+            } else if(i.finalStatus == '已完成') {
+              i.teachingMoudle.teaStatus = '已完成'
+            } else {
+              i.teachingMoudle.teaStatus = '审核中'
+            }
+         }
+         
        }
        this.list = res.result.reverse();
        this.listLoading = false;
