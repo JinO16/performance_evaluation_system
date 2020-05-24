@@ -21,17 +21,17 @@
           {{ scope.row.department}}
         </template>
       </el-table-column>
-      <el-table-column width="120px" align="center" label="教学工作量合计">
+      <el-table-column width="100px" align="center" label="教学工作量合计">
         <template slot-scope="scope">
           <span>{{ scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.teachWorkSum : 0}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="150px" align="center" label="用于计分的工作量">
+      <el-table-column width="100px" align="center" label="用于计分的工作量">
         <template slot-scope="scope">
           {{scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.scoreSum : 0}}
         </template>
       </el-table-column>
-      <el-table-column width="150px" align="center" label="个人逐项计分">
+      <el-table-column width="120px" align="center" label="个人逐项计分">
         <template slot-scope="scope">
           {{scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.itemScore : 0}}
         </template>
@@ -248,7 +248,10 @@ export default {
       await this.getDepartmentData().then(res => {
         let sum = 0;//部门所有的教学工作量合计
           for (let i of res.result) {
-            sum += parseInt(i.teachingMoudle.workLoad.teachWorkSum) 
+            console.log('i :>> ', i);
+            if (i.teachingMoudle.workLoad) {
+              sum += parseInt(i.teachingMoudle.workLoad.teachWorkSum ? i.teachingMoudle.workLoad.teachWorkSum : 0) 
+            }
           }
         this.averageWorkload = Math.floor (2 * (sum / res.result.length) / 3);
             
@@ -256,8 +259,8 @@ export default {
       await this.getList().then(res => {
         const resultArr = [];
         for (let i of res.result) {
-          if (i.teachingMoudle.workLoad) {
-            if(i.teachingMoudle.workLoad.teachWorkSum >= this.averageWorkload) {
+          if (i.teachingMoudle.workLoad ) {
+            if(i.teachingMoudle.workLoad.teachWorkSum && i.teachingMoudle.workLoad.teachWorkSum >= this.averageWorkload) {
               i.teachingMoudle.workLoad.isFinish = true;
             } else {
               i.teachingMoudle.workLoad.isFinish = false;

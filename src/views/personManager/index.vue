@@ -5,7 +5,7 @@
         type="primary"
         style="margin:20px"
         @click="handleAdd">
-        添加人员
+        添加用户
     </el-button>
     <!-- <el-input
         placeholder="请输入用户姓名或工号，按回车键查询"

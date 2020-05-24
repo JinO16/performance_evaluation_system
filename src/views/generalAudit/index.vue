@@ -283,9 +283,9 @@ export default {
             if (res.code == 200) {
                 for (let i of res.result) {
                     //总审核状态
-                    if (i.teachingMoudle.teaStatus == '审核中') {
+                    if (i.teachingMoudle.teaStatus && i.teachingMoudle.teaStatus == '审核中') {
                          i.finalStatus = '待审核';
-                    } else if (i.teachingMoudle.teaStatus == '待审核'){
+                    } else if (i.teachingMoudle.teaStatus && i.teachingMoudle.teaStatus == '待审核'){
                         res.result.pop(i);
                     } else {
                         i.finalStatus = i.teachingMoudle.teaStatus;
