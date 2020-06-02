@@ -60,7 +60,6 @@
     <el-dialog el-drag-dialog :visible.sync="dialogTableVisible" title="查看详情">
       <el-button type="primary" @click="handleDown">PDF下载</el-button>
       <el-form id="form" :inline="true" :model="form" class="demo-form-inline">
-        <!-- <el-button type="primary" @click="exportData(form)">导出数据</el-button> -->
         <el-form-item label="姓名：">
           {{form.name}}
         </el-form-item>
@@ -261,7 +260,6 @@ export default {
       dialogTableVisible: false,
       form: {},
       visibleItem:false,//当岗位为非科研岗时，隐藏
-      excelData:[],//将要导出的表格数据
     }
   },
   mounted() {
@@ -337,6 +335,7 @@ export default {
       this.dialogTableVisible = true;
       this.form = row
     },
+    
    //将页面以pdf的形式导出
    handleDown() {
      htmlToPdf.downloadPDF(document.querySelector('form'),'教研考评单')

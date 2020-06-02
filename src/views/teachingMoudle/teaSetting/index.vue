@@ -57,7 +57,7 @@
                 {{tag.name}}
             </el-tag>
             <!-- </el-tooltip> -->
-            <!-- <el-button class="button-new-tag" size="small" @click="handleStationAdd">+ 添加岗位</el-button> -->
+            <el-button class="button-new-tag" size="small" v-if="visibleAddButton" @click="handleStationAdd">+ 添加岗位</el-button>
         </el-card>
     </el-row>
     <!-- 审核员弹出框 -->
@@ -149,6 +149,7 @@ export default {
                 editStation: '编辑岗位'
             },
             auditorData: [],
+            visibleAddButton: false,//当岗位信息为0时显示，否则隐藏
             //获取的所有级别数组
             stationData:[],
             //添加并提交级别
@@ -179,7 +180,11 @@ export default {
         getStation() {
             getTeaStation().then(res => {
                 if (res.code == 200) {
-                    this.stationData = res.result
+                    this.stationData = res.result;
+                    console.log('this.stationData :>> ', this.stationData);
+                    if (this.stationData.length == 0) {
+                        this.visibleAddButton = true;
+                    }
                 }
             })
         },

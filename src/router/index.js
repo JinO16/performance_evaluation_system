@@ -102,7 +102,7 @@ export const constantRoutes = [
       {
         path:'teachingSumList',
         name:'teachingSumList',
-        component:() => import('@/views/teachingMoudle/teachingSumList'),
+        component:() => import('@/views/teachingMoudle/teachingSumList/index.vue'),
         meta:{title:'教研考评汇总单',icon:'chart'}
       },
       {
