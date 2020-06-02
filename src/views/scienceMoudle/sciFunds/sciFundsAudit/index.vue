@@ -1,41 +1,65 @@
 <template>
   <div class="app-container">
     <el-table v-loading="listLoading" :data="list" highlight-current-row style="width: 100%">
-      <el-table-column align="center" label="序号" width="80">
+      <el-table-column align="center" label="姓名" width="80">
         <template slot-scope="scope">
-          <span>{{ scope.row.id }}</span>
+          <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column width="120px" align="center" label="教师姓名">
+      <el-table-column width="120px" align="center" label="工号">
         <template slot-scope="scope">
-          <span>{{ scope.row.timestamp}}</span>
+          <span>{{ scope.row.jobID}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column width="120px" align="center" label="岗位">
+        <template slot-scope="scope">
+          {{ scope.row.station}}
         </template>
       </el-table-column>
       <el-table-column width="120px" align="center" label="部门">
         <template slot-scope="scope">
-          {{sum}}
+          {{ scope.row.department}}
         </template>
       </el-table-column>
-      <el-table-column width="80px" align="center" label="职称">
+      <el-table-column width="100px" align="center" label="额定科研经费金额">
         <template slot-scope="scope">
-          <span>{{ scope.row.author }}</span>
+          <span>{{ scope.row.scienceMoudle.sciFunds ? scope.row.scienceMoudle.sciFunds.ratedFunds : 0}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="150px" align="center" label="工资号">
+      <el-table-column width="100px" align="center" label="实际到账的科研经费金额">
         <template slot-scope="scope">
-          <svg-icon v-for="n in +scope.row.importance" :key="n" icon-class="star" class="meta-item__icon"/>
+          {{scope.row.scienceMoudle.sciFunds ? scope.row.scienceMoudle.sciFunds.virtualFunds : 0}}
         </template>
       </el-table-column>
+       <el-table-column width="100px" align="center" label="折抵后科研经费完成金额">
+        <template slot-scope="scope">
+          {{scope.row.scienceMoudle.sciFunds ? scope.row.scienceMoudle.sciFunds.fScienceFunds : 0}}
+        </template>
+      </el-table-column>
+       <el-table-column width="100px" align="center" label="科研经费完成比例">
+        <template slot-scope="scope">
+          {{scope.row.scienceMoudle.sciFunds ? scope.row.scienceMoudle.sciFunds.finishPro : 0}}
+        </template>
+      </el-table-column>
+      <el-table-column width="120px" align="center" label="个人逐项计分">
+        <template slot-scope="scope">
+          {{scope.row.scienceMoudle.sciFunds ? scope.row.scienceMoudle.sciFunds.itemScore : 0}}
+        </template>
+      </el-table-column>
+     
       <el-table-column class-name="status-col" align="center" label="状态" width="80">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.status | statusFilter">{{ scope.row.status }}</el-tag>
+          <!-- <el-tag :type="scope.row.finalStatus !== '待审核' ? scope.row.finalStatus : (scope.row.teachingMoudle.teaStatus ? scope.row.teachingMoudle.teaStatus : scope.row.teachingMoudle.workLoad.status) | statusFilter ">
+            {{scope.row.finalStatus !== '待审核' ? scope.row.finalStatus : (scope.row.teachingMoudle.teaStatus ? scope.row.teachingMoudle.teaStatus : scope.row.teachingMoudle.workLoad.status)}}
+          </el-tag> -->
+          <el-tag :type="scope.row.scienceMoudle.sciFunds.status | statusFilter">{{scope.row.scienceMoudle.sciFunds.status}}</el-tag>
         </template>
       </el-table-column>
-       <el-table-column width="100px" align="center" label="总分数">
+       <!-- <el-table-column width="100px" align="center" label="总分数">
         <template slot-scope="scope">
-          <span>{{ scope.row.author }}</span>
+          <span>{{ scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.itemScore : 0 }}</span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
        <el-table-column
         label="操作"
         align="center"
@@ -45,291 +69,308 @@
           <el-button
             size="mini"
             type="primary"
-            @click="handleSubmit(scope.row)"
+            @click="handleAudit(scope.row)"
           >审核</el-button>
           <el-button
             size="mini"
-            type="danger"
-            @click="handleDelete(scope.row)"
-          >删除</el-button>
+            plain
+            @click="handleDetail(scope.row)"
+          >查看详情</el-button>
         </template>
       </el-table-column>
 
     </el-table>
      <!-- 审核单弹出框 -->
-    <el-dialog v-el-drag-dialog :visible.sync="dialogTableVisible" title="科研经费审核单" @dragDialog="handleDrag">
-      <el-form ref="form" :model="form">
-        <el-row>
-          <el-col :span="8">
-              <el-form-item label="姓名">             
-                    {{"form.name"}}
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="部门">
-                  {{"部门"}}
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="学位">         
-                    {{"form.weight"}}
-              </el-form-item>
-            </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="8">
-              <el-form-item label="职称">             
-                    {{"职称"}}
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="工资号">
-                  {{"工资号"}}
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="状态">         
-                    {{"状态"}}
-              </el-form-item>
-            </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="8">
-              <el-form-item label="审核人">             
-                    {{"审核人"}}
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="审核时间">
-                  {{"审核时间"}}
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="审核理由">         
-                    {{"审核理由"}}
-              </el-form-item>
-            </el-col>
-        </el-row>
-        <el-collapse  @change="handleChange">
-          <el-row>
-            <el-col :span="8">
-              <el-collapse-item title="年额定科研经费金额">
-               <div><span class="item">权重：</span>{{'权重'}}</div>
-               <div><span class="item">数据：</span>{{'数据'}}</div>
-               <div><span class="item">总分：</span>{{'总分'}}</div>
-              </el-collapse-item>
-            </el-col>
-            <el-col :span="8">
-              <el-collapse-item title="年科研经费实际到账金额">
-                <div><span class="item">权重：</span>{{'权重'}}</div>
-                <div><span class="item">数据：</span>{{'数据'}}</div>
-                <div><span class="item">总分：</span>{{'总分'}}</div>
-              </el-collapse-item>
-            </el-col>
-            <!-- <el-col :span="8">
-              <el-collapse-item title="实验教学工作量">
-                <div><span class="item">权重：</span>{{'权重'}}</div>
-                <div><span class="item">数据：</span>{{'数据'}}</div>
-                <div><span class="item">总分：</span>{{'总分'}}</div>
-              </el-collapse-item>
-            </el-col> -->
-          </el-row>
-        </el-collapse>
-        <el-row>
-          <el-col :span="12">
-              <el-form-item label="折抵科研经费的教学工作量">             
-                    {{100}}
-              </el-form-item>
-            </el-col>
-            <el-col :span="12">
-              <el-form-item label="折抵科研经费的教学工作量上限40%">
-                {{'是'}}
-              </el-form-item>
-            </el-col>
-        </el-row>
-         <el-row>
-          <el-col :span="8">
-            <el-form-item label="折抵后科研经费完成金额">
-              {{100}}
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="科研经费完成比例">
-              {{100}}
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="总分">
-              {{100}}
-            </el-form-item>
-          </el-col>
-        </el-row>
-         <!-- 审核理由 -->
-        <el-form-item label="不通过理由(必填)" v-show="showReason">
-          <el-input type="textarea" :rows="2" placeholder="请输入审核理由" v-model="failedReason"></el-input>
+    <el-dialog el-drag-dialog :visible.sync="dialogTableVisible" :title="dialogTitle">
+      <el-form ref="form" :inline="true" :model="form" class="demo-form-inline">
+        <el-form-item label="姓名">
+          {{form.name}}
         </el-form-item>
-        <el-form-item align="center">
-          <el-button type="primary" @click="handlePass">审核通过</el-button>
-          <el-button type="danger" @click="handleFailed">审核不通过</el-button>
+        <el-form-item label="工号">
+          {{form.jobID}}
         </el-form-item>
-      </el-form> 
+        <el-form-item label="岗位">
+          {{form.station}}
+        </el-form-item>
+        <el-form-item label="部门">
+          {{form.department}}
+        </el-form-item>
+        <el-form-item label="提交时间">
+          {{form.submitTime | formateDate}}
+        </el-form-item>
+        <el-collapse>
+          <!-- <el-collapse-item title="科研经费数据">
+              <div class="collapse-item"><strong>上课教学工作量：</strong>{{form.teachingMoudle ? (form.teachingMoudle.workLoad ? form.teachingMoudle.workLoad.classWork : 0) : 0}}</div>
+              <div class="collapse-item"><strong>辅导员带班工作量折算：</strong>{{form.teachingMoudle ? (form.teachingMoudle.workLoad ? form.teachingMoudle.workLoad.instructorWork : 0) : 0}}</div>
+              <div class="collapse-item"><strong>实验教学工作量折算：</strong>{{form.teachingMoudle ? (form.teachingMoudle.workLoad ? form.teachingMoudle.workLoad.experimentWork : 0) : 0}}</div>
+              <div class="collapse-item" v-if="visibleItem"><strong>折抵教学工作量的科研经费金额：</strong>{{form.teachingMoudle ? (form.teachingMoudle.workLoad ? form.teachingMoudle.workLoad.scienceFunds :0) : 0}}</div>
+              <div class="collapse-item" v-if="visibleItem"><strong>科研经费折抵的教学工作量：</strong>{{form.teachingMoudle ? (form.teachingMoudle.workLoad ? form.teachingMoudle.workLoad.scienceFundsWork :0 ) : 0}}</div>
+              <div class="collapse-item"><strong>是否完成本部门人均相应工作量的三分之二：</strong>{{form.teachingMoudle ? (form.teachingMoudle.workLoad ? (form.teachingMoudle.workLoad.isFinish ? '是' :'否'):'') : ''}}</div>
+              <div class="collapse-item"><strong>教学工作量合计:</strong>{{form.teachingMoudle ? (form.teachingMoudle.workLoad ? form.teachingMoudle.workLoad.teachWorkSum :0) : 0}}</div>
+              <div class="collapse-item"><strong>用于计分的工作量：</strong>{{form.teachingMoudle ? (form.teachingMoudle.workLoad ? form.teachingMoudle.workLoad.scoreSum : 0 ) : 0}}</div>
+              <div class="collapse-item"><strong>个人逐项计分：</strong>{{form.teachingMoudle ? (form.teachingMoudle.workLoad ? 28 * form.teachingMoudle.workLoad.scoreSum / stationBase  : 0) : 0}}</div>
+          </el-collapse-item> -->
+          <el-collapse-item title="科研经费数据">
+              <div class="collapse-item"><strong>额定科研经费金额：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.ratedFunds : 0) : 0}}</div>
+              <div class="collapse-item"><strong>实际到账科研经费金额：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.virtualFunds : 0) : 0}}</div>
+              <div class="collapse-item" v-if="visibleItem"><strong>折抵科研经费的教学工作量：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.workLoads : 0) : 0}}</div>
+              <div class="collapse-item" v-if="visibleItem"><strong>折抵科研经费的教学工作量对应科研经费金额：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.scienceFunds :0) : 0}}</div>
+              <!-- <div class="collapse-item" v-if="visibleItem"><strong>折抵科研经费的教学工作量上限为40%：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? (form.scienceMoudle.sciFunds.upperLimit ? '是' :'否'):'') : ''}}</div> -->
+              <div class="collapse-item"><strong>折抵后科研经费完成金额:</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.fScienceFunds :0) : 0}}</div>
+              <div class="collapse-item"><strong>科研经费完成比例：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.finishPro : 0 ) : 0}}</div>
+              <div class="collapse-item"><strong>个人逐项计分：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? 30 * form.scienceMoudle.sciFunds.virtualFunds / form.scienceMoudle.sciFunds.ratedFunds : 0) : 0}}</div>
+          </el-collapse-item>
+          <el-collapse-item title="审核记录">
+            <div v-for="(item,key) in form.finalAuditRecord">
+              <span class="collapse-item"><strong>审核人：</strong>{{item.auditPerson}}</span>
+              <span class="collapse-item"><strong>审核时间：</strong>{{item.auditTime | formateDate}}</span>
+              <span class="collapse-item"><strong>审核状态：</strong>{{item.auditStatus}}</span>
+              <span class="collapse-item"><strong>审核理由：</strong>{{item.auditReason}}</span>
+            </div>
+            <div v-for="(item,key) in form.scienceMoudle ? form.scienceMoudle.sciMoudelAuditRecord : []">
+                <span class="data-items">审核人: {{item.auditPerson ? item.auditPerson :'暂无'}}</span>
+                <span class="data-items">审核时间: {{item.auditTime ? item.auditTime : 0 | formateDate}}</span>
+                <span class="data-items">状态: {{item.auditStatus ? item.auditStatus : '待审核'}}</span>
+                <span class="data-items">审核理由: {{item.auditReason ? item.auditReason : '暂无'}}</span>
+            </div>
+            <div v-for="(item,key) in form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.auditRecord : []) :[]">
+              <span class="data-items">审核人: {{item.auditPerson ? item.auditPerson :'暂无'}}</span>
+              <span class="data-items">审核时间: {{item.auditTime ? item.auditTime : 0 | formateDate}}</span>
+              <span class="data-items">状态: {{item.auditStatus ? item.auditStatus : '待审核'}}</span>
+              <span class="data-items">审核理由: {{item.auditReason ? item.auditReason : '暂无'}}</span>
+            </div>           
+          </el-collapse-item>
+        </el-collapse>     
+        <div class="audit-block" v-if="dialogTitle == '审核单'">
+          <!-- 审核理由 -->
+          <el-form-item label="不通过理由(必填)" v-if="showReason" required>
+            <el-input type="textarea" :rows="2" placeholder="请输入审核理由" v-model="failedReason"></el-input>
+          </el-form-item>
+          <el-form-item style="display:flex;justify-content:center">
+            <el-button type="primary" @click="handlePass">审核通过</el-button>
+            <el-button type="danger" @click="handleFailed">审核不通过</el-button>
+          </el-form-item>
+        </div>
+      </el-form>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { fetchList } from '@/api/article'
 import router from '../../../../router'
-
+import dayjs from 'dayjs'
+import { getAllTeachWorkload, updateTeachWorkload, getByDepartment } from '@/api/teachingAndRes/teachWorkload'
+//import { getAllSciFunds, updateSciFunds, getByDepartment } from '@/api/scienceAndRes/sciFunds'
+import { getAllLevel } from '@/api/setting'
 export default {
   name: 'InlineEditTable',
+  inject: ['reload'],
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
+        "已完成": 'success',
+        "draft": 'info',
+        "驳回": 'danger',
+        '审核中': 'warning'
       }
       return statusMap[status]
+    },
+    //格式化时间
+    formateDate(date) {
+      return dayjs(date).format('YYYY-MM-DD HH:mm')
     }
-  },
+   },
   data() {
     return {
       dialogTableVisible:false,
       failedReason:'',//审核不通过理由
-      showReason:false,//显示审核理由输入框
       list: null,
       listLoading: true,
       listQuery: {
         page: 1,
         limit: 10
       },
-      form: {
-      name: '',
-      weight: 4.55,
-      date1: '',
-      date2: '',
-      delivery: false,
-      type: [],
-      resource: '',
-      desc: ''
-    }
+      stationBase:350,//不同岗位对应算法的基数不同
+      visibleItem: true,//当岗位为科研岗时隐藏的项
+      failedReason:'',//审核不通过理由
+      showReason:false,//显示审核理由输入框
+      form: {},
+      dialogTitle:'',
+      dialogTitleItem: {
+        audit:'审核单',
+        detail:'查看详情'
+      },
+      upperWorkLoads : 0,//折抵为科研经费的工作量
+      //averageWorkload:0,//本部门人均工作量的三分之二
     }
   },
-  created() {
-    this.getList()
+  mounted() {
+    this.getData()
   },
   methods: {
-    getList() {
-      this.listLoading = true;
-      this.list = [
-        { 
-          id: 1,
-          timestamp: 622708727027,
-          author: "Deborah",
-          reviewer: "Ronald",
-          title: "Wfeevmqwub Mfvfxt Strkoggg Bdur Wfhjx Aiqd Dnwvju Uhxqh Pxsyd",
-          content_short: "我是测试数据",
-          forecast: 7.17,
-          importance: 2,
-          type: "US",
-          status: "draft",
-          display_time: "1988-01-05 04:26:31",
-          comment_disabled: true,
-          pageviews: 3518,
-          image_uri: "https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3"
-        },
-         { 
-          id: 2,
-          timestamp: 622708727027,
-          author: "Deborah",
-          reviewer: "Ronald",
-          title: "Wfeevmqwub Mfvfxt Strkoggg Bdur Wfhjx Aiqd Dnwvju Uhxqh Pxsyd",
-          content_short: "我是测试数据",
-          forecast: 6.66,
-          importance: 2,
-          type: "US",
-          status: "draft",
-          display_time: "1988-01-05 04:26:31",
-          comment_disabled: true,
-          pageviews: 3518,
-          image_uri: "https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3"
+    //获取所有级别岗位要求的接口
+    getStationInfo(value) {
+      console.log('value :>> ', value);
+      const userStation = value.station;
+      // console.log('userStation :>> ', userStation);
+      getAllLevel().then(res => {
+        console.log('res :>> ', res);
+        if (res.code == 200) {
+          switch (userStation) {
+            case '教学岗' : 
+              this.stationBase = res.result[0].teaching.teachWork;
+              break;
+            case '科研岗' :
+              this.stationBase = res.result[0].science.teachWork;
+              this.visibleItem = false;
+              break;
+            case '教学科研并重岗' :
+              this.stationBase = res.result[0].teachAndScience.teachWork;
+              break;
+            default:
+              this.$router.push('/user')
+          }
+          console.log('this.stationBase :>> ', this.stationBase);
         }
-      ];
-       this.listLoading = false
-      // fetchList(this.listQuery).then(response => {
-      //   const items = response.data.items
-      //   console.log('items--->',items)
-      //   this.list = items.map(v => {
-      //     this.$set(v, 'edit', false) // https://vuejs.org/v2/guide/reactivity.html
-      //     v.originalTitle = v.title //  will be used when user click the cancel botton
-      //     return v
-      //   })
-      //   this.listLoading = false
-      // })
+        
+      })
     },
-     // v-el-drag-dialog onDrag callback function
-    handleDrag() {
-      this.$refs.select.blur()
+    //根据部门获取本部门所有数据单
+    getDepartmentData() {
+      return new Promise((resolve, reject) => {
+        const department = this.$store.state.user.department;
+        getByDepartment(department).then(res => {
+          if (res.code == 200) {
+            resolve(res)
+          } else {
+            reject(res.message)
+          }
+          
+        })
+      })
+    },
+    //获取所有科研经费数据清单
+    getList() {
+      return new Promise((resolve,reject) => {
+          getAllTeachWorkload().then(res => {
+            if (res.code === 200) {
+              resolve(res);
+            } else {
+              reject(res.message)
+            }
+        })
+      })
+    },
+    //处理获取的科研经费数据
+    async getData() {
+      await this.getDepartmentData().then(res => {
+        let sum = 0;//部门所有的科研经费合计
+          for (let i of res.result) {
+            console.log('i :>> ', i);
+            if (i.scienceMoudle.sciFunds) {
+              
+              sum += parseInt(i.scienceMoudle.sciFunds.fScienceFunds ? i.scienceMoudle.sciFunds.fScienceFunds : 0) 
+            }
+          }
+       this.upperWorkLoads = Math.floor (((classWork+instructorWork+experimentWork)-stationBase)/100);
+            
+      });
+      await this.getList().then(res => {
+        const resultArr = [];
+        for (let i of res.result) {
+          if (i.scienceMoudle.sciFunds ) {
+            if(i.scienceMoudle.sciFunds.fScienceFunds && i.scienceMoudle.sciFunds.fScienceFunds >= this.averageWorkload) {
+              i.teachingMoudle.workLoad.isFinish = true;
+            } else {
+              i.teachingMoudle.workLoad.isFinish = false;
+            }
+            resultArr.unshift(i)
+          }
+        }
+        this.list = resultArr;
+        this.listLoading = false;
+      })
+    },
+    //查看详情
+    handleDetail(row) {
+      console.log('row :>> ', row);
+      this.dialogTableVisible = true;
+      this.dialogTitle = this.dialogTitleItem.detail;
+      this.form = row;
     },
     //审核
-    handleSubmit(row) {
+    handleAudit(row) {
       console.log('row :', row);
-      this.dialogTableVisible = true;
+      if (row.scienceMoudle.sciFunds.status == '待审核') {
+        this.form = row;
+        this.dialogTableVisible = true;
+        this.dialogTitle = this.dialogTitleItem.audit;
+        this.getStationInfo(row)  
+      } else {
+        this.$message({
+          type:'warning',
+          message:'该状态下无法重新审核！'
+        })
+      }
     },
-    //删除
-    handleDelete(row) {
-      console.log('row :', row);
+    //审核提交接口
+    handleSubmit (params) {
+        this.form.scienceMoudle.sciFunds.auditRecord.unshift(params);
+        this.form.scienceMoudle.sciFunds.status = params.auditStatus;
+        console.log('this.form :>> ', this.form);
+        updateTeachWorkload(this.form).then(res => {
+          console.log('res :>> ', res);
+          if (res.code === 200) {
+            this.$message({
+              type:'success',
+              message:'提交审核成功！'
+            })
+            this.dialogTableVisible = false;
+            this.reload();
+          } else {
+            this.$message({
+              type:'error',
+              message:res.message
+            })
+          }
+        })
     },
     //审核通过
     handlePass() {
       this.showReason = false;
+      const params = {
+        auditPerson:this.$store.state.user.name,
+        auditReason:'科研经费模块审核通过！',
+        auditStatus:'审核中',
+        auditTime:new Date()
+      }
+     this.handleSubmit(params);
     },
     //审核不通过
     handleFailed() {
       this.showReason = true;
       //审核不通过弹出文本框,必填
+      if (!this.failedReason) {
+       this.$message({
+         type:'error',
+         message:'请填写不通过理由！'
+       })
+     } else {
+        const params = {
+          auditPerson:this.$store.state.user.name,
+          auditReason:this.failedReason,
+          auditStatus:'驳回',
+          auditTime:new Date()
+        }
+        this.handleSubmit(params);
+      }
     }
   }
 }
 </script>
 
 <style scoped>
-.edit-input {
-  padding-right: 100px;
-}
-.cancel-btn {
-  position: absolute;
-  right: 15px;
-  top: 10px;
-}
-.data-items {
-  margin: 20px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #909399;
-}
-.el-col {
-  border-radius: 4px;
-}
-.el-row {
-  margin-left: 14px;
-}
-.label-items {
-  border-bottom: 1px solid #606266;
-  padding: 10px;
-  margin-bottom: 10px;
-  color: #606266;
-  font-weight: 700;
-  font-size: 16px;
-}
-.el-input {
-  width: auto;
-  position: absolute;
-  margin-right: 10px;
-}
-.item {
-  font-size: 14px;
-  font-weight: 700;
+.audit-block {
+  margin-top: 20px;
 }
 </style>

@@ -33,16 +33,10 @@ export function updateSciAchievement(data) {
     })
 }
 //获取所有的科研考评清单
-
 export function getAllSciAchievement(data) {
-
     return request({
-
         url: '/sciAchievement/getAll',
-
         method: 'get',
-
         params: {data}
-
     })
 }

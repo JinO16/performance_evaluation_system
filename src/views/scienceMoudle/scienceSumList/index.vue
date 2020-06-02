@@ -1,29 +1,14 @@
 <template>
   <div class="app-container">
     <el-table v-loading="listLoading" :data="list" highlight-current-row style="width: 100%">
-      <el-table-column align="center" label="姓名" width="80">
+      <el-table-column align="center" label="提交时间" width="140">
         <template slot-scope="scope">
-          <span>{{ scope.row.name }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column width="120px" align="center" label="工号">
-        <template slot-scope="scope">
-          <span>{{ scope.row.jobID}}</span>
-        </template>
-      </el-table-column>
-      <el-table-column width="120px" align="center" label="岗位">
-        <template slot-scope="scope">
-          {{ scope.row.station}}
-        </template>
-      </el-table-column>
-      <el-table-column width="120px" align="center" label="部门">
-        <template slot-scope="scope">
-          {{ scope.row.department}}
+          <span>{{ scope.row.submitTime | formateDate}}</span>
         </template>
       </el-table-column>
       <el-table-column width="120px" align="center" label="科研经费计分">
         <template slot-scope="scope">
-          {{ scope.row.scienceMoudle.scieFunds ? scope.row.scienceMoudle.sciFunds.itemScore : 0}}
+          {{ scope.row.scienceMoudle.sciFunds ? scope.row.scienceMoudle.sciFunds.itemScore : 0}}
         </template>
       </el-table-column>
       <el-table-column width="120px" align="center" label="科研论文计分">
@@ -31,17 +16,17 @@
           {{ scope.row.scienceMoudle.sciPapers ? scope.row.scienceMoudle.sciPapers.sciPapersScoreSum : 0}}
         </template>
       </el-table-column>
-      <el-table-column width="100px" align="center" label="科研立项计分">
+      <el-table-column width="150px" align="center" label="科研立项计分">
         <template slot-scope="scope">
           {{ scope.row.scienceMoudle.sciProjects ? scope.row.scienceMoudle.sciProjects.sciProjectsScoreSum : 0}}
         </template>
       </el-table-column>
-      <el-table-column width="100px" align="center" label="科研成果奖励计分">
+      <el-table-column width="150px" align="center" label="科研成果奖励计分">
         <template slot-scope="scope">
           {{ scope.row.scienceMoudle.sciAchievement ? scope.row.scienceMoudle.sciAchievement.sciAchievementScoreSum : 0}}
         </template>
       </el-table-column>
-      <el-table-column width="100px" align="center" label="论文、立项、成果奖励总分">
+      <el-table-column width="140px" align="center" label="论文、立项、成果奖励总分">
         <template slot-scope="scope">
           {{scope.row.scienceMoudle.sciProScoreSum }}
         </template>
@@ -64,20 +49,23 @@
         <template slot-scope="scope">
           <el-button
             size="mini"
-            type="primary"
-            @click="handleAudit(scope.row)"
-          >审核</el-button>
+            type="danger"
+            @click="handleDelete(scope.row)"
+          >删除</el-button>
           <el-button
             size="mini"
             plain
             @click="handleDetail(scope.row)"
           >查看详情</el-button>
+          
         </template>
       </el-table-column>
     </el-table>
-     <!-- 审核单弹窗 -->
-    <el-dialog el-drag-dialog :visible.sync="dialogTableVisible" :title="dialogTitle">
-      <el-form ref="form" :inline="true" :model="form" class="demo-form-inline">
+    <!-- 查看详情弹出框 -->
+    <el-dialog el-drag-dialog :visible.sync="dialogTableVisible" title="查看详情">
+      <el-button type="primary" @click="handleDown">PDF下载</el-button>
+      <el-form id="form" :inline="true" :model="form" class="demo-form-inline">
+        <!-- <el-button type="primary" @click="exportData(form)">导出数据</el-button> -->
         <el-form-item label="姓名：">
           {{form.name}}
         </el-form-item>
@@ -94,12 +82,12 @@
           {{form.submitTime | formateDate}}
         </el-form-item>
         <el-collapse>
-          <el-collapse-item title="科研经费数据">
+           <el-collapse-item title="科研经费数据">
               <div class="collapse-item"><strong>额定科研经费金额：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.ratedFunds : 0) : 0}}</div>
               <div class="collapse-item"><strong>实际到账科研经费金额：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.virtualFunds : 0) : 0}}</div>
               <div class="collapse-item" v-if="visibleItem"><strong>折抵科研经费的教学工作量：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.workLoads : 0) : 0}}</div>
               <div class="collapse-item" v-if="visibleItem"><strong>折抵科研经费的教学工作量对应科研经费金额：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.scienceFunds :0) : 0}}</div>
-              <div class="collapse-item"><strong>折抵科研经费的教学工作量上限为40%：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? (form.scienceMoudle.sciFunds.upperLimit ? '是' :'否'):'') : ''}}</div>
+              <div class="collapse-item"><strong>折抵科研经费的教学工作量上限：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? (form.scienceMoudle.sciFunds.upperLimit ? '是' :'否'):'') : ''}}</div>
               <div class="collapse-item"><strong>折抵后科研经费完成金额:</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.fScienceFunds :0) : 0}}</div>
               <div class="collapse-item"><strong>科研经费完成比例：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.finishPro : 0 ) : 0}}</div>
               <div class="collapse-item"><strong>个人逐项计分：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.itemScore : 0) : 0}}</div>
@@ -112,10 +100,10 @@
                   <a style="color:blue" id="fileDown" @click.once="handleDownload(item)">{{item.uploadFiles[0]?item.uploadFiles[0].originalname : ''}}</a>
                 </div>
               </div>
-              <span class="collapse-item"><strong>总分：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciPapers ? form.scienceMoudle.sciPapers.sum : 0) : 0}}</span>
+              <span class="collapse-item"><strong>总分：</strong>{{form.scienceMoudle ? (form.scinceMoudle.sciPapers ? form.scienceMoudle.sciPapers.sum : 0) : 0}}</span>
             </el-collapse-item>
             <el-collapse-item title="科研立项">
-              <div v-for="(item,key) in form.scienceMoudle ? (form.scienceMoudle.sciProjects ? form.scienceMoudle.sciProjects.item  : []) : []">
+              <div v-for="(item,key) in form.scienceMoudle ? (form.scienceMoudle.sciProjects ? form.scienceMoudle.sciProjects.item : []) : []">
                 <span class="collapse-item"><strong>项目名称：</strong>{{item.name}}</span>
                 <span class="collapse-item"><strong>项目编号：</strong>{{item.id}}</span>
                 <span class="collapse-item"><strong>批准日期：</strong>{{item.date | formateDate}}</span>
@@ -128,7 +116,7 @@
               <span class="collapse-item"><strong>总分：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciProjects ? form.scienceMoudle.sciProjects.sum : 0):0}}</span>
             </el-collapse-item>
             <el-collapse-item title="科研成果奖励">
-              <div v-for="(item,key) in form.scienceMoudle ? (form.scienceMoudle.sciAchievement ? form.scienceMoudle.sciAchievement.item  : []): []">
+              <div v-for="(item,key) in form.scienceMoudle ? (form.scienceMoudle.sciAchievement ? form.scienceMoudle.sciAchievement.item : []): []">
                 <span class="collapse-item"><strong>证书名称：</strong>{{item.name}}</span>
                 <span class="collapse-item"><strong>获奖日期：</strong>{{item.date | formateDate}}</span>
                 <span class="collapse-item"><strong>获奖级别：</strong>{{item.level ? item.level[0] : ''}}</span>
@@ -186,8 +174,8 @@
                   <span class="collapse-item"><strong>审核理由：</strong>{{item.auditReason}}</span>
                 </div>
               </div>
-              <div>
-                <span class="record-item">科研成果奖励模块审核记录</span>
+               <div>
+                <span class="record-item">科研经费模块审核记录</span>
                 <div v-for="(item,key) in form.scienceMoudle ? (form.scienceMoudle.sciAchievement ?  form.scienceMoudle.sciAchievement.auditRecord : []): []">
                   <span class="collapse-item"><strong>审核人：</strong>{{item.auditPerson}}</span>
                   <span class="collapse-item"><strong>审核时间：</strong>{{item.auditTime | formateDate}}</span>
@@ -197,16 +185,6 @@
               </div>
             </el-collapse-item>
         </el-collapse>
-        <div class="audit-block" v-if="dialogTitle == '审核单'">
-          <!-- 审核理由 -->
-          <el-form-item label="不通过理由(必填)" v-if="showReason" required>
-            <el-input type="textarea" :rows="2" placeholder="请输入审核理由" v-model="failedReason"></el-input>
-          </el-form-item>
-          <el-form-item style="display:flex;justify-content:center">
-            <el-button type="primary" @click="handlePass">审核通过</el-button>
-            <el-button type="danger" @click="handleFailed">审核不通过</el-button>
-          </el-form-item>
-        </div>
       </el-form>
     </el-dialog>
   </div>
@@ -214,11 +192,10 @@
 
 <script>
 import dayjs from 'dayjs'
-import { getAllTeachWorkload,updateTeachWorkload } from '@/api/teachingAndRes/teachWorkload';
-//import { getAllSciFunds,updateSciFunds } from '@/api/scienceAndRes/sciFunds';
-import { getTeaStation } from '@/api/scienceAndRes/sciSetting';
+import htmlToPdf from '@/utils/htmlToPdf'
+import { getOwnTeachWorkload,deleteTeachWorkload } from '@/api/teachingAndRes/teachWorkload'
+//import { getOwnSciFunds,deleteSciFunds } from '@/api/scienceAndRes/sciFunds';
 export default {
-  inject: ['reload'],
   filters: {
     statusFilter(status) {
       const statusMap = {
@@ -233,202 +210,97 @@ export default {
     formateDate(date) {
       return dayjs(date).format('YYYY-MM-DD HH:mm')
     }
-   },
- data() {
-   return {
-     list:[],//表格中数据
-     listLoading:true,
-     form: {},
-     dialogTableVisible: false,
-     dialogTitle:'',
-     dialogTitleItem: {
-       audit:'审核单',
-       detail:'查看详情'
-     },
-     showReason: false,
-     failedReason:'',
-     visibleItem: true,//当岗位为科研岗时隐藏的项---
-     stationData:null,
-   }
- },
- mounted() {
-  //  this.getAllData();
-   this.getStation()
-   
- },
- methods:{
-   //获取岗位权重数据：
-  getStation() {
-    return new Promise((resolve,reject) => {
-      getTeaStation().then(res => {
-       if(res.code == 200) {
-         resolve(res)
-       } else {
-         reject(res.message);
-       }
-     })
-    }).then(res => {
-      console.log('res--- promise:>> ', res);
-      this.stationData = res.result[0];
-      this.getAllData();
-    })
-     
-   },
-   //获取所有的数据单
-  getAllData() {
-     console.log('this.$store.state.user.station :>> ', this.$store.state.user.station);
-     console.log('this.stationData :>> ', this.stationData);
-     //判断岗位并赋值权重
-     let staWeight = 0;
-     switch (this.$store.state.user.station) {
-       case '教学岗':
-         staWeight = this.stationData.teaching.weight;
-         break;
-       case '科研岗':
-         staWeight = this.stationData.science.weight;
-         this.visibleItem = false;
-         break;
-       case '教学科研并重岗':
-         staWeight = this.stationData.teachAndScience.weight;
-         break;
-     }
-      getAllTeachWorkload().then(res => {
-       for (let i of res.result) {
-         //科研经费以外总分
-         if(i.scienceMoudle.sciFunds || i.scienceMoudle.sciPapers || i.scienceMoudle.sciProjects || i.scienceMoudle.sciAchievement) {
-         i.scienceMoudle.sciProScoreSum = (i.scienceMoudle.sciPapers ? i.scinenceMoudle.sciPapers.sciPapersScoreSum : 0)  + (i.scienceMoudle.sciProjects ? i.scienceMoudle.sciProjects.sciProjectsScoreSum : 0) 
-         +(i.scienceMoudle.sciAchievement ? i.scienceMoudle.sciAchievement.sciAchievementScoreSum : 0)
-         > 40 ? 40 :(i.scienceMoudle.sciPapers ? i.scinenceMoudle.sciPapers.sciPapersScoreSum : 0)  + (i.scienceMoudle.sciProjects ? i.scienceMoudle.sciProjects.sciProjectsScoreSum : 0) 
-         +(i.scienceMoudle.sciAchievement ? i.scienceMoudle.sciAchievement.sciAchievementScoreSum : 0) ;
-         //岗位权重计分
-         i.scienceMoudle.weightScore =Math.floor(((i.scienceMoudle.sciFunds ? i.scienceMoudle.sciFunds.itemScore : 0) + i.scienceMoudle.sciProScoreSum) * staWeight);
-         //科研考评审核状态
-        if(i.scienceMoudle.sciFunds && i.scienceMoudle.sciFunds.status == '驳回' 
-          || i.scienceMoudle.sciPapers && i.scienceMoudle.sciPapers.status =='驳回'
-          || i.scienceMoudle.sciProjects && i.scienceMoudle.sciProjects.status == '驳回'
-          || i.scienceMoudle.sciAchievement && i.scinenceMoudle.sciAchievement.status == '驳回') {
-          i.scienceMoudle.sciStatus = '驳回';
-        } else if (i.scienceMoudle.sciFunds && i.scienceMoudle.sciFunds.status == '待审核' 
-          || i.scienceMoudle.sciPapers && i.scienceMoudle.sciPapers.status =='待审核' 
-          ||  i.scienceMoudle.sciProjects && i.scienceMoudle.sciProjects.status == '待审核'
-          || i.scienceMoudle.sciAchievement && i.scienceMoudle.sciAchievement.status == '待审核'
-          || (i.scienceMoudle.sciFunds && i.scienceMoudle.sciFunds.status == '审核中' 
-          || i.scienceMoudle.sciPapers && i.scienceMoudle.sciPapers.status =='审核中' 
-          ||  i.scienceMoudle.sciProjects && i.scienceMoudle.sciProjects.status == '审核中'
-          || i.scienceMoudle.sciAchievement && i.scienceMoudle.sciAchievement.status == '审核中') && i.scienceMoudle.sciStatus !=='审核中' ) {
-          i.scienceMoudle.sciStatus = '待审核';
-        } else if(i.finalStatus == '已完成') {
-          i.scienceMoudle.sciStatus = '已完成'
-        } else {
-          i.scienceMoudle.sciStatus = '审核中'
-        }
-         }
-       }
-       this.list = res.result.reverse();
-       this.listLoading = false;
-     })
-   },
-   //审核
-   handleAudit(row) {
-     console.log('row :>> ', row);
-     if (row.scienceMoudle.sciStatus == '待审核') {
-        this.form = row;
-        this.dialogTableVisible = true;
-        this.dialogTitle = this.dialogTitleItem.audit;
-     } else {
-        this.$message({
-            type:'warning',
-            message:'该状态下无法重新审核！'
-        })
-     }
-   },
-   //审核通过
-   handlePass() {
-     const params = {
-        auditPerson:this.$store.state.user.name,
-        auditReason:'二级审核——科研考评模块审核通过！',
-        auditStatus:'审核中',
-        auditTime:new Date()
-      }
-     this.handleSubmit(params);
-   },
-   //审核不通过
-   handleFailed() {
-     this.showReason = true;
-      if (!this.failedReason) {
-       this.$message({
-         type:'error',
-         message:'请填写不通过理由！'
-       })
-     } else {
-      //  console.log('审核不通过的this.form :>> ', this.form);
-       const params = {
-        auditPerson:this.$store.state.user.name,
-        auditReason:this.failedReason,
-        auditStatus:'驳回',
-        auditTime:new Date()
-      }
-      this.handleSubmit(params);
-     }
-   },
-   //审核提交接口
-   handleSubmit(params) {
-    console.log('params :>> ', params);
-    this.form.scienceMoudle.sciStatus = params.auditStatus; 
-    this.form.scienceMoudle.sciFunds ? this.form.scienceMoudle.sciFunds.status = params.auditStatus : '';
-    this.form.scienceMoudle.sciPapers ? this.form.scienceMoudle.sciPapers.status = params.auditStatus : '';
-    this.form.scienceMoudle.sciProjects ? this.form.scienceMoudle.sciProjects.status = params.auditStatus :'';
-    this.form.scienceMoudle.sciAchievement ? this.form.scienceMoudle.sciProjects.status = params.auditStatus :'';
-    this.form.scienceMoudle.sciMoudelAuditRecord.unshift(params);
-    console.log('this.form :>> ', this.form);
-    localStorage.removeItem('_id');
-    console.log(' :>> ', localStorage.getItem('_id'));
-    updateTeachWorkload(this.form).then(res => {
-       console.log('res :>> ', res);
-       if (res.code === 200) {
-          this.$message({
-            type:'success',
-            message:'提交审核成功！'
-          })
-          this.dialogTableVisible = false;
-          this.reload();
-        } else {
-          this.$message({
-            type:'error',
-            message:res.message
-          })
-        }
-     })
-   },
-   //查看详情
-   handleDetail(row) {
-     console.log('row :>> ', row);
-     this.form = row;
-     this.dialogTableVisible = true;
-     this.dialogTitle = this.dialogTitleItem.detail;
-   },
-   //下载文件
-  handleDownload(item) {
-    const fileId = item.uploadFiles[0].filename;
-    let xhr = new XMLHttpRequest();
-      xhr.open('GET',`http://127.0.0.1:3000/downLoad?fileId=${fileId}`);
-      xhr.onload = function (a,b) {
-        let blob = this.response;
-        let reader = new FileReader();
-        reader.readAsDataURL(blob);
-        reader.onload = function(e) {
-          let a = document.getElementById('fileDown');
-          a.download = item.uploadFiles[0].originalname;
-          a.href = e.target.result;
-          a.click()
-        }
+  },
+  data() {
+    return {
+      listLoading: true,
+      list:[],
+      dialogTableVisible: false,
+      form: {},
+      visibleItem:true,//当岗位为科研岗时，隐藏
+      excelData:[],//将要导出的表格数据
     }
-    xhr.responseType = 'blob';
-    xhr.setRequestHeader('token',getToken())
-    xhr.send();
+  },
+  mounted() {
+    this.getAllData()
+  },
+  methods: {
+    //获取该用户的科研模块清单
+    getAllData() {
+      const jobID = this.$store.state.user.jobID;
+      console.log('jobID :>> ', jobID);
+       getOwnTeachWorkload(jobID).then(res => {
+        console.log('res :>> ', res);
+        if(res.code == 200) {
+          this.listLoading = false;
+          for(let i of res.result) {
+            console.log('i :>> ', i);
+            if(i.scienceMoudle.sciStatus === '审核中' 
+            || (i.scienceMoudle.sciFunds && i.scienceMoudle.sciFunds.status == '审核中') 
+            || (i.scienceMoudle.sciPapers && i.scienceMoudle.sciPapers.status == '审核中')
+            || (i.scienceMoudle.sciProjects && i.scienceMoudle.sciProjects.status == '审核中')
+            || (i.scienceMoudle.sciAchievement && i.scienceMoudle.sciAchievement.status == '审核中'))
+            {
+               i.scienceMoudle.sciStatus = '审核中'
+             };
+            if(i.station == '科研岗') {
+              this.visibleItem = false;
+            }
+          };
+          
+          this.list = res.result.reverse();
+        }
+      })
+    },
+    //删除
+    handleDelete(row) {
+      console.log('row :>> ', row);
+      if (row.scienceMoudle.sciStatus == '已完成') {
+        this.$confirm('此操作将永久删除该整条数据(包括其他模块提交的本条数据), 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+          }).then((value) => {
+            deleteTeachWorkload(row).then(res => {
+                console.log('res :>> ', res);
+                if (res.code === 200) {
+                  this.$message({
+                    type:'success',
+                    message:res.message
+                  })
+                  this.getAllData();
+                } else {
+                  this.$message({
+                    type:'error',
+                    message: res.message
+                  })
+                }
+            })
+          }).catch((err) => {
+            this.$message({
+              type: 'info',
+              message: '已取消删除'
+            });          
+          }); 
+      } else {
+        this.$message({
+          type:'warning',
+          message:'该审核状态无法进行删除操作！'
+        })
+      }
+    },
+    //查看详情
+    handleDetail(row) {
+      console.log('row :>> ', row);
+      this.dialogTableVisible = true;
+      this.form = row
+    },
+   //将页面以pdf的形式导出
+   handleDown() {
+     htmlToPdf.downloadPDF(document.querySelector('form'),'科研考评单')
+   }
+   
   }
-
- }
 }
 </script>
 
@@ -437,5 +309,4 @@ export default {
   font-size: 14px;
   font-weight: 600;
 }
-
 </style>

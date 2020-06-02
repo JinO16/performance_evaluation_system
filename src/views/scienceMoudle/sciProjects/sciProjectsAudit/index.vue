@@ -16,29 +16,24 @@
           <span>{{ scope.row.station }}</span>
         </template>
       </el-table-column>
-      <!-- <el-table-column  align="center" label="科研论文总分" width="120px">
+      <el-table-column width="80px" align="center" label="部门">
         <template slot-scope="scope">
-          <span>{{ scope.row.sciencePaper.sum }}</span>
-        </template>
-      </el-table-column> -->
-      <el-table-column align="center" label="科研项目总分" width="120px">
-        <template slot-scope="scope">
-          <span>{{ scope.row.sciProjects.sum }}</span>
+          <span>{{ scope.row.department }}</span>
         </template>
       </el-table-column>
-      <!-- <el-table-column align="center" label="科研成果奖励总分" width="140px">
+      <el-table-column align="center" label="科研立项总分" width="140px">
         <template slot-scope="scope">
-          <span>{{ scope.row.scienceAward.sum }}</span>
+          <span>{{ scope.row.scienceMoudle.sciProjects ? scope.row.scienceMoudle.sciProjects.sum : 0 }}</span>
         </template>
-      </el-table-column> -->
+      </el-table-column>
       <el-table-column class-name="status-col" align="center" label="状态" width="80px">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.auditRecord[0]? scope.row.auditRecord[0].auditStatus :'待审核'| statusFilter">{{ scope.row.auditRecord[0]? scope.row.auditRecord[0].auditStatus : '待审核'}}</el-tag>
+          <el-tag :type="scope.row.scienceMoudle.sciProjects.status |statusFilter">{{scope.row.scienceMoudle.sciProjects.status}}</el-tag>
         </template>
       </el-table-column>
        <el-table-column width="100px" align="center" label="总分数">
         <template slot-scope="scope">
-          <span>{{scope.row.sciProjects.sum}}</span>
+           <span>{{(scope.row.scienceMoudle.sciProjects ? scope.row.scienceMoudle.sciProjects.sum : 0)}}</span>
         </template>
       </el-table-column>
        <el-table-column
@@ -54,40 +49,34 @@
           >审核</el-button>
           <el-button
             size="mini"
-            type="danger"
-            @click="handleDelete(scope.row)"
-          >删除</el-button>
+           plain
+            @click="handleDteail(scope.row)"
+          >查看详情</el-button>
         </template>
       </el-table-column>
     </el-table>
     <!-- 审核单弹窗 -->
-    <el-dialog el-drag-dialog :visible.sync="dialogTableVisible" title="科研立项审核单">
+   <el-dialog el-drag-dialog :visible.sync="dialogTableVisible" :title="dialogTitle">
       <el-form ref="form" :inline="true" :model="form" class="demo-form-inline">
-        <el-form-item label="姓名">
-          <el-input v-model="form.name" disabled></el-input>
+       <el-form-item label="姓名">
+          {{form.name}}
         </el-form-item>
         <el-form-item label="工号">
-          <el-input v-model="form.jobID" disabled></el-input>
+          {{form.jobID}}
         </el-form-item>
         <el-form-item label="岗位">
-          <el-input v-model="form.station" disabled></el-input>
+          {{form.station}}
+        </el-form-item>
+        <el-form-item label="部门">
+          {{form.department}}
         </el-form-item>
         <el-form-item label="提交时间">
-          <el-input v-model="form.submitTime" disabled></el-input>
+          {{form.submitTime | formateDate}}
         </el-form-item>
         <el-collapse>
-             <!-- <el-collapse-item title="科研论文">
-              <div v-for="(item,key) in form.sciencePaper ? form.sciencePaper.item : []">
-                <span class="collapse-item"><strong>论文类型: </strong>{{item.type[0]}}</span>
-                <span class="collapse-item"><strong>个人逐项计分：</strong>{{item.type[1]}}</span>
-                <div class="collapse-item"><strong>附件：</strong>
-                  <a style="color:blue" id="fileDown" @click.once="handleDownload(item)">{{item.uploadFiles[0]?item.uploadFiles[0].originalname : ''}}</a>
-                </div>
-              </div>
-              <span class="collapse-item"><strong>总分：</strong>{{form.sciencePaper ? form.sciencePaper.sum : 0}}</span>
-            </el-collapse-item> -->
-            <el-collapse-item title="科研项目">
-              <div v-for="(item,key) in form.sciProjects ? form.sciProjects.item : []">
+             
+        <el-collapse-item title="科研项目">
+        <div v-for="(item,key) in form.scienceMoudle ? (form.scienceMoudle.sciProjects ? form.scienceMoudle.sciProjects.item : []) : []">
                 <span class="collapse-item"><strong>项目名称：</strong>{{item.name}}</span>
                 <span class="collapse-item"><strong>项目编号：</strong>{{item.id}}</span>
                 <span class="collapse-item"><strong>批准日期：</strong>{{item.date | formateDate}}</span>
@@ -97,22 +86,23 @@
                   <a style="color:blue" id="fileDown" @click.once="handleDownload(item)">{{item.uploadFiles[0] ? item.uploadFiles[0].originalname : ''}}</a>
                 </div>
               </div>
-              <span class="collapse-item"><strong>总分：</strong>{{form.sciProjects ? form.sciProjects.sum : 0}}</span>
+               <span class="collapse-item"><strong>总分：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciProjects ? form.scienceMoudle.sciProjects.sum : 0):0}}</span>
             </el-collapse-item>
-            <!-- <el-collapse-item title="科研成果奖励">
-              <div v-for="(item,key) in form.scienceAward ? form.scienceAward.item : []">
-                <span class="collapse-item"><strong>证书/专利/专著名称: </strong>{{item.name}}</span>
-                <span class="collapse-item"><strong>获奖日期：</strong>{{item.date | formateDate}}</span>
-                <span class="collapse-item"><strong>获奖级别：</strong>{{item.level ? item.level[0] : ''}}</span>
-                <span class="collapse-item"><strong>个人逐项计分：</strong>{{item.level ? item.level[1] * item.level[2] : 0}}</span>
-                <div class="collapse-item"><strong>附件：</strong>
-                  <a style="color:blue" id="fileDown" @click.once="handleDownload(item)">{{item.uploadFiles[0] ? item.uploadFiles[0].originalname :''}}</a>
-                </div>
-              </div>
-              <span class="collapse-item"><strong>总分：</strong>{{form.scienceAward ? form.scienceAward.sum : 0}}</span>
-            </el-collapse-item> -->
+           
             <el-collapse-item title="审核记录">
-              <div v-for="(item,key) in form.auditRecord">
+              <div v-for="(item,key) in form.finalAuditRecord">
+                <span class="collapse-item"><strong>审核人：</strong>{{item.auditPerson}}</span>
+                <span class="collapse-item"><strong>审核时间：</strong>{{item.auditTime | formateDate}}</span>
+                <span class="collapse-item"><strong>审核状态：</strong>{{item.auditStatus}}</span>
+                <span class="collapse-item"><strong>审核理由：</strong>{{item.auditReason}}</span>
+              </div>
+              <div v-for="(item,key) in form.scienceMoudle ? form.scienceMoudle.sciMoudelAuditRecord : []">
+                <span class="collapse-item"><strong>审核人：</strong>{{item.auditPerson}}</span>
+                <span class="collapse-item"><strong>审核时间：</strong>{{item.auditTime | formateDate}}</span>
+                <span class="collapse-item"><strong>审核状态：</strong>{{item.auditStatus}}</span>
+                <span class="collapse-item"><strong>审核理由：</strong>{{item.auditReason}}</span>
+              </div>
+              <div v-for="(item,key) in form.scienceMoudle ? (form.scienceMoudle.sciProjects ?  form.scienceMoudle.sciProjects.auditRecord : []): []">
                 <span class="collapse-item"><strong>审核人：</strong>{{item.auditPerson}}</span>
                 <span class="collapse-item"><strong>审核时间：</strong>{{item.auditTime | formateDate}}</span>
                 <span class="collapse-item"><strong>审核状态：</strong>{{item.auditStatus}}</span>
@@ -137,7 +127,8 @@
 
 <script>
 import dayjs from 'dayjs'
-import { getAllSciProjects, updateSciProjects } from '@/api/scienceAndRes/sciProjects'
+import { getAllTeachWorkload,updateTeachWorkload } from '@/api/teachingAndRes/teachWorkload'
+// import { getAllSciProjects, updateSciProjects } from '@/api/scienceAndRes/sciProjects'
 import { getToken } from '../../../../utils/auth'
 export default {
   inject:["reload"],
@@ -164,6 +155,11 @@ export default {
       form:{},//审核单内详情数据
       failedReason:'',//审核不通过理由
       showReason:false,//显示审核理由输入框
+       dialogTitle:'',
+      dialogTitleItem: {
+        audit:'审核单',
+        detail:'查看详情'
+      }
     }
   },
   mounted() {
@@ -172,22 +168,41 @@ export default {
   methods: {
     //获取表格数据
     getAllData() {
-      getAllSciProjects().then(res => {
+     getAllTeachWorkload().then(res => {
+        console.log('获取的表格数据审核单 :>> ', res);
         if (res.code === 200) {
-          this.list = res.result;
+          const resultArr = [];
+          for (let i of res.result) {
+            if (i.scienceMoudle.sciProjects) {
+              resultArr.unshift(i)
+            }
+          }
+          this.list = resultArr;
+          // console.log('this.list :>> ', this.list);
           this.listLoading = false;
         }
       }) 
     },
     //审核
     handleAudit(value) {
-      this.dialogTableVisible = true;
-      this.form = value;
+      console.log('value :>> ', value);
+      if (value.scienceMoudle.sciProjects.status = '待审核') {
+        this.dialogTableVisible = true;
+        this.dialogTitle = this.dialogTitleItem.audit;
+        this.form = value;
+      } else {
+        this.$message({
+          type:'warning',
+          message:'该状态下无法重新审核！'
+        })
+      }
+      
     },
     //审核提交接口调用
     handleSubmit(params) {
-      this.form.auditRecord.unshift(params);
-      updateSciProjects(this.form).then(res => {
+      this.form.scienceMoudle.sciProjects.auditRecord.unshift(params);
+      this.form.scienceMoudle.sciProjects.status = params.auditStatus;
+      updateTeachWorkload(this.form).then(res => {
         console.log('res :>> ', res);
         if (res.code === 200) {
           this.$message({
@@ -209,7 +224,7 @@ export default {
       this.showReason = false;
       const params = {
         auditPerson:this.$store.state.user.name,
-        auditReason:this.failedReason,
+        auditReason:'教学教研模块审核通过！',
         auditStatus:'审核中',
         auditTime:new Date()
       }
@@ -235,25 +250,12 @@ export default {
       this.handleSubmit(params);
      }
     },
-    //删除
-    handleDelete(value) {
-      this.$confirm('此操作将永久删除该项目, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          this.list.splice(value,1);
-          this.$message({
-            type: 'success',
-            message: '删除成功!'
-          });
-        }).catch((err) => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          });          
-      }); 
-      this.getAllData();
+   //查看详情
+    handleDteail(value) {
+      console.log('value :>> ', value);
+      this.dialogTableVisible = true;
+      this.dialogTitle = this.dialogTitleItem.detail;
+      this.form = value;
     },
      //下载文件
     handleDownload(item) {
