@@ -29,11 +29,7 @@
     "vue": "2.6.10",
     "vue-router": "3.0.6",
     "vuex": "3.1.0",
-<<<<<<< HEAD
-    "xlsx": "^0.16.1"
-=======
     "xlsx": "^0.16.0"
->>>>>>> 8aa5369a8dccd8fbe521ce986ed06f0f8dbbf881
   },
   "devDependencies": {
     "@babel/core": "7.0.0",

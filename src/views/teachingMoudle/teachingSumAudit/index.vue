@@ -1,9 +1,6 @@
 <template>
   <div class="app-container">
-<<<<<<< HEAD
-=======
     <el-button type="primary" @click="exportData()" style="float:right">导出数据</el-button> 
->>>>>>> 8aa5369a8dccd8fbe521ce986ed06f0f8dbbf881
     <el-table v-loading="listLoading" :data="list" highlight-current-row style="width: 100%">
       <el-table-column align="center" label="姓名" width="80">
         <template slot-scope="scope">
@@ -296,10 +293,7 @@ export default {
      failedReason:'',
      visibleItem: false,//当岗位为非科研岗时隐藏的项---
      stationData:null,
-<<<<<<< HEAD
-=======
      excelData:[],//将要导出的表格数据
->>>>>>> 8aa5369a8dccd8fbe521ce986ed06f0f8dbbf881
    }
  },
  mounted() {
@@ -372,10 +366,6 @@ export default {
          
        }
        this.list = res.result.reverse();
-<<<<<<< HEAD
-=======
-      //  console.log('this.list :>> ', this.list);
->>>>>>> 8aa5369a8dccd8fbe521ce986ed06f0f8dbbf881
        this.listLoading = false;
      })
    },
@@ -476,10 +466,6 @@ export default {
     xhr.responseType = 'blob';
     xhr.setRequestHeader('token',getToken())
     xhr.send();
-<<<<<<< HEAD
-  }
-
-=======
   },
   //导出表格数据
   exportData() {
@@ -519,7 +505,6 @@ export default {
   formatJson(filterVal, jsonData) {
     return jsonData.map(v => filterVal.map(j => v[j]))
   }
->>>>>>> 8aa5369a8dccd8fbe521ce986ed06f0f8dbbf881
  }
 }
 </script>

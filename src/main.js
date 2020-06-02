@@ -17,13 +17,8 @@ import '@/permission' // permission control
 import axios from 'axios'
 Vue.prototype.$axios = axios;
 // //导出表格
-<<<<<<< HEAD
-// import Blob from './excel/Blob.js'
-// import Export2Excel from './excel/Export2Excel.js'
-=======
 import Blob from './excel/Blob.js'
 import Export2Excel from './excel/Export2Excel.js'
->>>>>>> 8aa5369a8dccd8fbe521ce986ed06f0f8dbbf881
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api

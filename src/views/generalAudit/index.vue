@@ -26,7 +26,6 @@
           {{ scope.row.teachingMoudle.weightScore}}
         </template>
       </el-table-column>
-<<<<<<< HEAD
       <el-table-column width="120px" align="center" label="学科建设研究生工作权重计分">
         <template slot-scope="scope">
           {{ scope.row.xyrModule.weightScore}}
@@ -42,8 +41,6 @@
           {{ scope.row.xsgzModule.weightScore}}
         </template>
       </el-table-column>
-=======
->>>>>>> 8aa5369a8dccd8fbe521ce986ed06f0f8dbbf881
       <el-table-column width="120px" align="center" label="状态">
         <template slot-scope="scope">
          <el-tag :type="scope.row.finalStatus | statusFilter">{{scope.row.finalStatus}}</el-tag>
@@ -190,7 +187,6 @@
               </div>
               <span class="collapse-item"><strong>总分：</strong>{{form.teachingMoudle ? (form.teachingMoudle.teaProAndOther ? form.teachingMoudle.teaProAndOther.famousTeachers.sum : 0) : 0}}</span>
             </el-collapse-item>
-<<<<<<< HEAD
             <el-collapse-item title="学科建设">
               <div v-for="(item,key) in form.xyrModule ? (form.xyrModule.xyr ? form.xyrModule.xyr.xkjs.item : []) : []">
                 <span class="collapse-item"><strong>项目类型：</strong>{{item.level ? item.level[0] : ''}}</span>
@@ -323,8 +319,7 @@
               </div>
               <span class="collapse-item"><strong>总分：</strong>{{form.xsgzModule ? (form.xsgzModule.huojiang ? form.xsgzModule.huojiang.biaozhang.sum : 0) : 0}}</span>
             </el-collapse-item>
-=======
->>>>>>> 8aa5369a8dccd8fbe521ce986ed06f0f8dbbf881
+
             <el-collapse-item title="审核记录">
               <div>
                 <span class="record-item">终极审核记录</span>
@@ -344,7 +339,6 @@
                   <span class="collapse-item"><strong>审核理由：</strong>{{item.auditReason}}</span>
                 </div>
               </div>
-<<<<<<< HEAD
               <div>
                 <span class="record-item">学科建设研究生工作模块审核记录</span>
                 <div v-for="(item,key) in form.xyrModule ? form.xyrModule.xyrModuleAuditRecord : []">
@@ -372,9 +366,7 @@
                   <span class="collapse-item"><strong>审核理由：</strong>{{item.auditReason}}</span>
                 </div>
               </div>
-=======
-              
->>>>>>> 8aa5369a8dccd8fbe521ce986ed06f0f8dbbf881
+
               <div>
                 <span class="record-item">工作量模块审核记录</span>
                 <div v-for="(item,key) in form.teachingMoudle ? (form.teachingMoudle.workLoad ?  form.teachingMoudle.workLoad.auditRecord : []): []">
@@ -527,7 +519,6 @@ export default {
     console.log('params :>> ', params);
     this.form.finalStatus = params.auditStatus;
     this.form.teachingMoudle.teaStatus = params.auditStatus; 
-<<<<<<< HEAD
     this.form.xyrModule.xyrStatus = params.auditStatus; 
     this.form.zygxModule.zygxStatus = params.auditStatus; 
     this.form.xsgzModule.xsgzStatus = params.auditStatus; 
@@ -539,11 +530,6 @@ export default {
     this.form.zygxModule.zyjs ? this.form.xyrModule.zyjs.status = params.auditStatus : '';
     this.form.xsgzModule.huojiang ? this.form.xsgzModule.huojiang.status = params.auditStatus : '';
     this.form.xsgzModule.zhuanxiang ? this.form.xsgzModule.zhuanxiang.status = params.auditStatus : '';
-=======
-    this.form.teachingMoudle.workLoad ? this.form.teachingMoudle.workLoad.status = params.auditStatus : '';
-    this.form.teachingMoudle.teachResChild ? this.form.teachingMoudle.teachResChild.status = params.auditStatus : '';
-    this.form.teachingMoudle.teaProAndOther ? this.form.teachingMoudle.teaProAndOther.status = params.auditStatus :'';
->>>>>>> 8aa5369a8dccd8fbe521ce986ed06f0f8dbbf881
     this.form.finalAuditRecord.unshift(params);
     console.log('this.form :>> ', this.form);
     localStorage.removeItem('_id');
