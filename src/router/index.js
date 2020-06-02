@@ -29,6 +29,7 @@ export const constantRoutes = [
       meta: { title: '首页', icon: 'dashboard' }
     }]
   },
+<<<<<<< HEAD
 
 
 
@@ -45,6 +46,8 @@ export const constantRoutes = [
 
 
 
+=======
+>>>>>>> 8aa5369a8dccd8fbe521ce986ed06f0f8dbbf881
   {
     path: '/teachingModule',
     component: Layout,
@@ -57,7 +60,11 @@ export const constantRoutes = [
     children: [
       {
         path: 'workload',
+<<<<<<< HEAD
         component: () => import('@/views/teachingMoudle/workload/index'), // Parent router-view
+=======
+        component: () => import('@/views/teachingMoudle/workload/index'),
+>>>>>>> 8aa5369a8dccd8fbe521ce986ed06f0f8dbbf881
         name: 'workload',
         meta: { title: '工作量', icon: 'clipboard' },
         children: [
@@ -118,7 +125,11 @@ export const constantRoutes = [
       {
         path:'teachingSumList',
         name:'teachingSumList',
+<<<<<<< HEAD
         component:() => import('@/views/teachingMoudle/teachingSumList'),
+=======
+        component:() => import('@/views/teachingMoudle/teachingSumList/index.vue'),
+>>>>>>> 8aa5369a8dccd8fbe521ce986ed06f0f8dbbf881
         meta:{title:'教研考评汇总单',icon:'chart'}
       },
       {
@@ -135,6 +146,7 @@ export const constantRoutes = [
       }
     ]
   },
+<<<<<<< HEAD
 
 
 
@@ -359,6 +371,14 @@ export const constantRoutes = [
 
 
 
+=======
+  //个人信息页面路由定义
+  {
+    path:'/user',
+    component:() => import('@/views/userInformation/index'),
+    name:'user'
+  },
+>>>>>>> 8aa5369a8dccd8fbe521ce986ed06f0f8dbbf881
   {
     path: '/generalAudit',
     component: Layout,
@@ -391,7 +411,11 @@ export const constantRoutes = [
         path: 'index',
         name: 'personManager',
         component: () => import('@/views/personManager/index'),
+<<<<<<< HEAD
         meta: { title: '人员信息管理', icon: 'user' }
+=======
+        meta: { title: '用户信息管理', icon: 'user' }
+>>>>>>> 8aa5369a8dccd8fbe521ce986ed06f0f8dbbf881
       }
     ] 
   },

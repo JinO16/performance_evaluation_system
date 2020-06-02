@@ -1,5 +1,9 @@
 <template>
   <div class="app-container">
+<<<<<<< HEAD
+=======
+    <el-button type="primary" @click="exportData()" style="float:right">导出数据</el-button> 
+>>>>>>> 8aa5369a8dccd8fbe521ce986ed06f0f8dbbf881
     <el-table v-loading="listLoading" :data="list" highlight-current-row style="width: 100%">
       <el-table-column align="center" label="姓名" width="80">
         <template slot-scope="scope">
@@ -292,6 +296,10 @@ export default {
      failedReason:'',
      visibleItem: false,//当岗位为非科研岗时隐藏的项---
      stationData:null,
+<<<<<<< HEAD
+=======
+     excelData:[],//将要导出的表格数据
+>>>>>>> 8aa5369a8dccd8fbe521ce986ed06f0f8dbbf881
    }
  },
  mounted() {
@@ -364,6 +372,10 @@ export default {
          
        }
        this.list = res.result.reverse();
+<<<<<<< HEAD
+=======
+      //  console.log('this.list :>> ', this.list);
+>>>>>>> 8aa5369a8dccd8fbe521ce986ed06f0f8dbbf881
        this.listLoading = false;
      })
    },
@@ -464,8 +476,50 @@ export default {
     xhr.responseType = 'blob';
     xhr.setRequestHeader('token',getToken())
     xhr.send();
+<<<<<<< HEAD
   }
 
+=======
+  },
+  //导出表格数据
+  exportData() {
+    console.log(' 导出表格数据:>> ');
+    this.$confirm('此操作将导出excel文件，是否继续？','提示',{
+      confirmButtonText:'确定',
+      cancelButtonText:'取消',
+      type:'warning'
+    }).then(() => {
+      for (let item of this.list) {
+        item.workLoadSum = item.teachingMoudle.workLoad ? item.teachingMoudle.workLoad.itemScore : 0;
+        item.teachResChildSum = item.teachingMoudle.teachResChild ? item.teachingMoudle.teachResChild.teachResScoreSum : 0;
+        item.teaProAndOtherSum = item.teachingMoudle.teaProAndOther ? item.teachingMoudle.teaProAndOther.teaProScoreSum : 0;
+        item.teachSum = item.teachingMoudle.teachProScoreSum ? item.teachingMoudle.teachProScoreSum : 0;
+        item.weightScore = item.teachingMoudle.weightScore ? item.teachingMoudle.weightScore : 0;
+      }
+      this.excelData = this.list;//导出的数据list
+      this.exportExcel();
+    }).catch(() => {
+      this.$message({
+        type:'info',
+        message:'已取消！'
+      })
+    });
+  },
+  exportExcel(){
+    const that = this;
+    require.ensure([], () => {
+      const { export_json_to_excel } = require('../../../excel/Export2Excel.js');
+      const tHeader = ['姓名','工号','岗位','部门','工作量计分','教学教研计分','教学工程及其他计分','教研项目奖项总分','岗位权重计分'];
+      const filterVal = ['name','jobID','station','department','workLoadSum','teachResChildSum','teaProAndOtherSum','teachSum','weightScore'];
+      const list = that.excelData;
+      const data = that.formatJson(filterVal, list);
+      export_json_to_excel(tHeader, data ,'教研考评数据汇总')
+    });
+  },
+  formatJson(filterVal, jsonData) {
+    return jsonData.map(v => filterVal.map(j => v[j]))
+  }
+>>>>>>> 8aa5369a8dccd8fbe521ce986ed06f0f8dbbf881
  }
 }
 </script>

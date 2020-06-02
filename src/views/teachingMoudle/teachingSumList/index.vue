@@ -60,7 +60,10 @@
     <el-dialog el-drag-dialog :visible.sync="dialogTableVisible" title="查看详情">
       <el-button type="primary" @click="handleDown">PDF下载</el-button>
       <el-form id="form" :inline="true" :model="form" class="demo-form-inline">
+<<<<<<< HEAD
         <!-- <el-button type="primary" @click="exportData(form)">导出数据</el-button> -->
+=======
+>>>>>>> 8aa5369a8dccd8fbe521ce986ed06f0f8dbbf881
         <el-form-item label="姓名：">
           {{form.name}}
         </el-form-item>
@@ -261,7 +264,10 @@ export default {
       dialogTableVisible: false,
       form: {},
       visibleItem:false,//当岗位为非科研岗时，隐藏
+<<<<<<< HEAD
       excelData:[],//将要导出的表格数据
+=======
+>>>>>>> 8aa5369a8dccd8fbe521ce986ed06f0f8dbbf881
     }
   },
   mounted() {
@@ -278,11 +284,21 @@ export default {
           this.listLoading = false;
           for(let i of res.result) {
             console.log('i :>> ', i);
+<<<<<<< HEAD
             if(i.teachingMoudle.teaStatus === '审核中'  || (i.teachingMoudle.workLoad && i.teachingMoudle.workLoad.status == '审核中')  || (i.teachingMoudle.teachResChild && i.teachingMoudle.teachResChild.status == '审核中')|| (i.teachingMoudle.teaProAndOther && i.teachingMoudle.teaProAndOther.status == '审核中'))
             {
                i.teachingMoudle.teaStatus = '审核中'
              };
 
+=======
+            if(i.teachingMoudle.teaStatus === '审核中' 
+            || (i.teachingMoudle.workLoad && i.teachingMoudle.workLoad.status == '审核中') 
+            || (i.teachingMoudle.teachResChild && i.teachingMoudle.teachResChild.status == '审核中')
+            || (i.teachingMoudle.teaProAndOther && i.teachingMoudle.teaProAndOther.status == '审核中'))
+            {
+               i.teachingMoudle.teaStatus = '审核中'
+             };
+>>>>>>> 8aa5369a8dccd8fbe521ce986ed06f0f8dbbf881
             if(i.station == '科研岗') {
               this.visibleItem = true;
             }
@@ -335,6 +351,10 @@ export default {
       this.dialogTableVisible = true;
       this.form = row
     },
+<<<<<<< HEAD
+=======
+    
+>>>>>>> 8aa5369a8dccd8fbe521ce986ed06f0f8dbbf881
    //将页面以pdf的形式导出
    handleDown() {
      htmlToPdf.downloadPDF(document.querySelector('form'),'教研考评单')

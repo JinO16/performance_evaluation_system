@@ -46,7 +46,11 @@ module.exports = {
     resolve: {
       alias: {
         '@': resolve('src'),
+<<<<<<< HEAD
         // 'excel': path.resolve(__dirname, './src/excel'),//新增加一行,表格导出
+=======
+        'excel': path.resolve(__dirname, './src/excel'),//新增加一行,表格导出
+>>>>>>> 8aa5369a8dccd8fbe521ce986ed06f0f8dbbf881
       }
     }
   },
