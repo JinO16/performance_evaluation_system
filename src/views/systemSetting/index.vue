@@ -354,13 +354,17 @@ export default {
         },       
         //添加级别标签
         handleLevelAdd() {
-             this.$message({
-                type:'warning',
-                message:'抱歉！该功能暂不支持！'
-            })
-            // this.dialogLevelVisible = true;
-            // this.addLevelVisible = true;
-            // this.dialogLevelTitle = this.levelTitle.addLevel;
+            if (this.levelData.length != 0) {
+                this.$message({
+                    type:'warning',
+                    message:'抱歉！该功能暂不支持！'
+                })
+            } else {
+                this.dialogLevelVisible = true;
+                this.addLevelVisible = true;
+                this.dialogLevelTitle = this.levelTitle.addLevel;
+            }
+            
         },
         //确认添加级别
         handleLevelAddSubmit() {
