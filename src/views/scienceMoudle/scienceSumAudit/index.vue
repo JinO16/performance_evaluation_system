@@ -1,5 +1,6 @@
 <template>
   <div class="app-container">
+     <el-button type="primary" @click="exportData()" style="float:right">导出数据</el-button> 
     <el-table v-loading="listLoading" :data="list" highlight-current-row style="width: 100%">
       <el-table-column align="center" label="姓名" width="80">
         <template slot-scope="scope">
@@ -23,22 +24,22 @@
       </el-table-column>
       <el-table-column width="120px" align="center" label="科研经费计分">
         <template slot-scope="scope">
-          {{ scope.row.scienceMoudle.scieFunds ? scope.row.scienceMoudle.sciFunds.itemScore : 0}}
+          {{ scope.row.scienceMoudle.sciFunds ? scope.row.scienceMoudle.sciFunds.itemScore : 0}}
         </template>
       </el-table-column>
       <el-table-column width="120px" align="center" label="科研论文计分">
         <template slot-scope="scope">
-          {{ scope.row.scienceMoudle.sciPapers ? scope.row.scienceMoudle.sciPapers.sciPapersScoreSum : 0}}
+          {{ scope.row.scienceMoudle.sciPapers ? scope.row.scienceMoudle.sciPapers.sciPapersSum : 0}}
         </template>
       </el-table-column>
       <el-table-column width="100px" align="center" label="科研立项计分">
         <template slot-scope="scope">
-          {{ scope.row.scienceMoudle.sciProjects ? scope.row.scienceMoudle.sciProjects.sciProjectsScoreSum : 0}}
+          {{ scope.row.scienceMoudle.sciProjects ? scope.row.scienceMoudle.sciProjects.sciProjectsSum : 0}}
         </template>
       </el-table-column>
       <el-table-column width="100px" align="center" label="科研成果奖励计分">
         <template slot-scope="scope">
-          {{ scope.row.scienceMoudle.sciAchievement ? scope.row.scienceMoudle.sciAchievement.sciAchievementScoreSum : 0}}
+          {{ scope.row.scienceMoudle.sciAchievement ? scope.row.scienceMoudle.sciAchievement.sciAchievementSum : 0}}
         </template>
       </el-table-column>
       <el-table-column width="100px" align="center" label="论文、立项、成果奖励总分">
@@ -107,7 +108,7 @@
             <el-collapse-item title="科研论文">
               <div v-for="(item,key) in form.scienceMoudle ? (form.scienceMoudle.sciPapers ? form.scienceMoudle.sciPapers.item  : []) : []">
                 <span class="collapse-item"><strong>获奖级别：</strong>{{item.type[0]}}</span>
-                <span class="collapse-item"><strong>个人逐项计分：</strong>{{item.type[1]}}</span>
+                <span class="collapse-item"><strong>个人逐项计分：</strong>{{item.type[0]}}</span>
                 <div class="collapse-item"><strong>附件：</strong>
                   <a style="color:blue" id="fileDown" @click.once="handleDownload(item)">{{item.uploadFiles[0]?item.uploadFiles[0].originalname : ''}}</a>
                 </div>
@@ -216,7 +217,7 @@
 import dayjs from 'dayjs'
 import { getAllTeachWorkload,updateTeachWorkload } from '@/api/teachingAndRes/teachWorkload';
 //import { getAllSciFunds,updateSciFunds } from '@/api/scienceAndRes/sciFunds';
-import { getTeaStation } from '@/api/scienceAndRes/sciSetting';
+import { getSciStation } from '@/api/scienceAndRes/sciSetting';
 export default {
   inject: ['reload'],
   filters: {
@@ -249,6 +250,7 @@ export default {
      failedReason:'',
      visibleItem: true,//当岗位为科研岗时隐藏的项---
      stationData:null,
+      excelData:[],//将要导出的表格数据
    }
  },
  mounted() {
@@ -260,7 +262,7 @@ export default {
    //获取岗位权重数据：
   getStation() {
     return new Promise((resolve,reject) => {
-      getTeaStation().then(res => {
+      getSciStation().then(res => {
        if(res.code == 200) {
          resolve(res)
        } else {
@@ -296,17 +298,17 @@ export default {
        for (let i of res.result) {
          //科研经费以外总分
          if(i.scienceMoudle.sciFunds || i.scienceMoudle.sciPapers || i.scienceMoudle.sciProjects || i.scienceMoudle.sciAchievement) {
-         i.scienceMoudle.sciProScoreSum = (i.scienceMoudle.sciPapers ? i.scinenceMoudle.sciPapers.sciPapersScoreSum : 0)  + (i.scienceMoudle.sciProjects ? i.scienceMoudle.sciProjects.sciProjectsScoreSum : 0) 
-         +(i.scienceMoudle.sciAchievement ? i.scienceMoudle.sciAchievement.sciAchievementScoreSum : 0)
-         > 40 ? 40 :(i.scienceMoudle.sciPapers ? i.scinenceMoudle.sciPapers.sciPapersScoreSum : 0)  + (i.scienceMoudle.sciProjects ? i.scienceMoudle.sciProjects.sciProjectsScoreSum : 0) 
-         +(i.scienceMoudle.sciAchievement ? i.scienceMoudle.sciAchievement.sciAchievementScoreSum : 0) ;
+         i.scienceMoudle.sciProScoreSum = (i.scienceMoudle.sciPapers ? i.scienceMoudle.sciPapers.sciPapersSum : 0)  + (i.scienceMoudle.sciProjects ? i.scienceMoudle.sciProjects.sciProjectsSum : 0) 
+         +(i.scienceMoudle.sciAchievement ? i.scienceMoudle.sciAchievement.sciAchievementSum : 0)
+         > 40 ? 40 :(i.scienceMoudle.sciPapers ? i.scienceMoudle.sciPapers.sciPapersSum : 0)  + (i.scienceMoudle.sciProjects ? i.scienceMoudle.sciProjects.sciProjectsSum : 0) 
+         +(i.scienceMoudle.sciAchievement ? i.scienceMoudle.sciAchievement.sciAchievementSum : 0) ;
          //岗位权重计分
          i.scienceMoudle.weightScore =Math.floor(((i.scienceMoudle.sciFunds ? i.scienceMoudle.sciFunds.itemScore : 0) + i.scienceMoudle.sciProScoreSum) * staWeight);
          //科研考评审核状态
         if(i.scienceMoudle.sciFunds && i.scienceMoudle.sciFunds.status == '驳回' 
           || i.scienceMoudle.sciPapers && i.scienceMoudle.sciPapers.status =='驳回'
           || i.scienceMoudle.sciProjects && i.scienceMoudle.sciProjects.status == '驳回'
-          || i.scienceMoudle.sciAchievement && i.scinenceMoudle.sciAchievement.status == '驳回') {
+          || i.scienceMoudle.sciAchievement && i.scienceMoudle.sciAchievement.status == '驳回') {
           i.scienceMoudle.sciStatus = '驳回';
         } else if (i.scienceMoudle.sciFunds && i.scienceMoudle.sciFunds.status == '待审核' 
           || i.scienceMoudle.sciPapers && i.scienceMoudle.sciPapers.status =='待审核' 
@@ -373,12 +375,12 @@ export default {
    },
    //审核提交接口
    handleSubmit(params) {
-    console.log('params :>> ', params);
+    console.log('params审核提交接口 :>> ', params);
     this.form.scienceMoudle.sciStatus = params.auditStatus; 
     this.form.scienceMoudle.sciFunds ? this.form.scienceMoudle.sciFunds.status = params.auditStatus : '';
     this.form.scienceMoudle.sciPapers ? this.form.scienceMoudle.sciPapers.status = params.auditStatus : '';
     this.form.scienceMoudle.sciProjects ? this.form.scienceMoudle.sciProjects.status = params.auditStatus :'';
-    this.form.scienceMoudle.sciAchievement ? this.form.scienceMoudle.sciProjects.status = params.auditStatus :'';
+    this.form.scienceMoudle.sciAchievement ? this.form.scienceMoudle.sciAchievement.status = params.auditStatus :'';
     this.form.scienceMoudle.sciMoudelAuditRecord.unshift(params);
     console.log('this.form :>> ', this.form);
     localStorage.removeItem('_id');
@@ -426,8 +428,46 @@ export default {
     xhr.responseType = 'blob';
     xhr.setRequestHeader('token',getToken())
     xhr.send();
+     },
+  //导出表格数据
+  exportData() {
+    console.log(' 导出表格数据:>> ');
+    this.$confirm('此操作将导出excel文件，是否继续？','提示',{
+      confirmButtonText:'确定',
+      cancelButtonText:'取消',
+      type:'warning'
+    }).then(() => {
+      for (let item of this.list) {
+        item.sciFundsSum = item.scienceMoudle.sciFunds ? item.scienceMoudle.sciFunds.itemScore : 0;
+        item.sciPapersSum = item.teachingMoudle.sciPapers ? item.scienceMoudle.sciPapers.sciPapersSum : 0;
+        item.sciProjectsSum = item.scienceMoudle.sciProjects ? item.scienceMoudle.sciProjects.sciProjectsSum : 0;
+        item.sciAchievementSum = item.scienceMoudle.sciAchievement ? item.scienceMoudle.sciAchievement.sciAchievementSum : 0;
+        item.sciSum = item.scienceMoudle.sciProScoreSum ? item.scienceMoudle.sciProScoreSum : 0;
+        item.weightScore = item.scienceMoudle.weightScore ? item.scienceMoudle.weightScore : 0;
+      }
+      this.excelData = this.list;//导出的数据list
+      this.exportExcel();
+    }).catch(() => {
+      this.$message({
+        type:'info',
+        message:'已取消！'
+      })
+    });
+  },
+  exportExcel(){
+    const that = this;
+    require.ensure([], () => {
+      const { export_json_to_excel } = require('../../../excel/Export2Excel.js');
+      const tHeader = ['姓名','工号','岗位','部门','科研经费计分','科研论文计分','科研立项计分','科研成果奖励计分','科研论文、科研立项、科研成果奖励总分','岗位权重计分'];
+      const filterVal = ['name','jobID','station','department','sciFundsSum','sciPapersSum','sciProjectsSum','sciAchievementSum','sciSum','weightScore'];
+      const list = that.excelData;
+      const data = that.formatJson(filterVal, list);
+      export_json_to_excel(tHeader, data ,'科研考评数据汇总')
+    });
+  },
+  formatJson(filterVal, jsonData) {
+    return jsonData.map(v => filterVal.map(j => v[j]))
   }
-
  }
 }
 </script>

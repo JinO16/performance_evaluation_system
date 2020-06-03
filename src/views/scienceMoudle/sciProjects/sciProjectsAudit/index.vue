@@ -11,29 +11,29 @@
           <span>{{ scope.row.jobID}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="80px" align="center" label="岗位">
+      <el-table-column width="120px" align="center" label="岗位">
         <template slot-scope="scope">
-          <span>{{ scope.row.station }}</span>
+          {{ scope.row.station}}
         </template>
       </el-table-column>
-      <el-table-column width="80px" align="center" label="部门">
+      <el-table-column width="120px" align="center" label="部门">
         <template slot-scope="scope">
-          <span>{{ scope.row.department }}</span>
+          {{ scope.row.department}}
         </template>
       </el-table-column>
-      <el-table-column align="center" label="科研立项总分" width="140px">
+      <el-table-column align="center" label="科研立项总分" width="150px">
         <template slot-scope="scope">
           <span>{{ scope.row.scienceMoudle.sciProjects ? scope.row.scienceMoudle.sciProjects.sum : 0 }}</span>
         </template>
       </el-table-column>
-      <el-table-column class-name="status-col" align="center" label="状态" width="80px">
+      <el-table-column class-name="status-col" align="center" label="状态" width="150px">
         <template slot-scope="scope">
           <el-tag :type="scope.row.scienceMoudle.sciProjects.status |statusFilter">{{scope.row.scienceMoudle.sciProjects.status}}</el-tag>
         </template>
       </el-table-column>
-       <el-table-column width="100px" align="center" label="总分数">
+       <el-table-column width="150px" align="center" label="总分数">
         <template slot-scope="scope">
-           <span>{{(scope.row.scienceMoudle.sciProjects ? scope.row.scienceMoudle.sciProjects.sum : 0)}}</span>
+           <span>{{scope.row.scienceMoudle.sciProjects ? scope.row.scienceMoudle.sciProjects.sum : 0}}</span>
         </template>
       </el-table-column>
        <el-table-column
@@ -97,20 +97,20 @@
                 <span class="collapse-item"><strong>审核理由：</strong>{{item.auditReason}}</span>
               </div>
               <div v-for="(item,key) in form.scienceMoudle ? form.scienceMoudle.sciMoudelAuditRecord : []">
-                <span class="collapse-item"><strong>审核人：</strong>{{item.auditPerson}}</span>
-                <span class="collapse-item"><strong>审核时间：</strong>{{item.auditTime | formateDate}}</span>
-                <span class="collapse-item"><strong>审核状态：</strong>{{item.auditStatus}}</span>
-                <span class="collapse-item"><strong>审核理由：</strong>{{item.auditReason}}</span>
-              </div>
+                <span class="data-items">审核人: {{item.auditPerson ? item.auditPerson :'暂无'}}</span>
+                <span class="data-items">审核时间: {{item.auditTime ? item.auditTime : 0 | formateDate}}</span>
+                <span class="data-items">状态: {{item.auditStatus ? item.auditStatus : '待审核'}}</span>
+                <span class="data-items">审核理由: {{item.auditReason ? item.auditReason : '暂无'}}</span>
+            </div>
               <div v-for="(item,key) in form.scienceMoudle ? (form.scienceMoudle.sciProjects ?  form.scienceMoudle.sciProjects.auditRecord : []): []">
-                <span class="collapse-item"><strong>审核人：</strong>{{item.auditPerson}}</span>
-                <span class="collapse-item"><strong>审核时间：</strong>{{item.auditTime | formateDate}}</span>
-                <span class="collapse-item"><strong>审核状态：</strong>{{item.auditStatus}}</span>
-                <span class="collapse-item"><strong>审核理由：</strong>{{item.auditReason}}</span>
-              </div>
+              <span class="data-items">审核人: {{item.auditPerson ? item.auditPerson :'暂无'}}</span>
+              <span class="data-items">审核时间: {{item.auditTime ? item.auditTime : 0 | formateDate}}</span>
+              <span class="data-items">状态: {{item.auditStatus ? item.auditStatus : '待审核'}}</span>
+              <span class="data-items">审核理由: {{item.auditReason ? item.auditReason : '暂无'}}</span>
+            </div>    
             </el-collapse-item>
         </el-collapse>
-        <div class="audit-block">
+        <div class="audit-block" v-if="dialogTitle == '审核单'">
           <!-- 审核理由 -->
           <el-form-item label="不通过理由(必填)" v-if="showReason" required>
             <el-input type="textarea" :rows="2" placeholder="请输入审核理由" v-model="failedReason"></el-input>
@@ -126,12 +126,15 @@
 </template>
 
 <script>
+import router from '../../../../router'
 import dayjs from 'dayjs'
-import { getAllTeachWorkload,updateTeachWorkload } from '@/api/teachingAndRes/teachWorkload'
+import { getAllTeachWorkload, updateTeachWorkload, getByDepartment } from '@/api/teachingAndRes/teachWorkload'
 // import { getAllSciProjects, updateSciProjects } from '@/api/scienceAndRes/sciProjects'
 import { getToken } from '../../../../utils/auth'
+import { getAllLevel } from '@/api/setting'
 export default {
-  inject:["reload"],
+   name: 'InlineEditTable',
+  inject: ['reload'],
   filters: {
     statusFilter(status) {
       const statusMap = {
@@ -153,6 +156,10 @@ export default {
       dialogTableVisible: false,
       list: [],//表格数据--所有的该模块数据单
       form:{},//审核单内详情数据
+      listQuery: {
+        page: 1,
+        limit: 10
+      },
       failedReason:'',//审核不通过理由
       showReason:false,//显示审核理由输入框
        dialogTitle:'',
@@ -166,6 +173,48 @@ export default {
     this.getAllData()
   },
   methods: {
+    //获取所有级别岗位要求的接口
+    getStationInfo(value) {
+      console.log('value :>> ', value);
+      const userStation = value.station;
+      // console.log('userStation :>> ', userStation);
+      getAllLevel().then(res => {
+        console.log('res :>> ', res);
+        if (res.code == 200) {
+          switch (userStation) {
+            case '教学岗' : 
+              this.stationBase = res.result[0].teaching.teachWork;
+              break;
+            case '科研岗' :
+              this.stationBase = res.result[0].science.teachWork;
+              this.visibleItem = false;
+              break;
+            case '教学科研并重岗' :
+              this.stationBase = res.result[0].teachAndScience.teachWork;
+              break;
+            default:
+              this.$router.push('/user')
+          }
+          console.log('this.stationBase :>> ', this.stationBase);
+        }
+        
+      })
+    },
+    //根据部门获取本部门所有数据单
+    getDepartmentData() {
+      return new Promise((resolve, reject) => {
+        const department = this.$store.state.user.department;
+        getByDepartment(department).then(res => {
+          if (res.code == 200) {
+            resolve(res)
+          } else {
+            reject(res.message)
+          }
+          
+        })
+      })
+    },
+    
     //获取表格数据
     getAllData() {
      getAllTeachWorkload().then(res => {
@@ -186,10 +235,11 @@ export default {
     //审核
     handleAudit(value) {
       console.log('value :>> ', value);
-      if (value.scienceMoudle.sciProjects.status = '待审核') {
+      if (value.scienceMoudle.sciProjects.status == '待审核') {
         this.dialogTableVisible = true;
         this.dialogTitle = this.dialogTitleItem.audit;
         this.form = value;
+        this.getStationInfo(value)
       } else {
         this.$message({
           type:'warning',
@@ -224,7 +274,7 @@ export default {
       this.showReason = false;
       const params = {
         auditPerson:this.$store.state.user.name,
-        auditReason:'教学教研模块审核通过！',
+        auditReason:'科研立项模块审核通过！',
         auditStatus:'审核中',
         auditTime:new Date()
       }

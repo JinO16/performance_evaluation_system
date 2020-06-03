@@ -13,27 +13,27 @@
       </el-table-column>
       <el-table-column width="120px" align="center" label="科研论文计分">
         <template slot-scope="scope">
-          {{ scope.row.scienceMoudle.sciPapers ? scope.row.scienceMoudle.sciPapers.sciPapersScoreSum : 0}}
+          {{ scope.row.scienceMoudle.sciPapers ? scope.row.scienceMoudle.sciPapers.sciPapersSum : 0}}
         </template>
       </el-table-column>
       <el-table-column width="150px" align="center" label="科研立项计分">
         <template slot-scope="scope">
-          {{ scope.row.scienceMoudle.sciProjects ? scope.row.scienceMoudle.sciProjects.sciProjectsScoreSum : 0}}
+          {{ scope.row.scienceMoudle.sciProjects ? scope.row.scienceMoudle.sciProjects.sciProjectsSum : 0}}
         </template>
       </el-table-column>
       <el-table-column width="150px" align="center" label="科研成果奖励计分">
         <template slot-scope="scope">
-          {{ scope.row.scienceMoudle.sciAchievement ? scope.row.scienceMoudle.sciAchievement.sciAchievementScoreSum : 0}}
+          {{ scope.row.scienceMoudle.sciAchievement ? scope.row.scienceMoudle.sciAchievement.sciAchievementSum : 0}}
         </template>
       </el-table-column>
       <el-table-column width="140px" align="center" label="论文、立项、成果奖励总分">
         <template slot-scope="scope">
-          {{scope.row.scienceMoudle.sciProScoreSum }}
+          {{scope.row.scienceMoudle.sciProScoreSum ? scope.row.scienceMoudle.sciProScoreSum  :0}}
         </template>
       </el-table-column>
       <el-table-column width="120px" align="center" label="岗位权重计分">
         <template slot-scope="scope">
-         {{scope.row.scienceMoudle.weightScore}}
+         {{scope.row.scienceMoudle.weightScore ? scope.row.scienceMoudle.weightScore : 0 }}
         </template>
       </el-table-column>
       <el-table-column width="120px" align="center" label="状态">
@@ -62,7 +62,7 @@
       </el-table-column>
     </el-table>
     <!-- 查看详情弹出框 -->
-    <el-dialog el-drag-dialog :visible.sync="dialogTableVisible" title="查看详情">
+    <el-dialog el-drag-dialog :visible.sync="dialogTableVisible" :title="dialogTitle">
       <el-button type="primary" @click="handleDown">PDF下载</el-button>
       <el-form id="form" :inline="true" :model="form" class="demo-form-inline">
         <!-- <el-button type="primary" @click="exportData(form)">导出数据</el-button> -->
@@ -87,23 +87,24 @@
               <div class="collapse-item"><strong>实际到账科研经费金额：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.virtualFunds : 0) : 0}}</div>
               <div class="collapse-item" v-if="visibleItem"><strong>折抵科研经费的教学工作量：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.workLoads : 0) : 0}}</div>
               <div class="collapse-item" v-if="visibleItem"><strong>折抵科研经费的教学工作量对应科研经费金额：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.scienceFunds :0) : 0}}</div>
-              <div class="collapse-item"><strong>折抵科研经费的教学工作量上限：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? (form.scienceMoudle.sciFunds.upperLimit ? '是' :'否'):'') : ''}}</div>
+              <!-- <div class="collapse-item"><strong>折抵科研经费的教学工作量上限：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? (form.scienceMoudle.sciFunds.upperLimit ? '是' :'否'):'') : ''}}</div> -->
               <div class="collapse-item"><strong>折抵后科研经费完成金额:</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.fScienceFunds :0) : 0}}</div>
               <div class="collapse-item"><strong>科研经费完成比例：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.finishPro : 0 ) : 0}}</div>
               <div class="collapse-item"><strong>个人逐项计分：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.itemScore : 0) : 0}}</div>
           </el-collapse-item>
             <el-collapse-item title="科研论文">
-              <div v-for="(item,key) in form.scienceMoudle ? (form.scienceMoudle.sciPapers ? form.scienceMoudle.sciPapers.item  : []) : []">
-                <span class="collapse-item"><strong>获奖级别：</strong>{{item.type[0]}}</span>
-                <span class="collapse-item"><strong>个人逐项计分：</strong>{{item.type[1]}}</span>
+             <div v-for="(item,key) in form.scienceMoudle ? (form.scienceMoudle.sciPapers ? form.scienceMoudle.sciPapers.item : []) : []">
+                <span class="collapse-items"><strong>论文名称: </strong> {{item.name}}</span>
+                <span class="collapse-item"><strong>论文类型: </strong>{{item.type ? item.type[0] : ''}}</span>
+                <span class="collapse-item"><strong>个人逐项计分：</strong>{{item.type ? item.type[0] : 0}}</span>
                 <div class="collapse-item"><strong>附件：</strong>
-                  <a style="color:blue" id="fileDown" @click.once="handleDownload(item)">{{item.uploadFiles[0]?item.uploadFiles[0].originalname : ''}}</a>
+                  <a style="color:blue" id="fileDown" @click.once="handleDownload(item)">{{item.uploadFiles[0] ? item.uploadFiles[0].originalname :''}}</a>
                 </div>
               </div>
-              <span class="collapse-item"><strong>总分：</strong>{{form.scienceMoudle ? (form.scinceMoudle.sciPapers ? form.scienceMoudle.sciPapers.sum : 0) : 0}}</span>
+              <span class="collapse-item"><strong>总分：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciPapers ? form.scienceMoudle.sciPapers.sum : 0) : 0}}</span>
             </el-collapse-item>
-            <el-collapse-item title="科研立项">
-              <div v-for="(item,key) in form.scienceMoudle ? (form.scienceMoudle.sciProjects ? form.scienceMoudle.sciProjects.item : []) : []">
+            <el-collapse-item title="科研项目">
+        <div v-for="(item,key) in form.scienceMoudle ? (form.scienceMoudle.sciProjects ? form.scienceMoudle.sciProjects.item : []) : []">
                 <span class="collapse-item"><strong>项目名称：</strong>{{item.name}}</span>
                 <span class="collapse-item"><strong>项目编号：</strong>{{item.id}}</span>
                 <span class="collapse-item"><strong>批准日期：</strong>{{item.date | formateDate}}</span>
@@ -113,11 +114,11 @@
                   <a style="color:blue" id="fileDown" @click.once="handleDownload(item)">{{item.uploadFiles[0] ? item.uploadFiles[0].originalname : ''}}</a>
                 </div>
               </div>
-              <span class="collapse-item"><strong>总分：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciProjects ? form.scienceMoudle.sciProjects.sum : 0):0}}</span>
+               <span class="collapse-item"><strong>总分：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciProjects ? form.scienceMoudle.sciProjects.sum : 0):0}}</span>
             </el-collapse-item>
-            <el-collapse-item title="科研成果奖励">
+             <el-collapse-item title="科研成果奖励">
               <div v-for="(item,key) in form.scienceMoudle ? (form.scienceMoudle.sciAchievement ? form.scienceMoudle.sciAchievement.item : []): []">
-                <span class="collapse-item"><strong>证书名称：</strong>{{item.name}}</span>
+                <span class="collapse-item"><strong>证书/专利/专著名称: </strong>{{item.name}}</span>
                 <span class="collapse-item"><strong>获奖日期：</strong>{{item.date | formateDate}}</span>
                 <span class="collapse-item"><strong>获奖级别：</strong>{{item.level ? item.level[0] : ''}}</span>
                 <span class="collapse-item"><strong>个人逐项计分：</strong>{{item.level ? item.level[1] * item.level[2] : 0}}</span>
@@ -125,7 +126,7 @@
                   <a style="color:blue" id="fileDown" @click.once="handleDownload(item)">{{item.uploadFiles[0] ? item.uploadFiles[0].originalname :''}}</a>
                 </div>
               </div>
-              <span class="collapse-item"><strong>总分：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciAchievement ? form.scienceMoudle.sciAchievement.sum : 0) : 0}}</span>
+             <span class="collapse-item"><strong>总分：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciAchievement ? form.scienceMoudle.sciAchievement.sum  : 0) : 0}}</span>
             </el-collapse-item>
             <el-collapse-item title="审核记录">
               <div>
@@ -175,7 +176,7 @@
                 </div>
               </div>
                <div>
-                <span class="record-item">科研经费模块审核记录</span>
+                <span class="record-item">科研成果奖励模块审核记录</span>
                 <div v-for="(item,key) in form.scienceMoudle ? (form.scienceMoudle.sciAchievement ?  form.scienceMoudle.sciAchievement.auditRecord : []): []">
                   <span class="collapse-item"><strong>审核人：</strong>{{item.auditPerson}}</span>
                   <span class="collapse-item"><strong>审核时间：</strong>{{item.auditTime | formateDate}}</span>
@@ -191,6 +192,7 @@
 </template>
 
 <script>
+
 import dayjs from 'dayjs'
 import htmlToPdf from '@/utils/htmlToPdf'
 import { getOwnTeachWorkload,deleteTeachWorkload } from '@/api/teachingAndRes/teachWorkload'
@@ -217,6 +219,7 @@ export default {
       list:[],
       dialogTableVisible: false,
       form: {},
+      dialogTitle:'',
       visibleItem:true,//当岗位为科研岗时，隐藏
       excelData:[],//将要导出的表格数据
     }
@@ -230,11 +233,11 @@ export default {
       const jobID = this.$store.state.user.jobID;
       console.log('jobID :>> ', jobID);
        getOwnTeachWorkload(jobID).then(res => {
-        console.log('res :>> ', res);
+        console.log('res表格数据接口返回数据 :>> ', res);
         if(res.code == 200) {
           this.listLoading = false;
           for(let i of res.result) {
-            console.log('i :>> ', i);
+            // console.log('i :>> ', i);
             if(i.scienceMoudle.sciStatus === '审核中' 
             || (i.scienceMoudle.sciFunds && i.scienceMoudle.sciFunds.status == '审核中') 
             || (i.scienceMoudle.sciPapers && i.scienceMoudle.sciPapers.status == '审核中')
@@ -249,6 +252,7 @@ export default {
           };
           
           this.list = res.result.reverse();
+          // console.log('获取的表格数据this.list :>> ', this.list);
         }
       })
     },

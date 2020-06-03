@@ -12,16 +12,15 @@
       <!-- 展开或隐藏的内容 -->
       <el-table-column type="expand">
         <template slot-scope="scope" > 
-          <el-form label-position="left" inline class="demo-table-expand">
-           
+          <el-form label-position="left" inline class="demo-table-expand">           
              <el-form-item label="科研论文:">
-               <!-- {{scope.row}} -->
-               <div v-for="(item,key) in scope.row.scienceMoudle.sciPapers ? scope.row.scienceMoudle.sciPapers.item : []">
+                <div v-for="(item,key) in scope.row.scienceMoudle.sciPapers ? scope.row.scienceMoudle.sciPapers.item : []">
+                <span class="data-items">论文名称: {{item.name}}</span>
                 <span class="data-items">论文类型: {{item.type? item.type[0] : ''}}</span>
                 <span class="data-items">个人逐项计分: {{item.type ? item.type[0] : 0}}</span>
-                <span class="data-items">附件: <a id="fileDown" style="color:blue"  @click.once="handleDownload(item)">{{ item.uploadFiles[0] ? item.uploadFiles[0].originalname : ''}}</a></span>
+                <div class="data-items">附件: <a id="fileDown" style="color:blue"  @click.once="handleDownload(item)">{{ item.uploadFiles[0] ? item.uploadFiles[0].originalname : ''}}</a></div>
                 </div>
-                <span class="data-items">总分: {{scope.row.sciPapers.sum}}</span>
+                <span class="data-items">总分: {{scope.row.scienceMoudle.sciPapers ? scope.row.scienceMoudle.sciPapers.sum : 0}}</span>
             </el-form-item>
             <el-form-item label="审核记录:">
               <div v-for="(item,key) in scope.row.finalAuditRecord">
@@ -46,42 +45,43 @@
           </el-form>
         </template>
       </el-table-column>
-      <el-table-column width="140px" align="center" label="提交时间">
+      <el-table-column width="150px" align="center" label="提交时间">
         <template slot-scope="scope">
-          <span>{{ scope.row.submitTime | formateDate }}</span>
+          <span>{{ scope.row.submitTime | | formateDate  }}</span>
+        </template>
+      </el-table-column>      
+      <el-table-column width="150px" align="center" label="科研论文总分">
+        <template slot-scope="scope">
+          {{ scope.row.scienceMoudle.sciPapers ? scope.row.scienceMoudle.sciPapers.sum : 0 }}
         </template>
       </el-table-column>
       
-      <el-table-column align="center" label="科研论文总分" width="100">
+       <el-table-column class-name="status-col" align="center" label="状态" width="150">
         <template slot-scope="scope">
-          <span>{{ scope.row.scienceMoudle.sciPapers ? scienceMoudle.sciPapers.sum : 0 }}</span>
+          <el-tag :type="scope.row.scienceMoudle.sciPapers.status | statusFilter">
+            {{scope.row.scienceMoudle.sciPapers.status}}
+          </el-tag>
         </template>
       </el-table-column>
-      
-      <el-table-column class-name="status-col" label="状态" align="center" width="100">
-        <template slot-scope="scope">
-          <el-tag :type="scope.row.scienceMoudle.sciPapers.status | statusFilter">{{ scope.row.scienceMoudle.sciPapers.status }}</el-tag>
-        </template>
-      </el-table-column>
-       <el-table-column width="90px" align="center" label="审核人">
+      <el-table-column width="150px" align="center" label="审核人">
         <template slot-scope="scope">
           <span>
-            {{scope.row.finalAuditRecord[0]? scope.row.finalAuditRecord[0].auditPerson: (scope.row.scienceMoudle.sciMoudelAuditRecord[0] ? scope.row.scienceMoudle.sciMoudelAuditRecord[0].auditPerson :(scope.row.scienceMoudle.sciPapers ? (scope.row.scienceMoudle.sciPapers.auditRecord[0] ? scope.row.scienceMoudle.sciPapers.auditRecord[0].auditPerson : '暂无') : '暂无'))}}
+          {{ scope.row.finalAuditRecord[0] ? scope.row.finalAuditRecord[0].auditPerson 
+          : (scope.row.scienceMoudle.sciMoudelAuditRecord[0] ? scope.row.scienceMoudle.sciMoudelAuditRecord[0].auditPerson
+          : (scope.row.scienceMoudle.sciPapers ? (scope.row.scienceMoudle.sciPapers.auditRecord[0] ? scope.row.scienceMoudle.sciPapers.auditRecord[0].auditPerson :'暂无') : '暂无'))}}  
+          </span>
+        </template>
+      </el-table-column>
+      <el-table-column width="150px" align="center" label="审核时间">
+        <template slot-scope="scope">
+          <span>
+            {{ scope.row.finalAuditRecord[0] ? scope.row.finalAuditRecord[0].auditTime 
+          : (scope.row.scienceMoudle.sciMoudelAuditRecord[0] ? scope.row.scienceMoudle.sciMoudelAuditRecord[0].auditTime
+          : (scope.row.scienceMoudle.sciPapers ? (scope.row.scienceMoudle.sciPapers.auditRecord[0] ? scope.row.scienceMoudle.sciPapers.auditRecord[0].auditTime :'') : '')) | formateDate}}  
+          
             </span>
         </template>
       </el-table-column>
-       <el-table-column width="140px" align="center" label="审核时间">
-        <template slot-scope="scope">
-          <span>
-             {{scope.row.finalAuditRecord[0]? scope.row.finalAuditRecord[0].auditTime: (scope.row.scienceMoudle.sciMoudelAuditRecord[0] ? scope.row.scienceMoudle.sciMoudelAuditRecord[0].auditTime :(scope.row.scienceMoudle.sciPapers ? (scope.row.scienceMoudle.sciPapers.auditRecord[0] ? scope.row.scienceMoudle.sciPapers.auditRecord[0].auditTime : '') : '')) | formateDate}}  
-            </span>
-        </template>
-      </el-table-column>
-      <!-- <el-table-column width="90px" align="center" label="总分">
-        <template slot-scope="scope">
-          <span>{{ scope.row.sum }}</span>
-        </template>
-      </el-table-column> -->
        <el-table-column
         label="操作"
         align="center"
@@ -100,7 +100,6 @@
           >删除</el-button>
         </template>
       </el-table-column>
-
     </el-table>
     <!-- 创建数据单弹出框 -->
     <el-dialog el-drag-dialog :visible.sync="dialogTableVisible" :title="dialogTitle">
@@ -111,6 +110,9 @@
             <div v-for="(item,key) in formParams.scienceMoudle.sciPapers.item" style="position:relative">
               <el-button type="text" @click="deleteSciPaper(item)" style="position:absolute;left:76%;top:-30px">删除该项目</el-button>
               <div class="block" style="border-bottom:1px dashed;margin-top:20px">
+                <el-form-item label="论文名称" prop="name">
+                  <el-input v-model="item.name" clearable placeholder="请输入项目名称"></el-input>
+                </el-form-item>
                 <el-form-item label="论文类型" prop="type">  
                   <el-cascader
                     v-model="item.type"
@@ -206,10 +208,12 @@ export default {
         finalStatus:'待审核',//总审核状态
         submitTime: new Date(),//提交时间
         scienceMoudle :{
+          
           sciPapers:{ 
             sum:0,
             item:[{
               sign:'sciPapers',
+              name:'',
               type:'',
               uploadFiles:[]
             }],
@@ -271,7 +275,7 @@ export default {
     getList() {
       const u = this.$store.state.user;
       getOwnTeachWorkload(u.jobID).then(res => {
-        console.log('res :>> ', res);
+        console.log('res获取表格数据 :>> ', res);
         if ( res.code === 200) {
          const reaultArr = [];
           for (let i of res.result) {
@@ -346,12 +350,10 @@ export default {
         })
       }     
     },
-    //弹窗内的函数和方法
-    
+    //弹窗内的函数和方法 
     //选择科研论文类型的触发函数
     handleChange(value) {
-      console.log('value :>> ', value);
-      this.form.scienceMoudle.sciPapers.sum = 0
+      this.formParams.scienceMoudle.sciPapers.sum = 0;
       for (let i of this.formParams.scienceMoudle.sciPapers.item){
         this.formParams.scienceMoudle.sciPapers.sum += i.type ? i.type[0] : 0;
       } 
@@ -361,6 +363,7 @@ export default {
       console.log('添加科研论文项目');
       this.formParams.scienceMoudle.sciPapers.item.push({
           sign:"sciPapers",
+          name:'',
           type:'',
           uploadFiles:[]
         });
@@ -374,7 +377,7 @@ export default {
       switch (value.sign) {
          case 'sciPapers': 
           target =  this.formParams.scienceMoudle.sciPapers;
-          deleteData = value.type ? value.type[1] : 0;
+          deleteData = value.type ? value.type[0] : 0;
           break;
       }
        this.$confirm('此操作将永久删除该项目, 是否继续?', '提示', {
@@ -466,7 +469,6 @@ export default {
                 message:res.message
               })
               localStorage.setItem('_id',res.result._id);
-              // console.log("localStorage.getItem('_id') :>> ", localStorage.getItem('_id'));
               this.reload();
               this.dialogTableVisible = false;
             } else {

@@ -1,17 +1,17 @@
 //教研模块岗位权重设置接口
 import request from '@/utils/request';
 //添加接口
-export function createTeaStation(data) {
+export function createSciStation(data) {
     return request({
-        url: '/teaStationSet/add',
+        url: '/sciStationSet/add',
         method: 'post',
         data:Object.assign({},data)
     })
 }
 //获取所有信息接口
-export function getTeaStation(data) {
+export function getSciStation(data) {
     return request({
-        url:'/teaStationSet/getAll',
+        url:'/sciStationSet/getAll',
         method:'get',
         data
     })
@@ -19,7 +19,7 @@ export function getTeaStation(data) {
 //修改接口
 export function updateStation(data) {
     return request({
-        url: '/teaStationSet/update',
+        url: '/sciStationSet/update',
         method:'put',
         data: Object.assign({},data)
     })

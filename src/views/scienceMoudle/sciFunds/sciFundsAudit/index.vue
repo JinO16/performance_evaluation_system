@@ -3,7 +3,7 @@
     <el-table v-loading="listLoading" :data="list" highlight-current-row style="width: 100%">
       <el-table-column align="center" label="姓名" width="80">
         <template slot-scope="scope">
-          <span>{{ scope.row.name }}</span>
+          <span>{{ scope.row.name}}</span>
         </template>
       </el-table-column>
       <el-table-column width="120px" align="center" label="工号">
@@ -78,7 +78,6 @@
           >查看详情</el-button>
         </template>
       </el-table-column>
-
     </el-table>
      <!-- 审核单弹出框 -->
     <el-dialog el-drag-dialog :visible.sync="dialogTableVisible" :title="dialogTitle">
@@ -99,17 +98,7 @@
           {{form.submitTime | formateDate}}
         </el-form-item>
         <el-collapse>
-          <!-- <el-collapse-item title="科研经费数据">
-              <div class="collapse-item"><strong>上课教学工作量：</strong>{{form.teachingMoudle ? (form.teachingMoudle.workLoad ? form.teachingMoudle.workLoad.classWork : 0) : 0}}</div>
-              <div class="collapse-item"><strong>辅导员带班工作量折算：</strong>{{form.teachingMoudle ? (form.teachingMoudle.workLoad ? form.teachingMoudle.workLoad.instructorWork : 0) : 0}}</div>
-              <div class="collapse-item"><strong>实验教学工作量折算：</strong>{{form.teachingMoudle ? (form.teachingMoudle.workLoad ? form.teachingMoudle.workLoad.experimentWork : 0) : 0}}</div>
-              <div class="collapse-item" v-if="visibleItem"><strong>折抵教学工作量的科研经费金额：</strong>{{form.teachingMoudle ? (form.teachingMoudle.workLoad ? form.teachingMoudle.workLoad.scienceFunds :0) : 0}}</div>
-              <div class="collapse-item" v-if="visibleItem"><strong>科研经费折抵的教学工作量：</strong>{{form.teachingMoudle ? (form.teachingMoudle.workLoad ? form.teachingMoudle.workLoad.scienceFundsWork :0 ) : 0}}</div>
-              <div class="collapse-item"><strong>是否完成本部门人均相应工作量的三分之二：</strong>{{form.teachingMoudle ? (form.teachingMoudle.workLoad ? (form.teachingMoudle.workLoad.isFinish ? '是' :'否'):'') : ''}}</div>
-              <div class="collapse-item"><strong>教学工作量合计:</strong>{{form.teachingMoudle ? (form.teachingMoudle.workLoad ? form.teachingMoudle.workLoad.teachWorkSum :0) : 0}}</div>
-              <div class="collapse-item"><strong>用于计分的工作量：</strong>{{form.teachingMoudle ? (form.teachingMoudle.workLoad ? form.teachingMoudle.workLoad.scoreSum : 0 ) : 0}}</div>
-              <div class="collapse-item"><strong>个人逐项计分：</strong>{{form.teachingMoudle ? (form.teachingMoudle.workLoad ? 28 * form.teachingMoudle.workLoad.scoreSum / stationBase  : 0) : 0}}</div>
-          </el-collapse-item> -->
+
           <el-collapse-item title="科研经费数据">
               <div class="collapse-item"><strong>额定科研经费金额：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.ratedFunds : 0) : 0}}</div>
               <div class="collapse-item"><strong>实际到账科研经费金额：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.virtualFunds : 0) : 0}}</div>
@@ -200,8 +189,8 @@ export default {
         audit:'审核单',
         detail:'查看详情'
       },
-      upperWorkLoads : 0,//折抵为科研经费的工作量
-      //averageWorkload:0,//本部门人均工作量的三分之二
+      // upperWorkLoads : 0,//折抵为科研经费的工作量
+      averageWorkload:0,//本部门人均工作量的三分之二
     }
   },
   mounted() {
@@ -272,18 +261,18 @@ export default {
               sum += parseInt(i.scienceMoudle.sciFunds.fScienceFunds ? i.scienceMoudle.sciFunds.fScienceFunds : 0) 
             }
           }
-       this.upperWorkLoads = Math.floor (((classWork+instructorWork+experimentWork)-stationBase)/100);
+      //  this.averageWorkload = Math.floor (((classWork+instructorWork+experimentWork)-stationBase)/100);
             
       });
       await this.getList().then(res => {
         const resultArr = [];
         for (let i of res.result) {
           if (i.scienceMoudle.sciFunds ) {
-            if(i.scienceMoudle.sciFunds.fScienceFunds && i.scienceMoudle.sciFunds.fScienceFunds >= this.averageWorkload) {
-              i.teachingMoudle.workLoad.isFinish = true;
-            } else {
-              i.teachingMoudle.workLoad.isFinish = false;
-            }
+            // if(i.scienceMoudle.sciFunds.fScienceFunds && i.scienceMoudle.sciFunds.fScienceFunds >= this.averageWorkload) {
+            //   i.scienceMoudle.sciFunds.upperLimit = true;
+            // } else {
+            //   i.scienceMoudle.sciFunds.upperLimit = false;
+            // }
             resultArr.unshift(i)
           }
         }

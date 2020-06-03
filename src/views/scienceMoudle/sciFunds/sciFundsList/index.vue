@@ -44,7 +44,7 @@
                   <span class="data-items">状态: {{item.auditStatus ? item.auditStatus : '待审核'}}</span>
                   <span class="data-items">审核理由: {{item.auditReason ? item.auditReason : '暂无'}}</span>
                 </div>
-                <div v-for="(item,key) in scope.row.teachingMoudle ? scope.row.scienceMoudle.sciMoudelAuditRecord : []">
+                <div v-for="(item,key) in scope.row.scienceMoudle ? scope.row.scienceMoudle.sciMoudelAuditRecord : []">
                   <span class="data-items">审核人: {{item.auditPerson ? item.auditPerson :'暂无'}}</span>
                   <span class="data-items">审核时间: {{item.auditTime ? item.auditTime : 0 | formateDate}}</span>
                   <span class="data-items">状态: {{item.auditStatus ? item.auditStatus : '待审核'}}</span>
@@ -62,22 +62,22 @@
         </template>
       </el-table-column>
       <!-- 表格信息开始 -->
-      <el-table-column width="135px" align="center" label="提交时间">
+      <el-table-column width="150px" align="center" label="提交时间">
         <template slot-scope="scope">
           <span>{{ scope.row.submitTime | | formateDate  }}</span>
         </template>
       </el-table-column>
-      <el-table-column width="120px" align="center" label="额定科研经费金额">
+      <el-table-column width="150px" align="center" label="额定科研经费金额">
         <template slot-scope="scope">
           {{scope.row.scienceMoudle.sciFunds ? scope.row.scienceMoudle.sciFunds.ratedFunds : 0}}
         </template>
       </el-table-column>
-      <el-table-column width="120px" align="center" label="科研经费实际到账金额">
+      <el-table-column width="150px" align="center" label="科研经费实际到账金额">
         <template slot-scope="scope">
           {{scope.row.scienceMoudle.sciFunds ? scope.row.scienceMoudle.sciFunds.virtualFunds : 0}}
         </template>
       </el-table-column>
-       <el-table-column width="120px" align="center" label="个人逐项计分">
+       <el-table-column width="150px" align="center" label="个人逐项计分">
         <template slot-scope="scope">
           {{scope.row.scienceMoudle.sciFunds ? scope.row.scienceMoudle.sciFunds.itemScore :0}}
         </template>
@@ -206,7 +206,7 @@ export default {
         page: 1,
         limit: 10
       },
-      visibleItem: false,//当岗位为科研岗时隐藏的项
+      visibleItem: true,//当岗位为科研岗时隐藏的项
       stationBase:350,//不同岗位对应算法的基数不同
       formParams: {
         name: this.$store.state.user.name,//用户姓名
@@ -288,15 +288,15 @@ export default {
           switch (userStation) {
             case '教学岗' : 
               this.stationBase = res.result[0].teaching.teachWork;
-              this.visibleItem = true;
+    
               break;
             case '科研岗' :
               this.stationBase = res.result[0].science.teachWork;
-              
+              this.visibleItem = false;
               break;
             case '教学科研并重岗' :
               this.stationBase = res.result[0].teachAndScience.teachWork;
-              this.visibleItem = true;
+              
               break;
             default:
               this.$router.push('/user')
@@ -311,15 +311,18 @@ export default {
       this.listLoading = true;
       console.log('this.$store.state.user.jobID :>> ', this.$store.state.user.jobID);
       getOwnTeachWorkload(this.$store.state.user.jobID).then(res => {
-        // console.log('获取工作量数据清单res -----:>> ', res);
+        // console.log('接口返回的数据 -----:>> ', res);
         if (res.code == 200) {
           const resultArr = [];
           for (let i of res.result) {
+            //你得先看这个i是个什么东西
+            // console.log('i :>> ', i);
             if (i.scienceMoudle.sciFunds) {
               resultArr.unshift(i)
             }
           }
           this.list = resultArr;
+          console.log('this.list :>> ', this.list);//直接看这个list了，对应的就是你上面表格的数据格式，里面的每一项
           this.listLoading = false;
         } else {
           this.$message({
@@ -354,7 +357,8 @@ export default {
     //提交修改
     UpdateSubmit() {
       this.formParams.scienceMoudle.sciFunds.itemScore = this.formParams.scienceMoudle.sciFunds.ratedFunds && this.formParams.scienceMoudle.sciFunds.virtualFunds 
-      ? this.formParams.scienceMoudle.sciFunds.virtualFunds * 30 / this.formParams.scienceMoudle.sciFunds.ratedFunds : 0;
+      ? (this.formParams.scienceMoudle.sciFunds.virtualFunds * 30 / this.formParams.scienceMoudle.sciFunds.ratedFunds > 60 ? 60 :
+      this.formParams.scienceMoudle.sciFunds.virtualFunds * 30 / this.formParams.scienceMoudle.sciFunds.ratedFunds) : 0;
       this.formParams.submitTime = new Date();
       if (!this.formParams.scienceMoudle.sciFunds.ratedFunds) {
           this.$message({
@@ -396,7 +400,7 @@ export default {
           cancelButtonText: '取消',
           type: 'warning'
           }).then(() => {
-            deleteSciFunds(row).then(res => {
+           deleteTeachWorkload(row).then(res => {
                 console.log('res :>> ', res);
                 if (res.code === 200) {
                   this.$message({
@@ -428,7 +432,8 @@ export default {
     handleSubmit() {
       const id = this.$store.state.user._id;
       this.formParams.scienceMoudle.sciFunds.itemScore = this.formParams.scienceMoudle.sciFunds.ratedFunds && this.formParams.scienceMoudle.sciFunds.virtualFunds 
-      ? this.formParams.scienceMoudle.sciFunds.virtualFunds * 30 / this.formParams.scienceMoudle.sciFunds.ratedFunds : 0;
+      ? (this.formParams.scienceMoudle.sciFunds.virtualFunds * 30 / this.formParams.scienceMoudle.sciFunds.ratedFunds > 60 ? 60 :
+      this.formParams.scienceMoudle.sciFunds.virtualFunds * 30 / this.formParams.scienceMoudle.sciFunds.ratedFunds) : 0;
       console.log('this.formParams :>> ', this.formParams);
       if (!this.formParams.scienceMoudle.sciFunds.ratedFunds) {
          this.$message({

@@ -65,7 +65,7 @@
                 {{tag.name}}
             </el-tag>
             <!-- </el-tooltip> -->
-            <!-- <el-button class="button-new-tag" size="small" @click="handleStationAdd">+ 添加岗位</el-button> -->
+            <el-button class="button-new-tag" size="small" v-if="visibleAddButton" @click="handleStationAdd">+ 添加岗位</el-button>
         </el-card>
     </el-row>
     <!-- 审核员弹出框 -->
@@ -128,7 +128,7 @@
 </template>
 
 <script>
-import { createTeaStation, getTeaStation, updateStation } from '@/api/scienceAndRes/sciSetting'
+import { createSciStation, getSciStation, updateStation } from '@/api/scienceAndRes/sciSetting'
 import { getAllUser, updateUser, getUserByRole } from '@/api/user';
 export default {
     inject: ['reload'],
@@ -179,7 +179,8 @@ export default {
                     weight:0
                 }
                 
-            }
+            },
+            visibleAddButton: false,//当岗位信息为0时显示，否则隐藏
         }
     },
     mounted (){
@@ -189,9 +190,12 @@ export default {
     methods: {
         //获取岗位信息的方法
         getStation() {
-            getTeaStation().then(res => {
+            getSciStation().then(res => {
                 if (res.code == 200) {
                     this.stationData = res.result
+                    if (this.stationData.length == 0) {
+                        this.visibleAddButton = true;
+                    }
                 }
             })
         },
@@ -353,7 +357,7 @@ export default {
         //确认添加岗位
         handleStationAddSubmit() {
             console.log('添加岗位数据',this.stationSubmit);  
-            createTeaStation(this.stationSubmit).then(res => {
+            createSciStation(this.stationSubmit).then(res => {
                 console.log('res :>> ', res);
                 if(res.code == 200) {
                     this.$message({

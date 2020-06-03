@@ -76,11 +76,7 @@
             </span>
         </template>
       </el-table-column>
-      <!-- <el-table-column width="90px" align="center" label="总分">
-        <template slot-scope="scope">
-          <span>{{ scope.row.sum }}</span>
-        </template>
-      </el-table-column> -->
+    
        <el-table-column
         label="操作"
         align="center"

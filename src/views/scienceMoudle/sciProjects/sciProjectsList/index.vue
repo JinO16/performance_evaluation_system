@@ -47,33 +47,41 @@
           </el-form>
         </template>
       </el-table-column>
-      <el-table-column width="140px" align="center" label="提交时间">
+      <el-table-column width="150px" align="center" label="提交时间">
         <template slot-scope="scope">
-          <span>{{ scope.row.submitTime | formateDate }}</span>
+          <span>{{ scope.row.submitTime | | formateDate  }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column align="center" label="科研项目总分" width="150">
+        <template slot-scope="scope">
+          {{ scope.row.scienceMoudle.sciProjects ? scope.row.scienceMoudle.sciProjects.sum : 0 }}
         </template>
       </el-table-column>
      
-      <el-table-column align="center" label="科研项目总分" width="100">
+      <el-table-column class-name="status-col" label="状态" align="center" width="150">
         <template slot-scope="scope">
-          <span>{{ scope.row.scienceMoudle.sciProjects ? scope.row.scienceMoudle.sciProjects.sum : 0 }}</span>
+          <el-tag :type="scope.row.scienceMoudle.sciProjects.status | statusFilter">
+          {{ scope.row.scienceMoudle.sciProjects.status }}
+          </el-tag>
         </template>
       </el-table-column>
-     
-      <el-table-column class-name="status-col" label="状态" align="center" width="100">
-        <template slot-scope="scope">
-          <el-tag :type="scope.row.scienceMoudle.sciProjects.status | statusFilter">{{ scope.row.scienceMoudle.sciProjects.status }}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column width="90px" align="center" label="审核人">
+      <el-table-column width="150px" align="center" label="审核人">
         <template slot-scope="scope">
           <span>
-            {{scope.row.finalAuditRecord[0]? scope.row.finalAuditRecord[0].auditPerson: (scope.row.scienceMoudle.sciMoudelAuditRecord[0] ? scope.row.scienceMoudle.sciMoudelAuditRecord[0].auditPerson :(scope.row.scienceMoudle.sciProjects ? (scope.row.scienceMoudle.sciProjects.auditRecord[0] ? scope.row.scienceMoudle.sciProjects.auditRecord[0].auditPerson : '暂无') : '暂无'))}}</span>
+          {{ scope.row.finalAuditRecord[0] ? scope.row.finalAuditRecord[0].auditPerson 
+          : (scope.row.scienceMoudle.sciMoudelAuditRecord[0] ? scope.row.scienceMoudle.sciMoudelAuditRecord[0].auditPerson
+          : (scope.row.scienceMoudle.sciProjects ? (scope.row.scienceMoudle.sciProjects.auditRecord[0] ? scope.row.scienceMoudle.sciProjects.auditRecord[0].auditPerson :'暂无') : '暂无'))}}  
+          </span>
         </template>
       </el-table-column>
-      <el-table-column width="140px" align="center" label="审核时间">
+      <el-table-column width="150px" align="center" label="审核时间">
         <template slot-scope="scope">
           <span>
-            {{scope.row.finalAuditRecord[0]? scope.row.finalAuditRecord[0].auditTime: (scope.row.scienceMoudle.sciMoudelAuditRecord[0] ? scope.row.scienceMoudle.sciMoudelAuditRecord[0].auditTime :(scope.row.scienceMoudle.sciProjects ? (scope.row.scienceMoudle.sciProjects.auditRecord[0] ? scope.row.scienceMoudle.sciProjects.auditRecord[0].auditTime : '') : '')) | formateDate}}  </span>
+            {{ scope.row.finalAuditRecord[0] ? scope.row.finalAuditRecord[0].auditTime 
+          : (scope.row.scienceMoudle.sciMoudelAuditRecord[0] ? scope.row.scienceMoudle.sciMoudelAuditRecord[0].auditTime
+          : (scope.row.scienceMoudle.sciProjects ? (scope.row.scienceMoudle.sciProjects.auditRecord[0] ? scope.row.scienceMoudle.sciProjects.auditRecord[0].auditTime :'') : '')) | formateDate}}  
+          
+            </span>
         </template>
       </el-table-column>
       <el-table-column
@@ -140,8 +148,8 @@
             </el-form-item>
             <el-button type="text" @click="AddSciProject" style="position:relative;left:70%;top:-20px">添加科研项目</el-button>
              <el-form-item align="center">
-              <el-button type="primary" v-if="dialogTitle == '新建科研项目数据单'" @click="handleSubmit('formParams')">提 交</el-button>
-              <el-button type="success" v-else @click="UpdateSubmit('formParams')">确认提交</el-button>
+              <el-button type="primary" v-if="dialogTitle == '新建科研立项数据单'" @click="handleSubmit('formParams')">提 交</el-button>
+              <el-button type="success" v-else @click="UpdateSubmit('formParams')">确认修改</el-button>
               <el-button @click="handleCancel">取消</el-button>
             </el-form-item>
           </el-tab-pane>
@@ -290,11 +298,11 @@ export default {
         finalAuditRecord:[],//最终审核记录
         finalStatus:'待审核',//总审核状态
         submitTime: new Date(),//提交时间   
-        scienceMoudle: {
+        scienceMoudle :{
            //科研项目
-          sciProjects: {
+          sciProjects:{
               sum:0,
-              item: [{
+              item:[{
                 sign:'sciProjects',
                 name:'',//项目名次
                 date:'',//批准日期
@@ -309,8 +317,7 @@ export default {
           sciStatus:'待审核',//科研考评模块审核状态
           sciMoudelAuditRecord: [],//科研模块审核记录
           }
-        } 
-       
+        }  
     }
   },
   created() {
@@ -398,7 +405,6 @@ export default {
           message:'该审核状态无法进行修改操作！'
         })
       }
-
     },
     //删除
     handleDelete(row) {
@@ -445,17 +451,6 @@ export default {
         this.formParams.scienceMoudle.sciProjects.sum += i.level ? i.level[1] *i.level[2] : 0;
       }
     },
-    //添加科研项目
-    AddSciProject() {
-      this.formParams.scienceMoudle.sciProjects.item.push({
-            sign:'sciProjects',
-            name:'',
-            date:'',
-            id:'',
-            level:'',
-            uploadFiles:[]
-      })
-    },
     
     //删除项目
     deleteSciProject(value) {
@@ -485,6 +480,17 @@ export default {
             message: '已取消删除'
           });          
       }); 
+    },
+    //添加科研项目
+    AddSciProject() {
+      this.formParams.scienceMoudle.sciProjects.item.push({
+            sign:"sciProjects",
+            name:'',
+            date:'',
+            id:'',
+            level:'',
+            uploadFiles:[]
+      })
     },
     
     //上传文件选择文件
@@ -543,11 +549,10 @@ export default {
       xhr.send();
     },
     //创建提交弹出框数据
-    handleSubmit (formName) {
+    handleSubmit(formName) {
       this.formParams.scienceMoudle.sciProjects.sciProjectsSum = 
-       this.formParams.scienceMoudle.sciProjects.sum ;
+       this.formParams.scienceMoudle.sciProjects.sum;
        console.log('this.$store.state.user._id :>> ', this.$store.state.user._id);
-
         const id = this.$store.state.user._id;
         if (!id) {
           console.log('this.formParams :>> ', this.formParams);

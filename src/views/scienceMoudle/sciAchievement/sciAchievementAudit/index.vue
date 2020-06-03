@@ -11,30 +11,29 @@
           <span>{{ scope.row.jobID}}</span>
         </template>
       </el-table-column>
-      <el-table-column width="80px" align="center" label="岗位">
+      <el-table-column width="120px" align="center" label="岗位">
         <template slot-scope="scope">
-          <span>{{ scope.row.station }}</span>
+          {{ scope.row.station}}
         </template>
       </el-table-column>
-      <el-table-column width="80px" align="center" label="部门">
+      <el-table-column width="120px" align="center" label="部门">
         <template slot-scope="scope">
-          <span>{{ scope.row.department }}</span>
+          {{ scope.row.department }}
         </template>
       </el-table-column>
-      <el-table-column align="center" label="科研成果奖励总分" width="140px">
+      <el-table-column align="center" label="科研成果奖励总分" width="150px">
         <template slot-scope="scope">
           <span>{{ scope.row.scienceMoudle.sciAchievement ? scope.row.scienceMoudle.sciAchievement.sum : 0 }}</span>
         </template>
       </el-table-column>
-
-      <el-table-column class-name="status-col" align="center" label="状态" width="80px">
+      <el-table-column class-name="status-col" align="center" label="状态" width="150px">
         <template slot-scope="scope">
            <el-tag :type="scope.row.scienceMoudle.sciAchievement.status |statusFilter">{{scope.row.scienceMoudle.sciAchievement.status}}</el-tag>
         </template>
       </el-table-column>
-       <el-table-column width="100px" align="center" label="总分数">
+       <el-table-column width="150px" align="center" label="总分数">
         <template slot-scope="scope">
-          <span>{{scope.row.scienceMoudle.sciAchievement ? scope.row.scienceMoudle/sciAchievement.sum : 0}}</span>
+         {{scope.row.scienceMoudle.sciAchievement ? scope.row.scienceMoudle.sciAchievement.sum : 0}}
         </template>
       </el-table-column>
        <el-table-column
@@ -124,12 +123,15 @@
 </template>
 
 <script>
+import router from '../../../../router'
 import dayjs from 'dayjs'
-import { getAllTeachWorkload,updateTeachWorkload } from '@/api/teachingAndRes/teachWorkload'
+import { getAllTeachWorkload, updateTeachWorkload, getByDepartment } from '@/api/teachingAndRes/teachWorkload'
 // import { getAllSciAchievement, updateSciAchievement } from '@/api/scienceAndRes/sciAchievement'
 import { getToken } from '../../../../utils/auth'
+import { getAllLevel } from '@/api/setting'
 export default {
-  inject:["reload"],
+   name: 'InlineEditTable',
+  inject: ['reload'],
   filters: {
     statusFilter(status) {
       const statusMap = {
@@ -148,6 +150,10 @@ export default {
   data() {
     return {
       listLoading: true,
+       listQuery: {
+        page: 1,
+        limit: 10
+      },
       dialogTableVisible: false,
       list: [],//表格数据--所有的该模块数据单
       form:{},//审核单内详情数据
@@ -164,6 +170,47 @@ export default {
     this.getAllData()
   },
   methods: {
+     //获取所有级别岗位要求的接口
+    getStationInfo(value) {
+      console.log('value :>> ', value);
+      const userStation = value.station;
+      // console.log('userStation :>> ', userStation);
+      getAllLevel().then(res => {
+        console.log('res :>> ', res);
+        if (res.code == 200) {
+          switch (userStation) {
+            case '教学岗' : 
+              this.stationBase = res.result[0].teaching.teachWork;
+              break;
+            case '科研岗' :
+              this.stationBase = res.result[0].science.teachWork;
+              this.visibleItem = false;
+              break;
+            case '教学科研并重岗' :
+              this.stationBase = res.result[0].teachAndScience.teachWork;
+              break;
+            default:
+              this.$router.push('/user')
+          }
+          console.log('this.stationBase :>> ', this.stationBase);
+        }
+        
+      })
+    },
+    //根据部门获取本部门所有数据单
+    getDepartmentData() {
+      return new Promise((resolve, reject) => {
+        const department = this.$store.state.user.department;
+        getByDepartment(department).then(res => {
+          if (res.code == 200) {
+            resolve(res)
+          } else {
+            reject(res.message)
+          }
+          
+        })
+      })
+    },
     //获取表格数据
     getAllData() {
       getAllTeachWorkload().then(res => {
@@ -184,10 +231,11 @@ export default {
     //审核
     handleAudit(value) {
      console.log('value :>> ', value);
-      if (value.scienceMoudle.sciAchievement.status = '待审核') {
+      if (value.scienceMoudle.sciAchievement.status == '待审核') {
         this.dialogTableVisible = true;
         this.dialogTitle = this.dialogTitleItem.audit;
         this.form = value;
+        this.getStationInfo(value)
       } else {
         this.$message({
           type:'warning',
@@ -222,7 +270,7 @@ export default {
       this.showReason = false;
       const params = {
         auditPerson:this.$store.state.user.name,
-        auditReason:'教学教研模块审核通过！',
+        auditReason:'科研成果奖励模块审核通过！',
         auditStatus:'审核中',
         auditTime:new Date()
       }
