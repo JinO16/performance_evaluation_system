@@ -260,8 +260,25 @@ export default {
      })
     }).then(res => {
       console.log('res--- promise:>> ', res);
-      this.stationData = res.result[0];
-      this.getAllData();
+      if (res.result.length !=0 ) {
+        this.stationData = res.result[0];
+        this.getAllData();
+      } else {
+        this.$confirm('请先前往学生工作设置中心添加岗位权重信息，否则无法计算对应岗位权重值！点击确认前往>>','提示',{
+          confirmButtonText:'确定',
+          cancelButtonText:'取消',
+          type:'warning'
+        }).then(() => {
+          this.$router.push({name:"xsgzSetting"})
+          
+        }).catch(err => {
+          this.message({
+            type:'info',
+            message:'已取消！'
+          })
+
+        })
+      }
     })
      
    },
@@ -285,29 +302,30 @@ export default {
      }
      getAllTeachWorkload().then(res => {
        for (let i of res.result) {
-         //教研项目总分
-         if(i.xsgzModule.zhuanxiang || i.xsgzModule.huojiang ) {
-            i.xsgzModule.xsgzScoreSum = (i.xsgzModule.zhuanxiang ? i.xsgzModule.zhuanxiang.gongzuo.sum : 0)  + (i.xsgzModule.zhuanxiang ? i.xsgzModule.zhuanxiang.chuangxin.sum : 0) + (i.xsgzModule.huojiang ? i.xsgzModule.huojiang.geren.sum : 0)  + (i.xsgzModule.huojiang ? i.xsgzModule.huojiang.jiti.sum : 0) + (i.xsgzModule.huojiang ? i.xsgzModule.huojiang.biaozhang.sum : 0)
-          > 100 ? 100 : (i.xsgzModule.zhuanxiang ? i.xsgzModule.zhuanxiang.gongzuo.sum : 0)  + (i.xsgzModule.zhuanxiang ? i.xsgzModule.zhuanxiang.chuangxin.sum : 0) + (i.xsgzModule.huojiang ? i.xsgzModule.huojiang.geren.sum : 0)  + (i.xsgzModule.huojiang ? i.xsgzModule.huojiang.jiti.sum : 0) + (i.xsgzModule.huojiang ? i.xsgzModule.huojiang.biaozhang.sum : 0);
-          //岗位权重计分
-          i.xsgzModule.weightScore =Math.floor((i.xsgzModule.xsgzScoreSum ) * staWeight);
-            if(i.xsgzModule.huojiang && i.xsgzModule.huojiang.status == '驳回' 
-              || i.xsgzModule.zhuanxiang && i.xsgzModule.zhuanxiang.status =='驳回'
-             ) {
-              i.xsgzModule.xsgzStatus = '驳回';
-            } else if (i.xsgzModule.huojiang && i.xsgzModule.huojiang.status == '待审核' 
-              || i.xsgzModule.zhuanxiang && i.xsgzModule.zhuanxiang.status =='待审核' 
-              || (i.xsgzModule.huojiang && i.xsgzModule.huojiang.status == '审核中' 
-              || i.xsgzModule.zhuanxiang && i.xsgzModule.zhuanxiang.status =='审核中' 
-             ) && i.xsgzModule.xsgzStatus !=='审核中' ) {
-              i.xsgzModule.xsgzStatus = '待审核';
-            } else if(i.finalStatus == '已完成') {
-              i.xsgzModule.xsgzStatus = '已完成'
-            } else {
-              i.xsgzModule.xsgzStatus = '审核中'
+        if (i.xsgzModule) {
+           //教研项目总分
+          if(i.xsgzModule.zhuanxiang || i.xsgzModule.huojiang ) {
+              i.xsgzModule.xsgzScoreSum = (i.xsgzModule.zhuanxiang ? i.xsgzModule.zhuanxiang.gongzuo.sum : 0)  + (i.xsgzModule.zhuanxiang ? i.xsgzModule.zhuanxiang.chuangxin.sum : 0) + (i.xsgzModule.huojiang ? i.xsgzModule.huojiang.geren.sum : 0)  + (i.xsgzModule.huojiang ? i.xsgzModule.huojiang.jiti.sum : 0) + (i.xsgzModule.huojiang ? i.xsgzModule.huojiang.biaozhang.sum : 0)
+            > 100 ? 100 : (i.xsgzModule.zhuanxiang ? i.xsgzModule.zhuanxiang.gongzuo.sum : 0)  + (i.xsgzModule.zhuanxiang ? i.xsgzModule.zhuanxiang.chuangxin.sum : 0) + (i.xsgzModule.huojiang ? i.xsgzModule.huojiang.geren.sum : 0)  + (i.xsgzModule.huojiang ? i.xsgzModule.huojiang.jiti.sum : 0) + (i.xsgzModule.huojiang ? i.xsgzModule.huojiang.biaozhang.sum : 0);
+            //岗位权重计分
+            i.xsgzModule.weightScore =Math.floor((i.xsgzModule.xsgzScoreSum ) * staWeight);
+              if(i.xsgzModule.huojiang && i.xsgzModule.huojiang.status == '驳回' 
+                || i.xsgzModule.zhuanxiang && i.xsgzModule.zhuanxiang.status =='驳回'
+              ) {
+                i.xsgzModule.xsgzStatus = '驳回';
+              } else if (i.xsgzModule.huojiang && i.xsgzModule.huojiang.status == '待审核' 
+                || i.xsgzModule.zhuanxiang && i.xsgzModule.zhuanxiang.status =='待审核' 
+                || (i.xsgzModule.huojiang && i.xsgzModule.huojiang.status == '审核中' 
+                || i.xsgzModule.zhuanxiang && i.xsgzModule.zhuanxiang.status =='审核中' 
+              ) && i.xsgzModule.xsgzStatus !=='审核中' ) {
+                i.xsgzModule.xsgzStatus = '待审核';
+              } else if(i.finalStatus == '已完成') {
+                i.xsgzModule.xsgzStatus = '已完成'
+              } else {
+                i.xsgzModule.xsgzStatus = '审核中'
+              }
             }
-          }
-         
+        }
        }
        this.list = res.result.reverse();
        this.listLoading = false;

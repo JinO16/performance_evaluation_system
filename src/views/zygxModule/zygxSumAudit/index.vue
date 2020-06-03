@@ -231,8 +231,25 @@ export default {
      })
     }).then(res => {
       console.log('res--- promise:>> ', res);
-      this.stationData = res.result[0];
-      this.getAllData();
+      if (res.result.length !=0 ) {
+        this.stationData = res.result[0];
+        this.getAllData();
+      } else {
+        this.$confirm('请先前往专业贡献设置中心添加岗位权重信息，否则无法计算对应岗位权重值！点击确认前往>>','提示',{
+          confirmButtonText:'确定',
+          cancelButtonText:'取消',
+          type:'warning'
+        }).then(() => {
+          this.$router.push({name:"zygxSetting"})
+          
+        }).catch(err => {
+          this.message({
+            type:'info',
+            message:'已取消！'
+          })
+
+        })
+      }
     })
      
    },
@@ -257,11 +274,12 @@ export default {
      getAllTeachWorkload().then(res => {
        for (let i of res.result) {
          //教研项目总分
-         if(i.zygxModule.jingsai || i.zygxModule.zyjs ) {
+        if (i.zygxModule) {
+          if(i.zygxModule.jingsai || i.zygxModule.zyjs ) {
             i.zygxModule.zygxScoreSum = (i.zygxModule.jingsai ? i.zygxModule.jingsai.canjiajingsai.sum : 0)  + (i.zygxModule.zyjs ? i.zygxModule.zyjs.exchange.sum : 0) + (i.zygxModule.zyjs ? i.zygxModule.zyjs.zhuanye.sum : 0) 
-          > 100 ? 100 : (i.zygxModule.jingsai ? i.zygxModule.jingsai.canjiajingsai.sum : 0)  + (i.zygxModule.zyjs ? i.zygxModule.zyjs.exchange.sum : 0) + (i.zygxModule.zyjs ? i.zygxModule.zyjs.zhuanye.sum : 0);
-          //岗位权重计分
-          i.zygxModule.weightScore =Math.floor((i.zygxModule.zygxScoreSum ) * staWeight);
+            > 100 ? 100 : (i.zygxModule.jingsai ? i.zygxModule.jingsai.canjiajingsai.sum : 0)  + (i.zygxModule.zyjs ? i.zygxModule.zyjs.exchange.sum : 0) + (i.zygxModule.zyjs ? i.zygxModule.zyjs.zhuanye.sum : 0);
+            //岗位权重计分
+            i.zygxModule.weightScore =Math.floor((i.zygxModule.zygxScoreSum ) * staWeight);
             if(i.zygxModule.zyjs && i.zygxModule.zyjs.status == '驳回' 
               || i.zygxModule.jingsai && i.zygxModule.jingsai.status =='驳回'
              ) {
@@ -278,8 +296,9 @@ export default {
               i.zygxModule.zygxStatus = '审核中'
             }
           }
+        }
          
-       }
+      }
        this.list = res.result.reverse();
        this.listLoading = false;
      })

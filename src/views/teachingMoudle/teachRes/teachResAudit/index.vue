@@ -221,7 +221,7 @@ export default {
         if (res.code === 200) {
           const resultArr = [];
           for (let i of res.result) {
-            if (i.teachingMoudle.teachResChild) {
+            if (i.teachingMoudle && i.teachingMoudle.teachResChild) {
               resultArr.unshift(i)
             }
           }

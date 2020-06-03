@@ -324,7 +324,7 @@ export default {
         if ( res.code === 200) {
           const resultArr = [];
           for (let i of res.result) {
-            if (i.zygxModule.jingsai) {
+            if (i.zygxModule && i.zygxModule.jingsai) {
               resultArr.unshift(i);
             }
           }

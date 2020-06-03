@@ -14,31 +14,31 @@
         <template slot-scope="scope" > 
           <el-form label-position="left" inline class="demo-table-expand">
               <el-form-item label="上课教学工作量:">
-                {{scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.classWork : 0}}
+                {{scope.row.teachingMoudle ? (scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.classWork : 0) : 0}}
               </el-form-item>
               <el-form-item label="辅导员带班工作量折算:">
-                {{scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.instructorWork : 0}}
+                {{scope.row.teachingMoudle ? (scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.instructorWork : 0) : 0}}
               </el-form-item>
               <el-form-item label="实验教学工作量折算:">
-                {{scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.experimentWork : 0}}
+                {{scope.row.teachingMoudle ? (scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.experimentWork : 0) : 0}}
               </el-form-item>
               <!-- <el-form-item label="是否完成本部门人均相应工作量的三分之二:">
                 {{ scope.row.teachingMoudle.workLoad ? (scope.row.teachingMoudle.workLoad.isFinish ? '是' : '否') : ''}}
               </el-form-item> -->
               <el-form-item label="折抵教学工作量的科研经费金额:" v-if="visibleItem">
-                {{scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.scienceFunds : 0}}
+                {{scope.row.teachingMoudle ? (scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.scienceFunds : 0) : 0}}
               </el-form-item>
               <el-form-item label="科研经费折抵的教学工作量:" v-if="visibleItem">
-                {{scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.scienceFundsWork : 0}}
+                {{scope.row.teachingMoudle ? (scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.scienceFundsWork : 0) : 0}}
               </el-form-item>
               <el-form-item label="教学工作量合计:">
-                {{scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.teachWorkSum : 0}}
+                {{scope.row.teachingMoudle ? (scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.teachWorkSum : 0) : 0}}
               </el-form-item>
               <el-form-item label="用于计分的工作量:">
-                {{scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.scoreSum : 0}}
+                {{scope.row.teachingMoudle ? (scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.scoreSum : 0) : 0}}
               </el-form-item>
               <el-form-item label="个人逐项计分:">
-                {{scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.itemScore : 0}}
+                {{scope.row.teachingMoudle ? (scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.itemScore : 0) : 0}}
               </el-form-item>
               <el-form-item label="审核记录:">
                 <div v-for="(item,key) in scope.row.finalAuditRecord">
@@ -53,7 +53,7 @@
                   <span class="data-items">状态: {{item.auditStatus ? item.auditStatus : '待审核'}}</span>
                   <span class="data-items">审核理由: {{item.auditReason ? item.auditReason : '暂无'}}</span>
                 </div>
-                <div v-for="(item,key) in scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.auditRecord : []">
+                <div v-for="(item,key) in scope.row.teachingMoudle ? (scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.auditRecord : []) : []">
                   <span class="data-items">审核人: {{item.auditPerson ? item.auditPerson :'暂无'}}</span>
                   <span class="data-items">审核时间: {{item.auditTime ? item.auditTime : 0 | formateDate}}</span>
                   <span class="data-items">状态: {{item.auditStatus ? item.auditStatus : '待审核'}}</span>
@@ -72,28 +72,28 @@
       </el-table-column>
       <el-table-column width="120px" align="center" label="上课教学工作量">
         <template slot-scope="scope">
-          {{scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.classWork : 0}}
+          {{scope.row.teachingMoudle ? (scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.classWork : 0) : 0}}
         </template>
       </el-table-column>
       <el-table-column width="120px" align="center" label="教学工作量合计">
         <template slot-scope="scope">
-          {{scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.teachWorkSum : 0}}
+          {{scope.row.teachingMoudle ? (scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.teachWorkSum : 0) : 0}}
         </template>
       </el-table-column>
       <el-table-column width="135px" align="center" label="用于计分的工作量">
         <template slot-scope="scope">
-          {{scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.scoreSum : 0}}
+          {{scope.row.teachingMoudle ? (scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.scoreSum : 0) : 0}}
         </template>
       </el-table-column>
        <el-table-column width="120px" align="center" label="个人逐项计分">
         <template slot-scope="scope">
-          {{scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.itemScore :0}}
+          {{scope.row.teachingMoudle ? (scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.itemScore :0) : 0}}
         </template>
       </el-table-column>
       <el-table-column class-name="status-col" align="center" label="状态" width="80">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.teachingMoudle.workLoad.status | statusFilter">
-            {{scope.row.teachingMoudle.workLoad.status}}
+          <el-tag :type="scope.row.teachingMoudle ? scope.row.teachingMoudle.workLoad.status : '待审核' | statusFilter">
+            {{scope.row.teachingMoudle ? scope.row.teachingMoudle.workLoad.status : '待审核'}}
           </el-tag>
         </template>
       </el-table-column>
@@ -323,7 +323,7 @@ export default {
         if (res.code == 200) {
           const resultArr = [];
           for (let i of res.result) {
-            if (i.teachingMoudle.workLoad) {
+            if (i.teachingMoudle && i.teachingMoudle.workLoad) {
               resultArr.unshift(i)
             }
           }

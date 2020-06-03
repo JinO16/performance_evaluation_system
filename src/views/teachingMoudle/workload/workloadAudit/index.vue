@@ -249,7 +249,7 @@ export default {
         let sum = 0;//部门所有的教学工作量合计
           for (let i of res.result) {
             console.log('i :>> ', i);
-            if (i.teachingMoudle.workLoad) {
+            if (i.teachingMoudle && i.teachingMoudle.workLoad) {
               sum += parseInt(i.teachingMoudle.workLoad.teachWorkSum ? i.teachingMoudle.workLoad.teachWorkSum : 0) 
             }
           }
@@ -259,7 +259,7 @@ export default {
       await this.getList().then(res => {
         const resultArr = [];
         for (let i of res.result) {
-          if (i.teachingMoudle.workLoad ) {
+          if (i.teachingMoudle && i.teachingMoudle.workLoad ) {
             if(i.teachingMoudle.workLoad.teachWorkSum && i.teachingMoudle.workLoad.teachWorkSum >= this.averageWorkload) {
               i.teachingMoudle.workLoad.isFinish = true;
             } else {

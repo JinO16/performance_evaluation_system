@@ -232,7 +232,7 @@ export default {
         if (res.code === 200) {
           const resultArr = [];
           for (let i of res.result) {
-            if (i.teachingMoudle.teaProAndOther) {
+            if ( i.teachingMoudle && i.teachingMoudle.teaProAndOther) {
               resultArr.unshift(i);
             }
           }

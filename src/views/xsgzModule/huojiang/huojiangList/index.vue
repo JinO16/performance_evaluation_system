@@ -936,7 +936,7 @@ children: [{
         if ( res.code === 200) {
           const resultArr = [];
           for (let i of res.result) {
-            if (i.xsgzModule.huojiang) {
+            if (i.xsgzModule && i.xsgzModule.huojiang) {
               resultArr.unshift(i);
             }
           }

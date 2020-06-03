@@ -396,7 +396,7 @@ export default {
         if ( res.code === 200) {
           const resultArr = [];
           for (let i of res.result) {
-            if (i.xsgzModule.zhuanxiang) {
+            if (i.xsgzModule && i.xsgzModule.zhuanxiang) {
               resultArr.unshift(i);
             }
           }

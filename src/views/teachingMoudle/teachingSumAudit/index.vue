@@ -314,8 +314,25 @@ export default {
      })
     }).then(res => {
       console.log('res--- promise:>> ', res);
-      this.stationData = res.result[0];
-      this.getAllData();
+      if (res.result.length !=0 ) {
+        this.stationData = res.result[0];
+        this.getAllData();
+      } else {
+        this.$confirm('请先前往教研考评设置中心添加岗位权重信息，否则无法计算对应岗位权重值！点击确认前往>>','提示',{
+          confirmButtonText:'确定',
+          cancelButtonText:'取消',
+          type:'warning'
+        }).then(() => {
+          this.$router.push({name:"teaSetting"})
+          
+        }).catch(err => {
+          this.message({
+            type:'info',
+            message:'已取消！'
+          })
+
+        })
+      }
     })
      
    },
@@ -340,7 +357,8 @@ export default {
      getAllTeachWorkload().then(res => {
        for (let i of res.result) {
          //教研项目总分
-         if(i.teachingMoudle.workLoad || i.teachingMoudle.teachResChild || i.teachingMoudle.teaProAndOther) {
+        if(i.teachingMoudle) {
+           if(i.teachingMoudle.workLoad || i.teachingMoudle.teachResChild || i.teachingMoudle.teaProAndOther) {
             i.teachingMoudle.teachProScoreSum = (i.teachingMoudle.teaProAndOther ? i.teachingMoudle.teaProAndOther.teaProScoreSum : 0)  + (i.teachingMoudle.teachResChild ? i.teachingMoudle.teachResChild.teachResScoreSum : 0) 
           > 40 ? 40 :(i.teachingMoudle.teaProAndOther ? i.teachingMoudle.teaProAndOther.teaProScoreSum : 0)  + (i.teachingMoudle.teachResChild ? i.teachingMoudle.teachResChild.teachResScoreSum : 0) ;
           //岗位权重计分
@@ -362,7 +380,8 @@ export default {
             } else {
               i.teachingMoudle.teaStatus = '审核中'
             }
-         }
+          }
+        }
          
        }
        this.list = res.result.reverse();

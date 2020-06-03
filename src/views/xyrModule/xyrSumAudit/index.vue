@@ -213,8 +213,25 @@ export default {
      })
     }).then(res => {
       console.log('res--- promise:>> ', res);
-      this.stationData = res.result[0];
-      this.getAllData();
+      if (res.result.length !=0 ) {
+        this.stationData = res.result[0];
+        this.getAllData();
+      } else {
+        this.$confirm('请先前往学科、研究生、人才引进模块设置中心添加岗位权重信息，否则无法计算对应岗位权重值！点击确认前往>>','提示',{
+          confirmButtonText:'确定',
+          cancelButtonText:'取消',
+          type:'warning'
+        }).then(() => {
+          this.$router.push({name:"xyrSetting"})
+          
+        }).catch(err => {
+          this.message({
+            type:'info',
+            message:'已取消！'
+          })
+
+        })
+      }
     })
      
    },
@@ -239,25 +256,28 @@ export default {
      getAllTeachWorkload().then(res => {
        for (let i of res.result) {
          //教研项目总分
-         if(i.xyrModule.xyr) {
+         if (i.xyrModule) {
+           if(i.xyrModule.xyr) {
             i.xyrModule.xyr.xyrScoreSum = (i.xyrModule.xyr ? i.xyrModule.xyr.xkjs.sum : 0)  + (i.xyrModule.xyr ? i.xyrModule.xyr.yjsgz.sum : 0) + (i.xyrModule.xyr ? i.xyrModule.xyr.rcyj.sum : 0) 
-          > 100 ? 100 : (i.xyrModule.xyr ? i.xyrModule.xyr.xkjs.sum : 0)  + (i.xyrModule.xyr ? i.xyrModule.xyr.yjsgz.sum : 0) + (i.xyrModule.xyr ? i.xyrModule.xyr.rcyj.sum : 0);
-          //岗位权重计分
-          i.xyrModule.weightScore =Math.floor((i.xyrModule.xyr ? i.xyrModule.xyr.xyrScoreSum : 0) * staWeight);
+            > 100 ? 100 : (i.xyrModule.xyr ? i.xyrModule.xyr.xkjs.sum : 0)  + (i.xyrModule.xyr ? i.xyrModule.xyr.yjsgz.sum : 0) + (i.xyrModule.xyr ? i.xyrModule.xyr.rcyj.sum : 0);
+            //岗位权重计分
+            i.xyrModule.weightScore =Math.floor((i.xyrModule.xyr ? i.xyrModule.xyr.xyrScoreSum : 0) * staWeight);
             if(i.xyrModule.xyr && i.xyrModule.xyr.status == '驳回' ) 
             {
               i.xyrModule.xyrStatus = '驳回';
             } else if (i.xyrModule.xyr && i.xyrModule.xyr.status == '待审核' 
               || (i.xyrModule.xyr && i.xyrModule.xyr.status == '审核中' )
               && i.xyrModule.xyrStatus !=='审核中' )
-               {
+            {
               i.xyrModule.xyrStatus = '待审核';
-               } else if(i.finalStatus == '已完成') {
+            } else if(i.finalStatus == '已完成') {
               i.xyrModule.xyrStatus = '已完成'
-               } else {
+            } else {
               i.xyrModule.xyrStatus = '审核中'
-             }
+            }
           }
+         }
+        
          
        }
        this.list = res.result.reverse();

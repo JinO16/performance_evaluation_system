@@ -224,10 +224,12 @@ export default {
           this.listLoading = false;
           for(let i of res.result) {
             console.log('i :>> ', i);
-            if(i.xsgzModule.xsgzStatus === '审核中'  || (i.xsgzModule.huojiang && i.xsgzModule.huojiang.status == '审核中') || (i.xsgzModule.zhuanxiang && i.xsgzModule.zhuanxiang.status == '审核中'))
-            {
-               i.xsgzModule.xsgzStatus = '审核中'
-             };
+            if(i.xsgzModule) {
+              if(i.xsgzModule.xsgzStatus === '审核中'  || (i.xsgzModule.huojiang && i.xsgzModule.huojiang.status == '审核中') || (i.xsgzModule.zhuanxiang && i.xsgzModule.zhuanxiang.status == '审核中'))
+              {
+                i.xsgzModule.xsgzStatus = '审核中'
+              };
+            }
 
             if(i.station == '科研岗') {
               this.visibleItem = true;

@@ -41,7 +41,7 @@
                 {{tag.name}}
             </el-tag>
             <!-- </el-tooltip> -->
-            <el-button class="button-new-tag" size="small" @click="handleStationAdd">+ 添加岗位</el-button>
+            <el-button class="button-new-tag" size="small" @click="handleStationAdd">+ 添加岗位权重</el-button>
         </el-card>
     </el-row>
     <!-- 审核员弹出框 -->
@@ -122,8 +122,8 @@ export default {
             addStationVisible: false,//点击的是添加岗位按钮
             dialogStationTitle:'',//当点击的按钮不同，则显示的标题不同
             stationTitle:{
-                addStation: '添加岗位',
-                editStation: '编辑岗位'
+                addStation: '添加岗位权重',
+                editStation: '编辑岗位权重'
             },
             auditorData: [],
             //获取的所有级别数组

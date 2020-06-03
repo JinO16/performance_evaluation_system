@@ -1,0 +1,365 @@
+<template>
+  <div class="app-container">
+    <el-table v-loading="listLoading" :data="list" highlight-current-row style="width: 100%">
+      <el-table-column align="center" label="姓名" width="80">
+        <template slot-scope="scope">
+          <span>{{ scope.row.name}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column width="120px" align="center" label="工号">
+        <template slot-scope="scope">
+          <span>{{ scope.row.jobID}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column width="120px" align="center" label="岗位">
+        <template slot-scope="scope">
+          {{ scope.row.station}}
+        </template>
+      </el-table-column>
+      <el-table-column width="120px" align="center" label="部门">
+        <template slot-scope="scope">
+          {{ scope.row.department}}
+        </template>
+      </el-table-column>
+      <el-table-column width="100px" align="center" label="额定科研经费金额">
+        <template slot-scope="scope">
+          <span>{{ scope.row.scienceMoudle.sciFunds ? scope.row.scienceMoudle.sciFunds.ratedFunds : 0}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column width="100px" align="center" label="实际到账的科研经费金额">
+        <template slot-scope="scope">
+          {{scope.row.scienceMoudle.sciFunds ? scope.row.scienceMoudle.sciFunds.virtualFunds : 0}}
+        </template>
+      </el-table-column>
+       <el-table-column width="100px" align="center" label="折抵后科研经费完成金额">
+        <template slot-scope="scope">
+          {{scope.row.scienceMoudle.sciFunds ? scope.row.scienceMoudle.sciFunds.fScienceFunds : 0}}
+        </template>
+      </el-table-column>
+       <el-table-column width="100px" align="center" label="科研经费完成比例">
+        <template slot-scope="scope">
+          {{scope.row.scienceMoudle.sciFunds ? scope.row.scienceMoudle.sciFunds.finishPro : 0}}
+        </template>
+      </el-table-column>
+      <el-table-column width="120px" align="center" label="个人逐项计分">
+        <template slot-scope="scope">
+          {{scope.row.scienceMoudle.sciFunds ? scope.row.scienceMoudle.sciFunds.itemScore : 0}}
+        </template>
+      </el-table-column>
+     
+      <el-table-column class-name="status-col" align="center" label="状态" width="80">
+        <template slot-scope="scope">
+          <!-- <el-tag :type="scope.row.finalStatus !== '待审核' ? scope.row.finalStatus : (scope.row.teachingMoudle.teaStatus ? scope.row.teachingMoudle.teaStatus : scope.row.teachingMoudle.workLoad.status) | statusFilter ">
+            {{scope.row.finalStatus !== '待审核' ? scope.row.finalStatus : (scope.row.teachingMoudle.teaStatus ? scope.row.teachingMoudle.teaStatus : scope.row.teachingMoudle.workLoad.status)}}
+          </el-tag> -->
+          <el-tag :type="scope.row.scienceMoudle.sciFunds.status | statusFilter">{{scope.row.scienceMoudle.sciFunds.status}}</el-tag>
+        </template>
+      </el-table-column>
+       <!-- <el-table-column width="100px" align="center" label="总分数">
+        <template slot-scope="scope">
+          <span>{{ scope.row.teachingMoudle.workLoad ? scope.row.teachingMoudle.workLoad.itemScore : 0 }}</span>
+        </template>
+      </el-table-column> -->
+       <el-table-column
+        label="操作"
+        align="center"
+        class-name="small-padding fixed-width"
+      >
+        <template slot-scope="scope">
+          <el-button
+            size="mini"
+            type="primary"
+            @click="handleAudit(scope.row)"
+          >审核</el-button>
+          <el-button
+            size="mini"
+            plain
+            @click="handleDetail(scope.row)"
+          >查看详情</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+     <!-- 审核单弹出框 -->
+    <el-dialog el-drag-dialog :visible.sync="dialogTableVisible" :title="dialogTitle">
+      <el-form ref="form" :inline="true" :model="form" class="demo-form-inline">
+        <el-form-item label="姓名">
+          {{form.name}}
+        </el-form-item>
+        <el-form-item label="工号">
+          {{form.jobID}}
+        </el-form-item>
+        <el-form-item label="岗位">
+          {{form.station}}
+        </el-form-item>
+        <el-form-item label="部门">
+          {{form.department}}
+        </el-form-item>
+        <el-form-item label="提交时间">
+          {{form.submitTime | formateDate}}
+        </el-form-item>
+        <el-collapse>
+
+          <el-collapse-item title="科研经费数据">
+              <div class="collapse-item"><strong>额定科研经费金额：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.ratedFunds : 0) : 0}}</div>
+              <div class="collapse-item"><strong>实际到账科研经费金额：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.virtualFunds : 0) : 0}}</div>
+              <div class="collapse-item" v-if="visibleItem"><strong>折抵科研经费的教学工作量：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.workLoads : 0) : 0}}</div>
+              <div class="collapse-item" v-if="visibleItem"><strong>折抵科研经费的教学工作量对应科研经费金额：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.scienceFunds :0) : 0}}</div>
+              <!-- <div class="collapse-item" v-if="visibleItem"><strong>折抵科研经费的教学工作量上限为40%：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? (form.scienceMoudle.sciFunds.upperLimit ? '是' :'否'):'') : ''}}</div> -->
+              <div class="collapse-item"><strong>折抵后科研经费完成金额:</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.fScienceFunds :0) : 0}}</div>
+              <div class="collapse-item"><strong>科研经费完成比例：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.finishPro : 0 ) : 0}}</div>
+              <div class="collapse-item"><strong>个人逐项计分：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? 30 * form.scienceMoudle.sciFunds.virtualFunds / form.scienceMoudle.sciFunds.ratedFunds : 0) : 0}}</div>
+          </el-collapse-item>
+          <el-collapse-item title="审核记录">
+            <div v-for="(item,key) in form.finalAuditRecord">
+              <span class="collapse-item"><strong>审核人：</strong>{{item.auditPerson}}</span>
+              <span class="collapse-item"><strong>审核时间：</strong>{{item.auditTime | formateDate}}</span>
+              <span class="collapse-item"><strong>审核状态：</strong>{{item.auditStatus}}</span>
+              <span class="collapse-item"><strong>审核理由：</strong>{{item.auditReason}}</span>
+            </div>
+            <div v-for="(item,key) in form.scienceMoudle ? form.scienceMoudle.sciMoudelAuditRecord : []">
+                <span class="data-items">审核人: {{item.auditPerson ? item.auditPerson :'暂无'}}</span>
+                <span class="data-items">审核时间: {{item.auditTime ? item.auditTime : 0 | formateDate}}</span>
+                <span class="data-items">状态: {{item.auditStatus ? item.auditStatus : '待审核'}}</span>
+                <span class="data-items">审核理由: {{item.auditReason ? item.auditReason : '暂无'}}</span>
+            </div>
+            <div v-for="(item,key) in form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.auditRecord : []) :[]">
+              <span class="data-items">审核人: {{item.auditPerson ? item.auditPerson :'暂无'}}</span>
+              <span class="data-items">审核时间: {{item.auditTime ? item.auditTime : 0 | formateDate}}</span>
+              <span class="data-items">状态: {{item.auditStatus ? item.auditStatus : '待审核'}}</span>
+              <span class="data-items">审核理由: {{item.auditReason ? item.auditReason : '暂无'}}</span>
+            </div>           
+          </el-collapse-item>
+        </el-collapse>     
+        <div class="audit-block" v-if="dialogTitle == '审核单'">
+          <!-- 审核理由 -->
+          <el-form-item label="不通过理由(必填)" v-if="showReason" required>
+            <el-input type="textarea" :rows="2" placeholder="请输入审核理由" v-model="failedReason"></el-input>
+          </el-form-item>
+          <el-form-item style="display:flex;justify-content:center">
+            <el-button type="primary" @click="handlePass">审核通过</el-button>
+            <el-button type="danger" @click="handleFailed">审核不通过</el-button>
+          </el-form-item>
+        </div>
+      </el-form>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+import router from '../../../../router'
+import dayjs from 'dayjs'
+import { getAllTeachWorkload, updateTeachWorkload, getByDepartment } from '@/api/teachingAndRes/teachWorkload'
+//import { getAllSciFunds, updateSciFunds, getByDepartment } from '@/api/scienceAndRes/sciFunds'
+import { getAllLevel } from '@/api/setting'
+export default {
+  name: 'InlineEditTable',
+  inject: ['reload'],
+  filters: {
+    statusFilter(status) {
+      const statusMap = {
+        "已完成": 'success',
+        "draft": 'info',
+        "驳回": 'danger',
+        '审核中': 'warning'
+      }
+      return statusMap[status]
+    },
+    //格式化时间
+    formateDate(date) {
+      return dayjs(date).format('YYYY-MM-DD HH:mm')
+    }
+   },
+  data() {
+    return {
+      dialogTableVisible:false,
+      failedReason:'',//审核不通过理由
+      list: null,
+      listLoading: true,
+      listQuery: {
+        page: 1,
+        limit: 10
+      },
+      stationBase:350,//不同岗位对应算法的基数不同
+      visibleItem: true,//当岗位为科研岗时隐藏的项
+      failedReason:'',//审核不通过理由
+      showReason:false,//显示审核理由输入框
+      form: {},
+      dialogTitle:'',
+      dialogTitleItem: {
+        audit:'审核单',
+        detail:'查看详情'
+      },
+      // upperWorkLoads : 0,//折抵为科研经费的工作量
+      averageWorkload:0,//本部门人均工作量的三分之二
+    }
+  },
+  mounted() {
+    this.getData()
+  },
+  methods: {
+    //获取所有级别岗位要求的接口
+    getStationInfo(value) {
+      console.log('value :>> ', value);
+      const userStation = value.station;
+      // console.log('userStation :>> ', userStation);
+      getAllLevel().then(res => {
+        console.log('res :>> ', res);
+        if (res.code == 200) {
+          switch (userStation) {
+            case '教学岗' : 
+              this.stationBase = res.result[0].teaching.teachWork;
+              break;
+            case '科研岗' :
+              this.stationBase = res.result[0].science.teachWork;
+              this.visibleItem = false;
+              break;
+            case '教学科研并重岗' :
+              this.stationBase = res.result[0].teachAndScience.teachWork;
+              break;
+            default:
+              this.$router.push('/user')
+          }
+          console.log('this.stationBase :>> ', this.stationBase);
+        }
+        
+      })
+    },
+    //根据部门获取本部门所有数据单
+    getDepartmentData() {
+      return new Promise((resolve, reject) => {
+        const department = this.$store.state.user.department;
+        getByDepartment(department).then(res => {
+          if (res.code == 200) {
+            resolve(res)
+          } else {
+            reject(res.message)
+          }
+          
+        })
+      })
+    },
+    //获取所有科研经费数据清单
+    getList() {
+      return new Promise((resolve,reject) => {
+          getAllTeachWorkload().then(res => {
+            if (res.code === 200) {
+              resolve(res);
+            } else {
+              reject(res.message)
+            }
+        })
+      })
+    },
+    //处理获取的科研经费数据
+    async getData() {
+      await this.getDepartmentData().then(res => {
+        let sum = 0;//部门所有的科研经费合计
+          for (let i of res.result) {
+            console.log('i :>> ', i);
+            if (i.scienceMoudle.sciFunds) {
+              
+              sum += parseInt(i.scienceMoudle.sciFunds.fScienceFunds ? i.scienceMoudle.sciFunds.fScienceFunds : 0) 
+            }
+          }
+      //  this.averageWorkload = Math.floor (((classWork+instructorWork+experimentWork)-stationBase)/100);
+            
+      });
+      await this.getList().then(res => {
+        const resultArr = [];
+        for (let i of res.result) {
+          if (i.scienceMoudle && i.scienceMoudle.sciFunds ) {
+            // if(i.scienceMoudle.sciFunds.fScienceFunds && i.scienceMoudle.sciFunds.fScienceFunds >= this.averageWorkload) {
+            //   i.scienceMoudle.sciFunds.upperLimit = true;
+            // } else {
+            //   i.scienceMoudle.sciFunds.upperLimit = false;
+            // }
+            resultArr.unshift(i)
+          }
+        }
+        this.list = resultArr;
+        this.listLoading = false;
+      })
+    },
+    //查看详情
+    handleDetail(row) {
+      console.log('row :>> ', row);
+      this.dialogTableVisible = true;
+      this.dialogTitle = this.dialogTitleItem.detail;
+      this.form = row;
+    },
+    //审核
+    handleAudit(row) {
+      console.log('row :', row);
+      if (row.scienceMoudle.sciFunds.status == '待审核') {
+        this.form = row;
+        this.dialogTableVisible = true;
+        this.dialogTitle = this.dialogTitleItem.audit;
+        this.getStationInfo(row)  
+      } else {
+        this.$message({
+          type:'warning',
+          message:'该状态下无法重新审核！'
+        })
+      }
+    },
+    //审核提交接口
+    handleSubmit (params) {
+        this.form.scienceMoudle.sciFunds.auditRecord.unshift(params);
+        this.form.scienceMoudle.sciFunds.status = params.auditStatus;
+        console.log('this.form :>> ', this.form);
+        updateTeachWorkload(this.form).then(res => {
+          console.log('res :>> ', res);
+          if (res.code === 200) {
+            this.$message({
+              type:'success',
+              message:'提交审核成功！'
+            })
+            this.dialogTableVisible = false;
+            this.reload();
+          } else {
+            this.$message({
+              type:'error',
+              message:res.message
+            })
+          }
+        })
+    },
+    //审核通过
+    handlePass() {
+      this.showReason = false;
+      const params = {
+        auditPerson:this.$store.state.user.name,
+        auditReason:'科研经费模块审核通过！',
+        auditStatus:'审核中',
+        auditTime:new Date()
+      }
+     this.handleSubmit(params);
+    },
+    //审核不通过
+    handleFailed() {
+      this.showReason = true;
+      //审核不通过弹出文本框,必填
+      if (!this.failedReason) {
+       this.$message({
+         type:'error',
+         message:'请填写不通过理由！'
+       })
+     } else {
+        const params = {
+          auditPerson:this.$store.state.user.name,
+          auditReason:this.failedReason,
+          auditStatus:'驳回',
+          auditTime:new Date()
+        }
+        this.handleSubmit(params);
+      }
+    }
+  }
+}
+</script>
+
+<style scoped>
+.audit-block {
+  margin-top: 20px;
+}
+</style>

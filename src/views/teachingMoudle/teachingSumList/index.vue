@@ -277,13 +277,16 @@ export default {
           this.listLoading = false;
           for(let i of res.result) {
             console.log('i :>> ', i);
-            if(i.teachingMoudle.teaStatus === '审核中' 
-            || (i.teachingMoudle.workLoad && i.teachingMoudle.workLoad.status == '审核中') 
-            || (i.teachingMoudle.teachResChild && i.teachingMoudle.teachResChild.status == '审核中')
-            || (i.teachingMoudle.teaProAndOther && i.teachingMoudle.teaProAndOther.status == '审核中'))
-            {
-               i.teachingMoudle.teaStatus = '审核中'
-             };
+            if(i.teachingMoudle) {
+               if(i.teachingMoudle.teaStatus === '审核中' 
+              || (i.teachingMoudle.workLoad && i.teachingMoudle.workLoad.status == '审核中') 
+              || (i.teachingMoudle.teachResChild && i.teachingMoudle.teachResChild.status == '审核中')
+              || (i.teachingMoudle.teaProAndOther && i.teachingMoudle.teaProAndOther.status == '审核中'))
+              {
+                i.teachingMoudle.teaStatus = '审核中'
+              };
+            }
+           
             if(i.station == '科研岗') {
               this.visibleItem = true;
             }

@@ -189,11 +189,12 @@ export default {
           this.listLoading = false;
           for(let i of res.result) {
             console.log('i :>> ', i);
-            if(i.zygxModule.zygxStatus === '审核中'  || (i.zygxModule.zyjs && i.zygxModule.zyjs.status == '审核中')|| (i.zygxModule.jingsai && i.zygxModule.jingsai.status == '审核中'))
-            {
-               i.zygxModule.zygxStatus = '审核中'
-             };
-
+            if (i.zygxModule) {
+              if(i.zygxModule.zygxStatus === '审核中'  || (i.zygxModule.zyjs && i.zygxModule.zyjs.status == '审核中')|| (i.zygxModule.jingsai && i.zygxModule.jingsai.status == '审核中'))
+              {
+                i.zygxModule.zygxStatus = '审核中'
+              };
+            }
             if(i.station == '科研岗') {
               this.visibleItem = true;
             }

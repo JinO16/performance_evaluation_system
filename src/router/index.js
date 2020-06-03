@@ -125,6 +125,97 @@ export const constantRoutes = [
       }
     ]
   },
+  //科研考评
+  {
+    path: '/scienceModule',
+    component: Layout,
+    redirect: '/scienceModule/sciFunds/sciFundsList',
+    name: 'ScienceModule',
+    meta: {
+      title: '科研考评',
+      icon: 'example'
+    },
+    children: [
+      {
+        path: 'sciFunds',
+        component: () => import('@/views/scienceMoudle/sciFunds/index'), // Parent router-view
+        name: 'scienceFunds',
+        meta: { title: '科研经费', icon: 'clipboard' },
+        children: [
+          {
+            path:'sciFundsList',
+            name:'sciFundsList',
+            component: () => import('@/views/scienceMoudle/sciFunds/sciFundsList'),
+            meta: {title: '数据单',icon:'list'}
+          },
+          {
+            path:'sciFundsAudit',
+            name:'sciFundsAudit',
+            component: () => import('@/views/scienceMoudle/sciFunds/sciFundsAudit'),
+            meta: {title: '审核单',icon:'list'}
+          }
+        ]
+      },
+      {
+        path: 'sciPapers',
+        name: 'sciPapers',
+        component: () => import('@/views/scienceMoudle/sciPapers/index'),
+        meta: { title: '科研论文', icon: 'nested' },
+        children: [
+          {
+            path:'sciPapersList',
+            name:'sciPapersList',
+            component: () => import('@/views/scienceMoudle/sciPapers/sciPapersList'),
+            meta: {title: '数据单',icon:'list'}
+          },
+          {
+            path:'sciPapersAudit',
+            name:'sciPapersAudit',
+            component: () => import('@/views/scienceMoudle/sciPapers/sciPapersAudit'),
+            meta: {title: '审核单',icon:'list'}
+          }
+        ]
+      },
+      {
+        path: 'sciProjects',
+        name: 'sciProjects',
+        component: () => import('@/views/scienceMoudle/sciProjects'),
+        meta: { title: '科研立项', icon: 'component' },
+        children: [
+          {
+            path:'sciProjectsList',
+            name:'sciProjectsList',
+            component: () => import('@/views/scienceMoudle/sciProjects/sciProjectsList'),
+            meta: {title: '数据单',icon:'list'}
+          },
+          {
+            path:'sciProjectsAudit',
+            name:'sciProjectsAudit',
+            component: () => import('@/views/scienceMoudle/sciProjects/sciProjectsAudit'),
+            meta: {title: '审核单',icon:'list'}
+          }
+        ]
+      },
+      {
+        path:'scienceSumList',
+        name:'scienceSumList',
+        component:() => import('@/views/scienceMoudle/scienceSumList'),
+        meta:{title:'科研考评汇总单',icon:'chart'}
+      },
+      {
+        path:'scienceAudit',
+        name:'scienceAudit',
+        component:() => import('@/views/scienceMoudle/scienceSumAudit'),
+        meta:{title:'科研考评审核单',icon:'form'}
+      },
+      {
+        path:'sciSetting',
+        name:'sciSetting',
+        component:() => import('@/views/scienceMoudle/sciSetting'),
+        meta:{title:'科研考评设置中心',icon:'guide'}
+      }
+    ]
+  },
   {
     path: '/xyrModule',
     component: Layout,
@@ -176,18 +267,6 @@ export const constantRoutes = [
       }
     ]
   },
-
-
-
-  
-
-
-
-
-
-
-
-  
   {
     path: '/zygxModule',
     component: Layout,
@@ -217,8 +296,7 @@ export const constantRoutes = [
             meta: {title: '审核单',icon:'list'}
           }
         ]
-      },
-      
+      },      
       {
         path: 'jingsai',
         component: () => import('@/views/zygxModule/jingsai/index'), // Parent router-view
@@ -239,8 +317,6 @@ export const constantRoutes = [
           }
         ]
       },
-
-
       {
         path:'zygxSumList',
         name:'zxgxSumList',
@@ -261,11 +337,6 @@ export const constantRoutes = [
       }
     ]
   },
-
-
-
-
-
   {
     path: '/xsgzModule',
     component: Layout,

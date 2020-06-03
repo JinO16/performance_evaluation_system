@@ -23,22 +23,27 @@
       </el-table-column>
        <el-table-column width="120px" align="center" label="教研考评岗位权重计分">
         <template slot-scope="scope">
-          {{ scope.row.teachingMoudle.weightScore}}
+          {{ scope.row.teachingMoudle ? scope.row.teachingMoudle.weightScore : 0}}
+        </template>
+      </el-table-column>
+      <el-table-column width="120px" align="center" label="科研考评岗位权重计分">
+        <template slot-scope="scope">
+          {{ scope.row.scienceMoudle ? (scope.row.scienceMoudle.weightScore ? scope.row.scienceMoudle.weightScore : 0) : 0}}
         </template>
       </el-table-column>
       <el-table-column width="120px" align="center" label="学科建设研究生工作权重计分">
         <template slot-scope="scope">
-          {{ scope.row.xyrModule.weightScore}}
+          {{ scope.row.xyrModule ? scope.row.xyrModule.weightScore : 0}}
         </template>
       </el-table-column>
       <el-table-column width="120px" align="center" label="专业贡献权重计分">
         <template slot-scope="scope">
-          {{ scope.row.zygxModule.weightScore}}
+          {{ scope.row.zygxModule ? scope.row.zygxModule.weightScore : 0}}
         </template>
       </el-table-column>
       <el-table-column width="120px" align="center" label="学生工作权重计分">
         <template slot-scope="scope">
-          {{ scope.row.xsgzModule.weightScore}}
+          {{ scope.row.xsgzModule ? scope.row.xsgzModule.weightScore : 0}}
         </template>
       </el-table-column>
       <el-table-column width="120px" align="center" label="状态">
@@ -187,6 +192,51 @@
               </div>
               <span class="collapse-item"><strong>总分：</strong>{{form.teachingMoudle ? (form.teachingMoudle.teaProAndOther ? form.teachingMoudle.teaProAndOther.famousTeachers.sum : 0) : 0}}</span>
             </el-collapse-item>
+            <el-collapse-item title="科研经费">
+              <div class="collapse-item"><strong>额定科研经费金额：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.ratedFunds : 0) : 0}}</div>
+              <div class="collapse-item"><strong>实际到账科研经费金额：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.virtualFunds : 0) : 0}}</div>
+              <div class="collapse-item" v-if="visibleItem"><strong>折抵科研经费的教学工作量：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.workLoads : 0) : 0}}</div>
+              <div class="collapse-item" v-if="visibleItem"><strong>折抵科研经费的教学工作量对应科研经费金额：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.scienceFunds :0) : 0}}</div>
+              <div class="collapse-item"><strong>折抵后科研经费完成金额:</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.fScienceFunds :0) : 0}}</div>
+              <div class="collapse-item"><strong>科研经费完成比例：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.finishPro : 0 ) : 0}}</div>
+              <div class="collapse-item"><strong>个人逐项计分：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? 30 * form.scienceMoudle.sciFunds.virtualFunds / form.scienceMoudle.sciFunds.ratedFunds : 0) : 0}}</div>
+            </el-collapse-item>
+            <el-collapse-item title="科研论文">
+              <div v-for="(item,key) in form.scienceMoudle ? (form.scienceMoudle.sciPapers ? form.scienceMoudle.sciPapers.item : []) : []">
+                <span class="collapse-items"><strong>论文名称: </strong> {{item.name}}</span>
+                <span class="collapse-item"><strong>论文类型: </strong>{{item.type ? item.type[0] : ''}}</span>
+                <span class="collapse-item"><strong>个人逐项计分：</strong>{{item.type ? item.type[0] : 0}}</span>
+                <div class="collapse-item"><strong>附件：</strong>
+                  <a style="color:blue" id="fileDown" @click.once="handleDownload(item)">{{item.uploadFiles[0] ? item.uploadFiles[0].originalname :''}}</a>
+                </div>
+              </div>
+              <span class="collapse-item"><strong>总分：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciPapers ? form.scienceMoudle.sciPapers.sum : 0) : 0}}</span>
+            </el-collapse-item>
+            <el-collapse-item title="科研项目">
+             <div v-for="(item,key) in form.scienceMoudle ? (form.scienceMoudle.sciProjects ? form.scienceMoudle.sciProjects.item : []) : []">
+                <span class="collapse-item"><strong>项目名称：</strong>{{item.name}}</span>
+                <span class="collapse-item"><strong>项目编号：</strong>{{item.id}}</span>
+                <span class="collapse-item"><strong>批准日期：</strong>{{item.date | formateDate}}</span>
+                <span class="collapse-item"><strong>获奖级别：</strong>{{item.level?item.level[0]:''}}</span>
+                <span class="collapse-item"><strong>个人逐项计分：</strong>{{item.level? item.level[1] * item.level[2] : 0}}</span>
+                <div class="collapse-item"><strong>附件：</strong>
+                  <a style="color:blue" id="fileDown" @click.once="handleDownload(item)">{{item.uploadFiles[0] ? item.uploadFiles[0].originalname : ''}}</a>
+                </div>
+              </div>
+               <span class="collapse-item"><strong>总分：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciProjects ? form.scienceMoudle.sciProjects.sum : 0):0}}</span>
+            </el-collapse-item>
+            <el-collapse-item title="科研成果奖励">
+              <div v-for="(item,key) in form.scienceMoudle ? (form.scienceMoudle.sciAchievement ? form.scienceMoudle.sciAchievement.item : []): []">
+                <span class="collapse-item"><strong>证书/专利/专著名称: </strong>{{item.name}}</span>
+                <span class="collapse-item"><strong>获奖日期：</strong>{{item.date | formateDate}}</span>
+                <span class="collapse-item"><strong>获奖级别：</strong>{{item.level ? item.level[0] : ''}}</span>
+                <span class="collapse-item"><strong>个人逐项计分：</strong>{{item.level ? item.level[1] * item.level[2] : 0}}</span>
+                <div class="collapse-item"><strong>附件：</strong>
+                  <a style="color:blue" id="fileDown" @click.once="handleDownload(item)">{{item.uploadFiles[0] ? item.uploadFiles[0].originalname :''}}</a>
+                </div>
+              </div>
+             <span class="collapse-item"><strong>总分：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciAchievement ? form.scienceMoudle.sciAchievement.sum  : 0) : 0}}</span>
+            </el-collapse-item>
             <el-collapse-item title="学科建设">
               <div v-for="(item,key) in form.xyrModule ? (form.xyrModule.xyr ? form.xyrModule.xyr.xkjs.item : []) : []">
                 <span class="collapse-item"><strong>项目类型：</strong>{{item.level ? item.level[0] : ''}}</span>
@@ -319,7 +369,7 @@
               </div>
               <span class="collapse-item"><strong>总分：</strong>{{form.xsgzModule ? (form.xsgzModule.huojiang ? form.xsgzModule.huojiang.biaozhang.sum : 0) : 0}}</span>
             </el-collapse-item>
-
+            
             <el-collapse-item title="审核记录">
               <div>
                 <span class="record-item">终极审核记录</span>
@@ -333,6 +383,79 @@
               <div>
                 <span class="record-item">教学教研考评模块审核记录</span>
                 <div v-for="(item,key) in form.teachingMoudle ? form.teachingMoudle.teaMoudelAuditRecord : []">
+                  <span class="collapse-item"><strong>审核人：</strong>{{item.auditPerson}}</span>
+                  <span class="collapse-item"><strong>审核时间：</strong>{{item.auditTime | formateDate}}</span>
+                  <span class="collapse-item"><strong>审核状态：</strong>{{item.auditStatus}}</span>
+                  <span class="collapse-item"><strong>审核理由：</strong>{{item.auditReason}}</span>
+                </div>
+              </div>
+              <div>
+                <span class="record-item">工作量模块审核记录</span>
+                <div v-for="(item,key) in form.teachingMoudle ? (form.teachingMoudle.workLoad ?  form.teachingMoudle.workLoad.auditRecord : []): []">
+                  <span class="collapse-item"><strong>审核人：</strong>{{item.auditPerson}}</span>
+                  <span class="collapse-item"><strong>审核时间：</strong>{{item.auditTime | formateDate}}</span>
+                  <span class="collapse-item"><strong>审核状态：</strong>{{item.auditStatus}}</span>
+                  <span class="collapse-item"><strong>审核理由：</strong>{{item.auditReason}}</span>
+                </div>
+              </div>
+              <div>
+                <span class="record-item">教学教研模块审核记录</span>
+                <div v-for="(item,key) in form.teachingMoudle ? (form.teachingMoudle.teachResChild ?  form.teachingMoudle.teachResChild.auditRecord : []): []">
+                  <span class="collapse-item"><strong>审核人：</strong>{{item.auditPerson}}</span>
+                  <span class="collapse-item"><strong>审核时间：</strong>{{item.auditTime | formateDate}}</span>
+                  <span class="collapse-item"><strong>审核状态：</strong>{{item.auditStatus}}</span>
+                  <span class="collapse-item"><strong>审核理由：</strong>{{item.auditReason}}</span>
+                </div>
+              </div>
+              <div>
+                <span class="record-item">教学工程及其他模块审核记录</span>
+                <div v-for="(item,key) in form.teachingMoudle ? (form.teachingMoudle.teaProAndOther ?  form.teachingMoudle.teaProAndOther.auditRecord : []): []">
+                  <span class="collapse-item"><strong>审核人：</strong>{{item.auditPerson}}</span>
+                  <span class="collapse-item"><strong>审核时间：</strong>{{item.auditTime | formateDate}}</span>
+                  <span class="collapse-item"><strong>审核状态：</strong>{{item.auditStatus}}</span>
+                  <span class="collapse-item"><strong>审核理由：</strong>{{item.auditReason}}</span>
+                </div>
+              </div>
+              <div>
+                <span class="record-item">科研考评模块审核记录</span>
+                <div v-for="(item,key) in form.scienceMoudle ? form.scienceMoudle.sciMoudelAuditRecord : []">
+                  <span class="collapse-item"><strong>审核人：</strong>{{item.auditPerson}}</span>
+                  <span class="collapse-item"><strong>审核时间：</strong>{{item.auditTime | formateDate}}</span>
+                  <span class="collapse-item"><strong>审核状态：</strong>{{item.auditStatus}}</span>
+                  <span class="collapse-item"><strong>审核理由：</strong>{{item.auditReason}}</span>
+                </div>
+              </div>
+              
+              <div>
+                <span class="record-item">科研经费模块审核记录</span>
+                <div v-for="(item,key) in form.scienceMoudle ? (form.scienceMoudle.sciFunds ?  form.scienceMoudle.sciFunds.auditRecord : []): []">
+                  <span class="collapse-item"><strong>审核人：</strong>{{item.auditPerson}}</span>
+                  <span class="collapse-item"><strong>审核时间：</strong>{{item.auditTime | formateDate}}</span>
+                  <span class="collapse-item"><strong>审核状态：</strong>{{item.auditStatus}}</span>
+                  <span class="collapse-item"><strong>审核理由：</strong>{{item.auditReason}}</span>
+                </div>
+              </div>
+              <div>
+                <span class="record-item">科研论文模块审核记录</span>
+                <div v-for="(item,key) in form.scienceMoudle ? (form.scienceMoudle.sciPapers ?  form.scienceMoudle.sciPapers.auditRecord : []): []">
+                  <span class="collapse-item"><strong>审核人：</strong>{{item.auditPerson}}</span>
+                  <span class="collapse-item"><strong>审核时间：</strong>{{item.auditTime | formateDate}}</span>
+                  <span class="collapse-item"><strong>审核状态：</strong>{{item.auditStatus}}</span>
+                  <span class="collapse-item"><strong>审核理由：</strong>{{item.auditReason}}</span>
+                </div>
+              </div>
+              <div>
+                <span class="record-item">科研立项模块审核记录</span>
+                <div v-for="(item,key) in form.scienceMoudle ? (form.scienceMoudle.sciProjects ?  form.scienceMoudle.sciProjects.auditRecord : []): []">
+                  <span class="collapse-item"><strong>审核人：</strong>{{item.auditPerson}}</span>
+                  <span class="collapse-item"><strong>审核时间：</strong>{{item.auditTime | formateDate}}</span>
+                  <span class="collapse-item"><strong>审核状态：</strong>{{item.auditStatus}}</span>
+                  <span class="collapse-item"><strong>审核理由：</strong>{{item.auditReason}}</span>
+                </div>
+              </div>
+              <div>
+                <span class="record-item">科研成果奖励模块审核记录</span>
+                <div v-for="(item,key) in form.scienceMoudle ? (form.scienceMoudle.sciAchievement ?  form.scienceMoudle.sciAchievement.auditRecord : []): []">
                   <span class="collapse-item"><strong>审核人：</strong>{{item.auditPerson}}</span>
                   <span class="collapse-item"><strong>审核时间：</strong>{{item.auditTime | formateDate}}</span>
                   <span class="collapse-item"><strong>审核状态：</strong>{{item.auditStatus}}</span>
@@ -367,33 +490,8 @@
                 </div>
               </div>
 
-              <div>
-                <span class="record-item">工作量模块审核记录</span>
-                <div v-for="(item,key) in form.teachingMoudle ? (form.teachingMoudle.workLoad ?  form.teachingMoudle.workLoad.auditRecord : []): []">
-                  <span class="collapse-item"><strong>审核人：</strong>{{item.auditPerson}}</span>
-                  <span class="collapse-item"><strong>审核时间：</strong>{{item.auditTime | formateDate}}</span>
-                  <span class="collapse-item"><strong>审核状态：</strong>{{item.auditStatus}}</span>
-                  <span class="collapse-item"><strong>审核理由：</strong>{{item.auditReason}}</span>
-                </div>
-              </div>
-              <div>
-                <span class="record-item">教学教研模块审核记录</span>
-                <div v-for="(item,key) in form.teachingMoudle ? (form.teachingMoudle.teachResChild ?  form.teachingMoudle.teachResChild.auditRecord : []): []">
-                  <span class="collapse-item"><strong>审核人：</strong>{{item.auditPerson}}</span>
-                  <span class="collapse-item"><strong>审核时间：</strong>{{item.auditTime | formateDate}}</span>
-                  <span class="collapse-item"><strong>审核状态：</strong>{{item.auditStatus}}</span>
-                  <span class="collapse-item"><strong>审核理由：</strong>{{item.auditReason}}</span>
-                </div>
-              </div>
-              <div>
-                <span class="record-item">教学工程及其他模块审核记录</span>
-                <div v-for="(item,key) in form.teachingMoudle ? (form.teachingMoudle.teaProAndOther ?  form.teachingMoudle.teaProAndOther.auditRecord : []): []">
-                  <span class="collapse-item"><strong>审核人：</strong>{{item.auditPerson}}</span>
-                  <span class="collapse-item"><strong>审核时间：</strong>{{item.auditTime | formateDate}}</span>
-                  <span class="collapse-item"><strong>审核状态：</strong>{{item.auditStatus}}</span>
-                  <span class="collapse-item"><strong>审核理由：</strong>{{item.auditReason}}</span>
-                </div>
-              </div>
+              
+              
             </el-collapse-item>
         </el-collapse>
         <div class="audit-block" v-if="dialogTitle == '审核单'">
@@ -454,10 +552,11 @@ export default {
     //获取所有的数据单
     getAllData() {
         getAllTeachWorkload().then(res => {
-            console.log('res :>> ', res);
+            console.log('res 获取所有的数据单:>> ', res);
             if (res.code == 200) {
                 for (let i of res.result) {
-                    //总审核状态
+                    //教学教研
+                  if (i.teachingMoudle) {
                     if (i.teachingMoudle.teaStatus && i.teachingMoudle.teaStatus == '审核中') {
                          i.finalStatus = '待审核';
                     } else if (i.teachingMoudle.teaStatus && i.teachingMoudle.teaStatus == '待审核'){
@@ -465,8 +564,20 @@ export default {
                     } else {
                         i.finalStatus = i.teachingMoudle.teaStatus;
                     }
+                  }
+                  //科研
+                   if (i.scienceMoudle) {
+                    if (i.scienceMoudle.sciStatus && i.scienceMoudle.sciStatus == '审核中') {
+                         i.finalStatus = '待审核';
+                    } else if (i.scienceMoudle.sciStatus && i.scienceMoudle.sciStatus == '待审核'){
+                        res.result.pop(i);
+                    } else {
+                        i.finalStatus = i.scienceMoudle.sciStatus;
+                    }
+                  }
                 }
                 this.list = res.result.reverse();
+                console.log('this.list---->数据列表 :>> ', this.list);
                 this.listLoading = false;
             }
         })
@@ -517,19 +628,31 @@ export default {
    //审核提交接口
    handleSubmit(params) {
     console.log('params :>> ', params);
+    console.log('this.form---- :>> ', this.form);
     this.form.finalStatus = params.auditStatus;
-    this.form.teachingMoudle.teaStatus = params.auditStatus; 
-    this.form.xyrModule.xyrStatus = params.auditStatus; 
-    this.form.zygxModule.zygxStatus = params.auditStatus; 
-    this.form.xsgzModule.xsgzStatus = params.auditStatus; 
-    this.form.teachingMoudle.workLoad ? this.form.teachingMoudle.workLoad.status = params.auditStatus : '';
-    this.form.teachingMoudle.teachResChild ? this.form.teachingMoudle.teachResChild.status = params.auditStatus : '';
-    this.form.teachingMoudle.teaProAndOther ? this.form.teachingMoudle.teaProAndOther.status = params.auditStatus :'';
-    this.form.xyrModule.xyr ? this.form.xyrModule.xyr.status = params.auditStatus : '';
-    this.form.zygxModule.jingsai ? this.form.zygxModule.jingsai.status = params.auditStatus : '';
-    this.form.zygxModule.zyjs ? this.form.xyrModule.zyjs.status = params.auditStatus : '';
-    this.form.xsgzModule.huojiang ? this.form.xsgzModule.huojiang.status = params.auditStatus : '';
-    this.form.xsgzModule.zhuanxiang ? this.form.xsgzModule.zhuanxiang.status = params.auditStatus : '';
+    if (this.form.teachingMoudle) {
+       this.form.teachingMoudle.teaStatus = params.auditStatus;
+       this.form.teachingMoudle.workLoad ? this.form.teachingMoudle.workLoad.status = params.auditStatus : '';
+       this.form.teachingMoudle.teachResChild ? this.form.teachingMoudle.teachResChild.status = params.auditStatus : '';
+       this.form.teachingMoudle.teaProAndOther ? this.form.teachingMoudle.teaProAndOther.status = params.auditStatus :'';
+    } else if (this.form.scienceMoudle) {
+        this.form.scienceMoudle.sciStatus = params.auditStatus;
+        this.form.scienceMoudle.sciFunds ? this.form.scienceMoudle.sciFunds.status = params.auditStatus :'';
+        this.form.scienceMoudle.sciPapers ? this.form.scienceMoudle.sciPapers.status = params.auditStatus :'';
+        this.form.scienceMoudle.sciProjects ? this.form.scienceMoudle.sciProjects.status = params.auditStatus :'';
+        this.form.scienceMoudle.sciAchievement ? this.form.scienceMoudle.sciAchievement.status = params.auditStatus :'';
+
+    } else if (this.form.xyrModule || this.form.xsgzModule || this.form.zygxModule) {
+      this.form.xyrModule.xyrStatus = params.auditStatus; 
+      this.form.zygxModule.zygxStatus = params.auditStatus; 
+      this.form.xsgzModule.xsgzStatus = params.auditStatus; 
+      this.form.xyrModule.xyr ? this.form.xyrModule.xyr.status = params.auditStatus : '';
+      this.form.zygxModule.jingsai ? this.form.zygxModule.jingsai.status = params.auditStatus : '';
+      this.form.zygxModule.zyjs ? this.form.xyrModule.zyjs.status = params.auditStatus : '';
+      this.form.xsgzModule.huojiang ? this.form.xsgzModule.huojiang.status = params.auditStatus : '';
+      this.form.xsgzModule.zhuanxiang ? this.form.xsgzModule.zhuanxiang.status = params.auditStatus : '';
+
+    }
     this.form.finalAuditRecord.unshift(params);
     console.log('this.form :>> ', this.form);
     localStorage.removeItem('_id');

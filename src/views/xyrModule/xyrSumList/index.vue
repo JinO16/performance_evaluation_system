@@ -185,10 +185,12 @@ export default {
           this.listLoading = false;
           for(let i of res.result) {
             console.log('i :>> ', i);
-            if(i.xyrModule.xyrStatus === '审核中'  || (i.xyrModule.xyr && i.xyrModule.xyr.status == '审核中'))
-            {
-               i.xyrModule.xyrStatus = '审核中'
-             };
+            if(i.xyrModule) {
+              if(i.xyrModule.xyrStatus === '审核中'  || (i.xyrModule.xyr && i.xyrModule.xyr.status == '审核中'))
+              {
+                i.xyrModule.xyrStatus = '审核中'
+              };
+            }
 
             if(i.station == '科研岗') {
               this.visibleItem = true;

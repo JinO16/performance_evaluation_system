@@ -218,7 +218,7 @@ export default {
         if (res.code === 200) {
           const resultArr = [];
           for (let i of res.result) {
-            if (i.xyrModule.xyr) {
+            if (i.xyrModule && i.xyrModule.xyr) {
               resultArr.unshift(i);
             }
           }

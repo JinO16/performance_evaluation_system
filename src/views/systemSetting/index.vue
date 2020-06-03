@@ -363,8 +363,7 @@ export default {
                 this.dialogLevelVisible = true;
                 this.addLevelVisible = true;
                 this.dialogLevelTitle = this.levelTitle.addLevel;
-            }
-            
+            }    
         },
         //确认添加级别
         handleLevelAddSubmit() {

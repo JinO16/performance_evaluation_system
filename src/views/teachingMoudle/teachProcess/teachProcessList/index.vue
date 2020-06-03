@@ -359,7 +359,7 @@ export default {
       file:'',
       list: null,
       listLoading: true,
-     //教学工程获奖级别
+       //教学工程获奖级别
       teachProcess_options: [{
         value: 60,
         label:'国家级',
@@ -873,7 +873,7 @@ export default {
         if ( res.code === 200) {
           const resultArr = [];
           for (let i of res.result) {
-            if (i.teachingMoudle.teaProAndOther) {
+            if (i.teachingMoudle && i.teachingMoudle.teaProAndOther) {
               resultArr.unshift(i);
             }
           }

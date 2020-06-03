@@ -206,7 +206,7 @@ export default {
         if (res.code === 200) {
           const resultArr = [];
           for (let i of res.result) {
-            if (i.zygxModule.zyjs) {
+            if (i.zygxModule && i.zygxModule.zyjs) {
               resultArr.unshift(i);
             }
           }
