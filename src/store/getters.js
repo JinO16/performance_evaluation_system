@@ -7,6 +7,9 @@ const getters = {
   jobID: state => state.user.jobID,
   station: state => state.user.station,
   department: state => state.user.department,
-  _id : state => state.user._id
+  _id : state => state.user._id,
+  role: state => state.user.role,
+  routers: state => state.user.routers,
+  addRouters: state => state.user.addRouters
 }
 export default getters

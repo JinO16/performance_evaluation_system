@@ -28,13 +28,18 @@ export default {
   components: { SidebarItem, Logo },
   computed: {
     ...mapGetters([
-      'sidebar'
+      'sidebar',
+      'routers'
     ]),
     routes() {
-      return this.$router.options.routes
+       console.log('侧边栏',this.$router.options.routes)
+       console.log('routers :>> ', this.routers);
+       return this.routers
+      // return this.$router.options.routes
     },
     activeMenu() {
       const route = this.$route
+      console.log('route----> :>> ', route);
       const { meta, path } = route
       // if set path, the sidebar will highlight the path you set
       if (meta.activeMenu) {

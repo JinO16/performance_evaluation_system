@@ -190,10 +190,14 @@ export default {
           for(let i of res.result) {
             console.log('i :>> ', i);
             if (i.zygxModule) {
-              if(i.zygxModule.zygxStatus === '审核中'  || (i.zygxModule.zyjs && i.zygxModule.zyjs.status == '审核中')|| (i.zygxModule.jingsai && i.zygxModule.jingsai.status == '审核中'))
-              {
-                i.zygxModule.zygxStatus = '审核中'
-              };
+              if(i.zygxModule.zyjs && i.zygxModule.zyjs.status == '驳回' 
+              || i.zygxModule.jingsai && i.zygxModule.jingsai.status =='驳回')
+            {
+              i.zygxModule.zygxStatus = '驳回';
+            }else if(i.zygxModule.zygxStatus === '审核中'  || (i.zygxModule.zyjs && i.zygxModule.zyjs.status == '审核中')|| (i.zygxModule.jingsai && i.zygxModule.jingsai.status == '审核中'))
+            {
+              i.zygxModule.zygxStatus = '审核中'
+            };
             }
             if(i.station == '科研岗') {
               this.visibleItem = true;
@@ -207,7 +211,7 @@ export default {
     //删除
     handleDelete(row) {
       console.log('row :>> ', row);
-      if (row.zygxModule.zygxStatus == '已完成') {
+      if (row.zygxModule.zygxStatus == '已完成' || row.zygxModule.zygxStatus == '待审核') {
         this.$confirm('此操作将永久删除该整条数据(包括其他模块提交的本条数据), 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',

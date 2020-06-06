@@ -842,7 +842,6 @@ children: [{
         finalAuditRecord:[],//最终审核记录
         finalStatus:'待审核',//总审核状态
         submitTime: new Date(),//提交时间
-        // teachingMoudle:{},//教学教研总模块
         xsgzModule: {
           huojiang: {
               //教学工程项目
@@ -880,9 +879,27 @@ children: [{
               auditRecord:[],//教学工程及其他模块审核记录
               huojiangScoreSum: 0,//教学工程及其他模块总分
           },
-          huojiangStatus:'待审核',//教学教研考评模块审核状态
-          xsgzModuleAuditRecord: [],//教学教研模块审核记录
-        }
+          xsgzStatus:'待审核',//学生工作审核状态
+          xsgzModuleAuditRecord: [],//学生工作模块审核记录
+        },
+        xyrModule: {
+          xyrStatus:'待审核',//学科、研究生、人才审核状态
+          xyrModuleAuditRecord: [],//学科、研究生、人才审核记录
+        },
+          //教研模块
+        teachingMoudle: {
+          teaStatus:'待审核',//教学教研考评模块审核状态
+          teaMoudelAuditRecord: [],//教学教研模块审核记录
+        },
+         //科研模块
+        scienceMoudle: {
+          sciStatus:'待审核',//科研考评模块审核状态
+          sciMoudelAuditRecord: [],//科研模块审核记录
+        },
+        zygxModule:{
+          zygxStatus:'待审核',//专业贡献模块审核状态
+          zygxModuleAuditRecord: [],//专业贡献审核记录
+        },
         
       }
     }

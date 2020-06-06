@@ -112,7 +112,7 @@ export default {
                 type:'success',
                 message:res.message
               })
-              if (!res.result.station && !res.result.department) {
+              if (!res.result.station && !res.result.department) {              
                 this.$router.push({ path:'./user'})
                 this.$message({
                   type:'warning',
@@ -120,10 +120,12 @@ export default {
                 })
               } else {
                 // this.$router.push({ path: this.redirect || '/' })
-                this.$router.push({ path:'/'})
                 t.$store.dispatch('user/getInfo').then(res => {
-                  console.log('res 获取用户个人信息:>> ', res);
+                  // this.$store.commit('SET_ROLE',res.result.role);
+                  window.location.reload();
+                  this.$router.push({ path:'/'});
                 })
+                
                 
               }
             }

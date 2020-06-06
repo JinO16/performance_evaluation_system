@@ -225,7 +225,10 @@ export default {
           for(let i of res.result) {
             console.log('i :>> ', i);
             if(i.xsgzModule) {
-              if(i.xsgzModule.xsgzStatus === '审核中'  || (i.xsgzModule.huojiang && i.xsgzModule.huojiang.status == '审核中') || (i.xsgzModule.zhuanxiang && i.xsgzModule.zhuanxiang.status == '审核中'))
+              if (i.xsgzModule.huojiang && i.xsgzModule.huojiang.status == '驳回' 
+                || i.xsgzModule.zhuanxiang && i.xsgzModule.zhuanxiang.status =='驳回') {
+                  i.xsgzModule.xsgzStatus = '驳回';
+                }else if(i.xsgzModule.xsgzStatus === '审核中'  || (i.xsgzModule.huojiang && i.xsgzModule.huojiang.status == '审核中') || (i.xsgzModule.zhuanxiang && i.xsgzModule.zhuanxiang.status == '审核中'))
               {
                 i.xsgzModule.xsgzStatus = '审核中'
               };
@@ -243,7 +246,7 @@ export default {
     //删除
     handleDelete(row) {
       console.log('row :>> ', row);
-      if (row.xsgzModule.xsgzStatus == '已完成') {
+      if (row.xsgzModule.xsgzStatus == '已完成' || row.xsgzModule.xsgzStatus == '待审核') {
         this.$confirm('此操作将永久删除该整条数据(包括其他模块提交的本条数据), 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',

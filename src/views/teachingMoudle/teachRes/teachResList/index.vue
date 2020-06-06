@@ -702,6 +702,7 @@ export default {
         finalStatus:'待审核',//总审核状态
         submitTime: new Date(),//提交时间
         teachingMoudle: {
+          name:'教研模块',
           teachResChild: {
              //教学质量评价
             teachQuality:{
@@ -747,7 +748,25 @@ export default {
           }, 
           teaStatus:'待审核',//教学教研考评模块审核状态
           teaMoudelAuditRecord: [],//教学教研模块审核记录
-        }   
+        },
+        //科研模块
+        scienceMoudle: {
+          sciStatus:'待审核',//科研考评模块审核状态
+          sciMoudelAuditRecord: [],//科研模块审核记录
+        },
+        //学科建设等其他模块
+        xyrModule:{
+          xyrStatus:'待审核',//学科、研究生、人才审核状态
+          xyrModuleAuditRecord: [],//学科、研究生、人才审核记录
+        },
+        zygxModule:{
+          zygxStatus:'待审核',//专业贡献模块审核状态
+          zygxModuleAuditRecord: [],//专业贡献审核记录
+        },
+        xsgzModule:{
+          xsgzStatus:'待审核',//学生工作审核状态
+          xsgzModuleAuditRecord: [],//学生工作模块审核记录
+        },      
       }
     }
   },

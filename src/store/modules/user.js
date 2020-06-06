@@ -1,7 +1,15 @@
 import { login, logout, getInfo } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
-import { resetRouter } from '@/router'
-
+import { resetRouter, asyncRouter, constantRoutes } from '@/router'
+function hasPermission (roles,route) {
+  let roleArray = [];
+  if (route.meta && route.meta.role) {
+    roleArray = route.meta.role;
+    return roleArray.indexOf(roles) >= 0;
+  } else {
+    return true
+  }
+}
 const getDefaultState = () => {
   return {
     token: getToken(),
@@ -9,7 +17,10 @@ const getDefaultState = () => {
     name: '',
     station:'',
     department:'',
-    _id: ''
+    _id: '',
+    role: '',
+    routers:'',
+    addRouters:[]
     // avatar: ''
   }
 }
@@ -46,6 +57,14 @@ const mutations = {
   SET_ID: (state, _id) => {
     sessionStorage.setItem('_id',_id);
     state._id = _id;
+  },
+  SET_ROLE: (state, role) => {
+    sessionStorage.setItem('role',role);
+    state.role = role;
+  },
+  SET_ROUTERS: (state, routers) => {
+    state.addRouters = routers;
+    state.routers = constantRoutes.concat(routers);
   }
 }
 
@@ -57,7 +76,6 @@ const actions = {
     return new Promise((resolve, reject) => {
       login({ jobID: jobID.trim(), password: password }).then(response => {
           commit('SET_TOKEN', response.token);
-         
           setToken(response.token);
           resolve(response);       
       }).catch(error => {
@@ -78,6 +96,7 @@ const actions = {
         commit('SET_STATION',response.result.station);
         commit('SET_JOBID', response.result.jobID);
         commit('SET_NAME',response.result.name);
+        commit('SET_ROLE',response.result.role);
         resolve(response)
       }).catch(error => {
         reject(error)
@@ -96,6 +115,38 @@ const actions = {
       }).catch(error => {
         reject(error)
       })
+    })
+  },
+  GenerateRoutes({ commit }, data) {
+    return new Promise(resolve => {
+      const { roles } = data;
+      const accessedRouters = asyncRouter.filter(v => {
+        if (hasPermission(roles,v)) {
+          if (v.children && v.children.length > 0) {
+            v.children = v.children.filter(child => {
+              if (hasPermission(roles, child)) {
+                // console.log('child :>> ', child);
+                if (child.children && child.children.length > 0) {
+                  child.children = child.children.filter(ele => {
+                    if (hasPermission(roles,ele)) {
+                      // console.log('ele :>> ', ele);
+                      return ele;
+                    }
+                  })
+                }
+                return child
+              }
+              return false;
+            });
+            return v
+          } else {
+            return v
+          }
+        }
+        return false;
+      });
+      commit('SET_ROUTERS',accessedRouters);
+      resolve();
     })
   },
 

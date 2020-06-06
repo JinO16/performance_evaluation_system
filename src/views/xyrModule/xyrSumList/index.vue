@@ -1,21 +1,23 @@
 <template>
   <div class="app-container">
+    <el-alert
+      title="注：本模块汇总审核完毕后，岗位权重计分才会显示！"
+      type="info"
+      show-icon
+      :closable="false"
+      style="margin-bottom:10px">
+    </el-alert>
     <el-table v-loading="listLoading" :data="list" highlight-current-row style="width: 100%">
       <el-table-column align="center" label="提交时间" width="140">
         <template slot-scope="scope">
           <span>{{ scope.row.submitTime | formateDate}}</span>
         </template>
         </el-table-column>
-      <el-table-column width="150px" align="center" label="xyr计分">
+      <el-table-column width="220px" align="center" label="学科、研究生、人才引进计分">
         <template slot-scope="scope">
           {{ scope.row.xyrModule.xyr ? scope.row.xyrModule.xyr.xyrScoreSum : 0}}
         </template>
       </el-table-column>
-    <!-- <el-table-column width="140px" align="center" label="教研项目奖项总分">
-        <template slot-scope="scope">
-          {{scope.row.xyrModule.teachProScoreSum }}
-        </template>
-      </el-table-column> -->
       <el-table-column width="120px" align="center" label="岗位权重计分">
         <template slot-scope="scope">
          {{scope.row.xyrModule.weightScore}}
@@ -186,7 +188,10 @@ export default {
           for(let i of res.result) {
             console.log('i :>> ', i);
             if(i.xyrModule) {
-              if(i.xyrModule.xyrStatus === '审核中'  || (i.xyrModule.xyr && i.xyrModule.xyr.status == '审核中'))
+              if(i.xyrModule.xyr && i.xyrModule.xyr.status == '驳回' ) 
+              {
+                i.xyrModule.xyrStatus = '驳回';
+              }else if(i.xyrModule.xyrStatus === '审核中'  || (i.xyrModule.xyr && i.xyrModule.xyr.status == '审核中'))
               {
                 i.xyrModule.xyrStatus = '审核中'
               };
@@ -204,7 +209,7 @@ export default {
     //删除
     handleDelete(row) {
       console.log('row :>> ', row);
-      if (row.xyrModule.xyrStatus == '已完成') {
+      if (row.xyrModule.xyrStatus == '已完成' || row.xyrModule.xyrStatus == '待审核') {
         this.$confirm('此操作将永久删除该整条数据(包括其他模块提交的本条数据), 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',

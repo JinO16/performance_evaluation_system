@@ -152,7 +152,7 @@
           <el-input v-model="formParams.teachingMoudle.workLoad.scienceFunds"></el-input>
         </el-form-item>
         <el-form-item label="科研经费折抵的教学工作量" v-if="visibleItem">
-          <el-input v-model="formParams.teachingMoudle.workLoad.scienceFundsWork"></el-input>
+          {{Math.floor(formParams.teachingMoudle.workLoad.scienceFunds / 1000)}}
         </el-form-item>
         <!-- <el-form-item label="是否完成本部门人均相应工作量的三分之二">
           <el-switch v-model="formParams.teachingMoudle.workLoad.isFinish"></el-switch>
@@ -226,22 +226,40 @@ export default {
         finalStatus:'待审核',//总审核状态
         submitTime: new Date(),//提交时间
         teachingMoudle: {
-            workLoad: {
-              classWork: null,//上课教学工作量
-              instructorWork: null,//辅导员带班工作量
-              experimentWork: null,//实验教学工作量
-              scienceFunds: null,//折抵教学工作量的科研经费金额（科研为主岗填写）
-              scienceFundsWork: null,//科研经费折抵的教学工作量（科研为主岗填写）
-              isFinish:true,//是否完成本部门人均相应工作量的三分之二
-              teachWorkSum:null,//教学工作量合计
-              scoreSum:null,//用于计分的工作量
-              itemScore:null,//个人逐项计分
-              auditRecord:[],//工作量模块审核记录
-              status:'待审核',//工作量模块审核状态
+          workLoad: {
+            classWork: null,//上课教学工作量
+            instructorWork: null,//辅导员带班工作量
+            experimentWork: null,//实验教学工作量
+            scienceFunds: null,//折抵教学工作量的科研经费金额（科研为主岗填写）
+            scienceFundsWork: null,//科研经费折抵的教学工作量（科研为主岗填写）
+            isFinish:true,//是否完成本部门人均相应工作量的三分之二
+            teachWorkSum:null,//教学工作量合计
+            scoreSum:null,//用于计分的工作量
+            itemScore:null,//个人逐项计分
+            auditRecord:[],//工作量模块审核记录
+            status:'待审核',//工作量模块审核状态
           },
           teaStatus:'待审核',//教学教研考评模块审核状态
           teaMoudelAuditRecord: [],//教学教研模块审核记录
-        }   
+        },
+        //科研模块
+        scienceMoudle: {
+          sciStatus:'待审核',//科研考评模块审核状态
+          sciMoudelAuditRecord: [],//科研模块审核记录
+        },
+        //学科建设等其他模块
+        xyrModule:{
+          xyrStatus:'待审核',//学科、研究生、人才审核状态
+          xyrModuleAuditRecord: [],//学科、研究生、人才审核记录
+        },
+        zygxModule:{
+          zygxStatus:'待审核',//专业贡献模块审核状态
+          zygxModuleAuditRecord: [],//专业贡献审核记录
+        },
+        xsgzModule:{
+          xsgzStatus:'待审核',//学生工作审核状态
+          xsgzModuleAuditRecord: [],//学生工作模块审核记录
+        },   
       }
     }
   },
@@ -257,7 +275,7 @@ export default {
       const id = this.$store.state.user._id;
       if (id) {
         getBaseFormData(id).then(res => {
-        console.log('res :>> ', res);
+        console.log('res---- :>> ', res);
         if (res.result.length != 0 && res.result[0].teachingMoudle.workLoad)  {
           this.$confirm('此操作将创建新的数据单, 是否继续?', '提示', {
             confirmButtonText: '确定',
@@ -278,11 +296,12 @@ export default {
             })
             this.dialogTableVisible = false;
           })
-        } else if (res.result[0].length != 0){
+        } else if (res.result.length != 0){
             this.form = res.result[0];
         } else {
           localStorage.removeItem('_id');
           this.$store.state.user._id = '';
+          console.log('this.---- :>> ', this.$store.state.user._id)
         }
 
         })
@@ -362,8 +381,14 @@ export default {
     //提交修改
     UpdateSubmit() {
       this.formParams.teachingMoudle.workLoad.itemScore = this.formParams.teachingMoudle.workLoad.scoreSum ? this.formParams.teachingMoudle.workLoad.scoreSum * 28 / this.stationBase : 0;
+      this.formParams.teachingMoudle.workLoad.scienceFundsWork = Math.floor(this.formParams.teachingMoudle.workLoad.scienceFunds / 1000);  
       this.formParams.submitTime = new Date();
-      if (!this.formParams.teachingMoudle.workLoad.scoreSum) {
+      if(this.formParams.teachingMoudle.workLoad.itemScore > 60) {
+        this.$message({
+          type:'warning',
+          message:'工作量的个人逐项计分最高为60，请确定填写的用于计分的工作量是否在范围之内！'
+        })
+      } else if (!this.formParams.teachingMoudle.workLoad.scoreSum) {
          this.$message({
            type:'warning',
            message:'用于计分的工作量是必填选项！！！'
@@ -430,8 +455,14 @@ export default {
     handleSubmit() {
       const id = this.$store.state.user._id;
       this.formParams.teachingMoudle.workLoad.itemScore = this.formParams.teachingMoudle.workLoad.scoreSum ? this.formParams.teachingMoudle.workLoad.scoreSum * 28 / this.stationBase : 0;
+      this.formParams.teachingMoudle.workLoad.scienceFundsWork = Math.floor(this.formParams.teachingMoudle.workLoad.scienceFunds / 1000);
       console.log('this.formParams :>> ', this.formParams);
-      if (!this.formParams.teachingMoudle.workLoad.scoreSum) {
+      if(this.formParams.teachingMoudle.workLoad.itemScore > 60) {
+        this.$message({
+          type:'warning',
+          message:'工作量的个人逐项计分最高为60，请确定填写的用于计分的工作量是否在范围之内！'
+        })
+      } else if (!this.formParams.teachingMoudle.workLoad.scoreSum) {
          this.$message({
             type:'warning',
             message:'用于计分的工作量是必填选项！！！'
@@ -457,8 +488,9 @@ export default {
             }
           })
         } else {
-          this.form.teachingMoudle.workLoad = this.formParams.teachingMoudle.workLoad;
           console.log('this.form :>> ', this.form);
+          this.form.teachingMoudle.workLoad = this.formParams.teachingMoudle.workLoad;
+          
           updateTeachWorkload(this.form).then(res => {
             console.log('res :>> ', res);
             if (res.code === 200) {

@@ -26,13 +26,19 @@ router.beforeEach(async(to, from, next) => {
       NProgress.done()
     } else {
       const hasGetUserInfo = store.getters.jobID;
+      const hasGetUserRole = store.getters.role;
       if (hasGetUserInfo) {
         next()
       } else {
         try {
           // get user info
-          await store.dispatch('user/getInfo')
-          next()
+          await store.dispatch('user/getInfo').then(res => {
+            const roles = res.result.role;
+            store.dispatch('user/GenerateRoutes', {roles}).then(() => {
+            router.addRoutes(store.getters.addRouters);
+              next({...to, replace: true})
+            })
+          })
         } catch (error) {
           // remove token and go to login page to re-login
           await store.dispatch('user/resetToken')

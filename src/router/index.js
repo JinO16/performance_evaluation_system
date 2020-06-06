@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-
+import store from '../store'
+import { getToken } from '@/utils/auth' // get token from cookie
 Vue.use(Router)
 
 /* Layout */
@@ -34,7 +35,11 @@ export const constantRoutes = [
       path:'/user',
       component:() => import('@/views/userInformation/index'),
       name:'user'
-    },
+    }
+  
+]
+export const asyncRouter = [
+  //教研考评
   {
     path: '/teachingModule',
     component: Layout,
@@ -55,13 +60,14 @@ export const constantRoutes = [
             path:'workloadList',
             name:'workloadList',
             component: () => import('@/views/teachingMoudle/workload/workloadList'),
-            meta: {title: '数据单',icon:'list'}
+            meta: {title: '工作量数据单',icon:'list'}
           },
           {
             path:'workloadAudit',
             name:'workloadAudit',
             component: () => import('@/views/teachingMoudle/workload/workloadAudit'),
-            meta: {title: '审核单',icon:'list'}
+            meta: {title: '工作量审核单',icon:'list',role:['工作量审核员','系统管理员']},
+            // hidden: isShow
           }
         ]
       },
@@ -75,13 +81,14 @@ export const constantRoutes = [
             path:'teachResList',
             name:'teachResList',
             component: () => import('@/views/teachingMoudle/teachRes/teachResList'),
-            meta: {title: '数据单',icon:'list'}
+            meta: {title: '教学教研数据单',icon:'list'}
           },
           {
             path:'teachResAudit',
             name:'teachResAudit',
             component: () => import('@/views/teachingMoudle/teachRes/teachResAudit'),
-            meta: {title: '审核单',icon:'list'}
+            meta: {title: '教学教研审核单',icon:'list',role:['教学教研审核员','系统管理员']},
+            // hidden: isShow ? true : false
           }
         ]
       },
@@ -95,13 +102,14 @@ export const constantRoutes = [
             path:'teachProcessList',
             name:'teachProcessList',
             component: () => import('@/views/teachingMoudle/teachProcess/teachProcessList'),
-            meta: {title: '数据单',icon:'list'}
+            meta: {title: '教学工程及其他数据单',icon:'list'}
           },
           {
             path:'teachProcessAudit',
             name:'teachProcessAudit',
             component: () => import('@/views/teachingMoudle/teachProcess/teachProcessAudit'),
-            meta: {title: '审核单',icon:'list'}
+            meta: {title: '教学工程及其他审核单',icon:'list',role:['教学工程及其他审核员','系统管理员']},
+            // hidden: isShow ? true : false
           }
         ]
       },
@@ -115,13 +123,15 @@ export const constantRoutes = [
         path:'teachingAudit',
         name:'teachingAudit',
         component:() => import('@/views/teachingMoudle/teachingSumAudit'),
-        meta:{title:'教研考评审核单',icon:'form'}
+        meta:{title:'教研考评审核单',icon:'form',role:['教研考评审核员',,'系统管理员']},
+        // hidden: isShow ? true : false 
       },
       {
         path:'teaSetting',
         name:'teaSetting',
         component:() => import('@/views/teachingMoudle/teaSetting'),
-        meta:{title:'教研考评设置中心',icon:'guide'}
+        meta:{title:'教研考评设置中心',icon:'guide',role:['教研考评审核员','系统管理员']},
+        // hidden: isShow ? true : false
       }
     ]
   },
@@ -146,13 +156,14 @@ export const constantRoutes = [
             path:'sciFundsList',
             name:'sciFundsList',
             component: () => import('@/views/scienceMoudle/sciFunds/sciFundsList'),
-            meta: {title: '数据单',icon:'list'}
+            meta: {title: '科研经费数据单',icon:'list'}
           },
           {
             path:'sciFundsAudit',
             name:'sciFundsAudit',
             component: () => import('@/views/scienceMoudle/sciFunds/sciFundsAudit'),
-            meta: {title: '审核单',icon:'list'}
+            meta: {title: '科研经费审核单',icon:'list',role:['科研经费审核员','系统管理员']},
+            // hidden: isShow ? false : true
           }
         ]
       },
@@ -166,13 +177,14 @@ export const constantRoutes = [
             path:'sciPapersList',
             name:'sciPapersList',
             component: () => import('@/views/scienceMoudle/sciPapers/sciPapersList'),
-            meta: {title: '数据单',icon:'list'}
+            meta: {title: '科研论文数据单',icon:'list'}
           },
           {
             path:'sciPapersAudit',
             name:'sciPapersAudit',
             component: () => import('@/views/scienceMoudle/sciPapers/sciPapersAudit'),
-            meta: {title: '审核单',icon:'list'}
+            meta: {title: '科研论文审核单',icon:'list',role:['科研论文审核员','系统管理员']},
+            // hidden: isShow ? false : true
           }
         ]
       },
@@ -186,16 +198,39 @@ export const constantRoutes = [
             path:'sciProjectsList',
             name:'sciProjectsList',
             component: () => import('@/views/scienceMoudle/sciProjects/sciProjectsList'),
-            meta: {title: '数据单',icon:'list'}
+            meta: {title: '科研立项数据单',icon:'list'}
           },
           {
             path:'sciProjectsAudit',
             name:'sciProjectsAudit',
             component: () => import('@/views/scienceMoudle/sciProjects/sciProjectsAudit'),
-            meta: {title: '审核单',icon:'list'}
+            meta: {title: '科研立项审核单',icon:'list',role:['科研立项审核员','系统管理员']},
+            // hidden: isShow ? false : true
           }
         ]
       },
+      {
+        path: 'sciAchievement',
+        name: 'sciAchievement',
+        component: () => import('@/views/scienceMoudle/sciAchievement'),
+        meta: { title: '科研成果奖励', icon: 'drag' },
+        children: [
+          {
+            path:'sciAchievementList',
+            name:'sciAchievementList',
+            component: () => import('@/views/scienceMoudle/sciAchievement/sciAchievementList'),
+            meta: {title: '科研成果数据单',icon:'list'}
+          },
+          {
+            path:'sciAchievementAudit',
+            name:'sciAchievementAudit',
+            component: () => import('@/views/scienceMoudle/sciAchievement/sciAchievementAudit'),
+            meta: {title: '科研成果审核单',icon:'list',role:['科研成果奖励审核员','系统管理员']},
+            // hidden: isShow ? false : true
+          }
+        ]
+      },
+
       {
         path:'scienceSumList',
         name:'scienceSumList',
@@ -206,13 +241,15 @@ export const constantRoutes = [
         path:'scienceAudit',
         name:'scienceAudit',
         component:() => import('@/views/scienceMoudle/scienceSumAudit'),
-        meta:{title:'科研考评审核单',icon:'form'}
+        meta:{title:'科研考评审核单',icon:'form',role:['科研考评审核员','系统管理员']},
+        // hidden: isShow ? false : true
       },
       {
         path:'sciSetting',
         name:'sciSetting',
         component:() => import('@/views/scienceMoudle/sciSetting'),
-        meta:{title:'科研考评设置中心',icon:'guide'}
+        meta:{title:'科研考评设置中心',icon:'guide',role:['科研考评审核员','系统管理员']},
+        // hidden: isShow ? false : true
       }
     ]
   },
@@ -227,24 +264,24 @@ export const constantRoutes = [
     },
     children: [
       {
-        path: 'xyr',
-        component: () => import('@/views/xyrModule/xyr/index'), // Parent router-view
-        name: 'xyr',
-        meta: { title: '相关工作 ', icon: 'clipboard' },
-        children: [
-          {
+        // path: 'xyr',
+        // component: () => import('@/views/xyrModule/xyr/index'), // Parent router-view
+        // name: 'xyr',
+        // meta: { title: '相关工作 ', icon: 'clipboard' },
+        // children: [
+        //   {
             path:'xyrList',
             name:'xyrList',
             component: () => import('@/views/xyrModule/xyr/xyrList'),
             meta: {title: '数据单',icon:'list'}
-          },
-          {
-            path:'xyrAudit',
-            name:'xyrAudit',
-            component: () => import('@/views/xyrModule/xyr/xyrAudit'),
-            meta: {title: '审核单',icon:'list'}
-          }
-        ]
+          // },
+          // {
+          //   path:'xyrAudit',
+          //   name:'xyrAudit',
+          //   component: () => import('@/views/xyrModule/xyr/xyrAudit'),
+          //   meta: {title: '审核单',icon:'list'}
+          // }
+        // ]
       },
      
       {
@@ -257,13 +294,15 @@ export const constantRoutes = [
         path:'xyrAudit',
         name:'xyrAudit',
         component:() => import('@/views/xyrModule/xyrSumAudit'),
-        meta:{title:'汇总审核单',icon:'form'}
+        meta:{title:'汇总审核单',icon:'form',role:['学科、研究生、人才引进审核员','系统管理员']},
+        // hidden: isShow ? false : true
       },
       {
         path:'xyrSetting',
         name:'xyrSetting',
         component:() => import('@/views/xyrModule/xyrSetting'),
-        meta:{title:'设置中心',icon:'guide'}
+        meta:{title:'设置中心',icon:'guide',role:['学科、研究生、人才引进审核员','系统管理员']},
+        // hidden: isShow ? false : true
       }
     ]
   },
@@ -287,13 +326,14 @@ export const constantRoutes = [
             path:'zyjsList',
             name:'zyjsList',
             component: () => import('@/views/zygxModule/zyjs/zyjsList'),
-            meta: {title: '数据单',icon:'list'}
+            meta: {title: '专业工作数据单',icon:'list'}
           },
           {
             path:'zyjsAudit',
             name:'zyjsAudit',
             component: () => import('@/views/zygxModule/zyjs/zyjsAudit'),
-            meta: {title: '审核单',icon:'list'}
+            meta: {title: '专业工作审核单',icon:'list',role:['专业建设审核员','系统管理员']},
+            // hidden: isShow ? false : true
           }
         ]
       },      
@@ -307,13 +347,14 @@ export const constantRoutes = [
             path:'jingsaiList',
             name:'jingsaiList',
             component: () => import('@/views/zygxModule/jingsai/jingsaiList'),
-            meta: {title: '数据单',icon:'list'}
+            meta: {title: '竞赛相关数据单',icon:'list'}
           },
           {
             path:'jingsaiAudit',
             name:'jingsaiAudit',
             component: () => import('@/views/zygxModule/jingsai/jingsaiAudit'),
-            meta: {title: '审核单',icon:'list'}
+            meta: {title: '竞赛相关审核单',icon:'list',role:['竞赛相关审核员','系统管理员']},
+            // hidden: isShow ? false : true
           }
         ]
       },
@@ -327,13 +368,15 @@ export const constantRoutes = [
         path:'zygxAudit',
         name:'zygxAudit',
         component:() => import('@/views/zygxModule/zygxSumAudit'),
-        meta:{title:'专业贡献汇总审核单',icon:'form'}
+        meta:{title:'专业贡献汇总审核单',icon:'form',role:['专业贡献审核员','系统管理员']},
+        // hidden: isShow ? false : true
       },
       {
         path:'zygxSetting',
         name:'zygxSetting',
         component:() => import('@/views/zygxModule/zygxSetting'),
-        meta:{title:'设置中心',icon:'guide'}
+        meta:{title:'设置中心',icon:'guide',role:['专业贡献审核员','系统管理员']},
+        // hidden: isShow ? false : true
       }
     ]
   },
@@ -357,13 +400,14 @@ export const constantRoutes = [
             path:'zhuanxiangList',
             name:'zhuanxiangList',
             component: () => import('@/views/xsgzModule/zhuanxiang/zhuanxiangList'),
-            meta: {title: '数据单',icon:'list'}
+            meta: {title: '工作相关数据单',icon:'list'}
           },
           {
             path:'zhuanxiangAudit',
             name:'zhuanxiangAudit',
             component: () => import('@/views/xsgzModule/zhuanxiang/zhuanxiangAudit'),
-            meta: {title: '审核单',icon:'list'}
+            meta: {title: '工作相关审核单',icon:'list',role:['工作相关审核员','系统管理员']},
+            // hidden: isShow ? false : true
           }
         ]
       },
@@ -377,13 +421,14 @@ export const constantRoutes = [
             path:'huojiangList',
             name:'huojiangList',
             component: () => import('@/views/xsgzModule/huojiang/huojiangList'),
-            meta: {title: '数据单',icon:'list'}
+            meta: {title: '奖项及荣誉数据单',icon:'list'}
           },
           {
             path:'huojiangAudit',
             name:'huojiangAudit',
             component: () => import('@/views/xsgzModule/huojiang/huojiangAudit'),
-            meta: {title: '审核单',icon:'list'}
+            meta: {title: '奖项及荣誉审核单',icon:'list',role:['奖项及荣誉相关审核员','系统管理员']},
+            // hidden: isShow ? false : true
           }
         ]
       },
@@ -397,23 +442,19 @@ export const constantRoutes = [
         path:'xsgzAudit',
         name:'xsgzAudit',
         component:() => import('@/views/xsgzModule/xsgzSumAudit'),
-        meta:{title:'汇总审核单',icon:'form'}
+        meta:{title:'汇总审核单',icon:'form',role:['学生工作审核员','系统管理员']},
+        // hidden: isShow ? false : true
       },
       {
         path:'xsgzSetting',
         name:'xsgzSetting',
         component:() => import('@/views/xsgzModule/xsgzSetting'),
-        meta:{title:'设置中心',icon:'guide'}
+        meta:{title:'设置中心',icon:'guide',role:['学生工作审核员','系统管理员']},
+        // hidden: isShow ? false : true
       }
     ]
   },
-
-  //个人信息页面路由定义
-  {
-    path:'/user',
-    component:() => import('@/views/userInformation/index'),
-    name:'user'
-  },
+  //总审核
   {
     path: '/generalAudit',
     component: Layout,
@@ -422,7 +463,8 @@ export const constantRoutes = [
         path: 'index',
         name: 'generalAudit',
         component: () => import('@/views/generalAudit/index'),
-        meta: { title: '终极审核单', icon: 'form' }
+        meta: { title: '终极审核单', icon: 'form' ,role:['系统管理员','领导']},
+        // hidden: isShow ? false : true
       }
     ] 
   },
@@ -434,7 +476,8 @@ export const constantRoutes = [
         path: 'index',
         name: 'systemSetting',
         component: () => import('@/views/systemSetting/index'),
-        meta: { title: '系统设置中心', icon: 'guide' }
+        meta: { title: '系统设置中心', icon: 'guide',role:['系统管理员','领导'] },
+        // hidden: isShow ? false : true
       }
     ] 
   },
@@ -446,14 +489,15 @@ export const constantRoutes = [
         path: 'index',
         name: 'personManager',
         component: () => import('@/views/personManager/index'),
-        meta: { title: '用户信息管理', icon: 'user' }
+        meta: { title: '用户信息管理', icon: 'user',role:['系统管理员','用户管理员'] },
+        // hidden: isShow ? false : true
       }
     ] 
   },
 
 
-  // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
+// 404 page must be placed at the end !!!
+{ path: '*', redirect: '/404', hidden: true }
 ]
 
 const createRouter = () => new Router({
@@ -461,8 +505,7 @@ const createRouter = () => new Router({
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRoutes
 })
-
-const router = createRouter()
+const router = createRouter();
 
 // Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
 export function resetRouter() {

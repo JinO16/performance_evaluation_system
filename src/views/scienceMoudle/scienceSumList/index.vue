@@ -1,5 +1,12 @@
 <template>
   <div class="app-container">
+    <el-alert
+      title="注：科研考评审核完毕后，论文、立项、成果奖励总分及岗位权重计分才会显示！"
+      type="info"
+      show-icon
+      :closable="false"
+      style="margin-bottom:10px">
+    </el-alert>
     <el-table v-loading="listLoading" :data="list" highlight-current-row style="width: 100%">
       <el-table-column align="center" label="提交时间" width="140">
         <template slot-scope="scope">
@@ -238,7 +245,12 @@ export default {
           this.listLoading = false;
           for(let i of res.result) {
             if (i.scienceMoudle) {
-              if(i.scienceMoudle.sciStatus === '审核中' 
+              if (i.scienceMoudle.sciFunds && i.scienceMoudle.sciFunds.status == '驳回' 
+              || i.scienceMoudle.sciPapers && i.scienceMoudle.sciPapers.status =='驳回'
+              || i.scienceMoudle.sciProjects && i.scienceMoudle.sciProjects.status == '驳回'
+              || i.scienceMoudle.sciAchievement && i.scienceMoudle.sciAchievement.status == '驳回') {
+                i.scienceMoudle.sciStatus = '驳回';
+              }else if(i.scienceMoudle.sciStatus === '审核中' 
                 || (i.scienceMoudle.sciFunds && i.scienceMoudle.sciFunds.status == '审核中') 
                 || (i.scienceMoudle.sciPapers && i.scienceMoudle.sciPapers.status == '审核中')
                 || (i.scienceMoudle.sciProjects && i.scienceMoudle.sciProjects.status == '审核中')
@@ -260,7 +272,7 @@ export default {
     //删除
     handleDelete(row) {
       console.log('row :>> ', row);
-      if (row.scienceMoudle.sciStatus == '已完成') {
+      if (row.scienceMoudle.sciStatus == '已完成' || row.scienceMoudle.sciStatus == '待审核') {
         this.$confirm('此操作将永久删除该整条数据(包括其他模块提交的本条数据), 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',

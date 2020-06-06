@@ -217,7 +217,7 @@ export default {
         finalStatus:'待审核',//总审核状态
         submitTime: new Date(),//提交时间
         scienceMoudle: {
-            sciFunds: {
+          sciFunds: {
               ratedFunds: null,//额定科研经费
               virtualFunds: null,//实际到账科研经费
               workLoads: null,//折抵的教学工作量
@@ -231,7 +231,25 @@ export default {
           },
           sciStatus:'待审核',//科研考评模块审核状态
           sciMoudelAuditRecord: [],//科研模块审核记录
-        }   
+        },
+        //教研模块
+        teachingMoudle: {
+          teaStatus:'待审核',//教学教研考评模块审核状态
+          teaMoudelAuditRecord: [],//教学教研模块审核记录
+        },
+        //学科建设等其他模块
+        xyrModule:{
+          xyrStatus:'待审核',//学科、研究生、人才审核状态
+          xyrModuleAuditRecord: [],//学科、研究生、人才审核记录
+        },
+        zygxModule:{
+          zygxStatus:'待审核',//专业贡献模块审核状态
+          zygxModuleAuditRecord: [],//专业贡献审核记录
+        },
+        xsgzModule:{
+          xsgzStatus:'待审核',//学生工作审核状态
+          xsgzModuleAuditRecord: [],//学生工作模块审核记录
+        },    
       }
     }
   },
@@ -268,7 +286,7 @@ export default {
             })
             this.dialogTableVisible = false;
           })
-        } else if (res.result[0].length != 0){
+        } else if (res.result.length != 0){
             this.form = res.result[0];
         } else {
           localStorage.removeItem('_id');
@@ -371,7 +389,7 @@ export default {
             message:'科研经费实际到账金额是必填选项！！！' 
          })
        } else {
-         console.log('this.formParams :>> ', this.formParams);
+         console.log('this.formParams----- :>> ', this.formParams);
          this.formParams.scienceMoudle.sciFunds.status = '待审核';
         updateTeachWorkload(this.formParams).then(res => {
            console.log('res ====:>> ', res);

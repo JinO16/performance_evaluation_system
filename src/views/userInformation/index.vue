@@ -212,6 +212,7 @@ export default {
             this.handleSubmit();
             next();
         }
+        
     },
     data() {
         //原密码的校验方式
@@ -394,12 +395,8 @@ export default {
             } else {
                 updateUser(this.form).then(res => {
                 if(res.code === 200) {
-                    this.$message({
-                        message: res.message,
-                        type: 'success'
-                    })
                     this.handleGetPersonData();
-                    this.$router.push('/');
+                    this.$router.push('/');    
                     } else {
                         this.$message({
                             message: res.message,

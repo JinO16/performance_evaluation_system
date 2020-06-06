@@ -1,5 +1,6 @@
 <template>
   <div class="app-container">
+    <el-button type="primary" @click="exportData()" style="float:right">导出数据</el-button> 
     <el-table v-loading="listLoading" :data="list" highlight-current-row style="width: 100%">
       <el-table-column align="center" label="姓名" width="80">
         <template slot-scope="scope">
@@ -555,25 +556,25 @@ export default {
             console.log('res 获取所有的数据单:>> ', res);
             if (res.code == 200) {
                 for (let i of res.result) {
-                    //教学教研
-                  if (i.teachingMoudle) {
-                    if (i.teachingMoudle.teaStatus && i.teachingMoudle.teaStatus == '审核中') {
+                  //总审核状态
+                  if ((i.teachingMoudle.teaStatus && i.teachingMoudle.teaStatus == '审核中') 
+                    && (i.scienceMoudle.sciStatus && i.scienceMoudle.sciStatus == '审核中')
+                    && (i.xsgzModule.xsgzStatus && i.xsgzModule.xsgzStatus == '审核中')
+                    && (i.xyrModule.xyrStatus && i.xyrModule.xyrStatus == '审核中')
+                    && (i.zygxModule.zygxStatus && i.zygxModule.zygxStatus == '审核中')) {
                          i.finalStatus = '待审核';
-                    } else if (i.teachingMoudle.teaStatus && i.teachingMoudle.teaStatus == '待审核'){
+                  } else if ((i.teachingMoudle.teaStatus && i.teachingMoudle.teaStatus == '待审核')
+                    || (i.scienceMoudle.sciStatus && i.scienceMoudle.sciStatus == '待审核')
+                    || (i.xsgzModule.xsgzStatus && i.xsgzModule.xsgzStatus == '待审核')
+                    || (i.xyrModule.xyrStatus && i.xyrModule.xyrStatus == '待审核')
+                    || (i.zygxModule.zygxStatus && i.zygxModule.zygxStatus == '待审核')) {
                         res.result.pop(i);
-                    } else {
-                        i.finalStatus = i.teachingMoudle.teaStatus;
-                    }
-                  }
-                  //科研
-                   if (i.scienceMoudle) {
-                    if (i.scienceMoudle.sciStatus && i.scienceMoudle.sciStatus == '审核中') {
-                         i.finalStatus = '待审核';
-                    } else if (i.scienceMoudle.sciStatus && i.scienceMoudle.sciStatus == '待审核'){
-                        res.result.pop(i);
-                    } else {
-                        i.finalStatus = i.scienceMoudle.sciStatus;
-                    }
+                  } else if ((i.teachingMoudle.teaStatus && i.teachingMoudle.teaStatus == '驳回')
+                    || (i.scienceMoudle.sciStatus && i.scienceMoudle.sciStatus == '驳回')
+                    || (i.xsgzModule.xsgzStatus && i.xsgzModule.xsgzStatus == '驳回')
+                    || (i.xyrModule.xyrStatus && i.xyrModule.xyrStatus == '驳回')
+                    || (i.zygxModule.zygxStatus && i.zygxModule.zygxStatus == '驳回')){
+                        i.finalStatus = '驳回';
                   }
                 }
                 this.list = res.result.reverse();
@@ -630,29 +631,26 @@ export default {
     console.log('params :>> ', params);
     console.log('this.form---- :>> ', this.form);
     this.form.finalStatus = params.auditStatus;
-    if (this.form.teachingMoudle) {
-       this.form.teachingMoudle.teaStatus = params.auditStatus;
-       this.form.teachingMoudle.workLoad ? this.form.teachingMoudle.workLoad.status = params.auditStatus : '';
-       this.form.teachingMoudle.teachResChild ? this.form.teachingMoudle.teachResChild.status = params.auditStatus : '';
-       this.form.teachingMoudle.teaProAndOther ? this.form.teachingMoudle.teaProAndOther.status = params.auditStatus :'';
-    } else if (this.form.scienceMoudle) {
-        this.form.scienceMoudle.sciStatus = params.auditStatus;
-        this.form.scienceMoudle.sciFunds ? this.form.scienceMoudle.sciFunds.status = params.auditStatus :'';
-        this.form.scienceMoudle.sciPapers ? this.form.scienceMoudle.sciPapers.status = params.auditStatus :'';
-        this.form.scienceMoudle.sciProjects ? this.form.scienceMoudle.sciProjects.status = params.auditStatus :'';
-        this.form.scienceMoudle.sciAchievement ? this.form.scienceMoudle.sciAchievement.status = params.auditStatus :'';
-
-    } else if (this.form.xyrModule || this.form.xsgzModule || this.form.zygxModule) {
-      this.form.xyrModule.xyrStatus = params.auditStatus; 
-      this.form.zygxModule.zygxStatus = params.auditStatus; 
-      this.form.xsgzModule.xsgzStatus = params.auditStatus; 
-      this.form.xyrModule.xyr ? this.form.xyrModule.xyr.status = params.auditStatus : '';
-      this.form.zygxModule.jingsai ? this.form.zygxModule.jingsai.status = params.auditStatus : '';
-      this.form.zygxModule.zyjs ? this.form.xyrModule.zyjs.status = params.auditStatus : '';
-      this.form.xsgzModule.huojiang ? this.form.xsgzModule.huojiang.status = params.auditStatus : '';
-      this.form.xsgzModule.zhuanxiang ? this.form.xsgzModule.zhuanxiang.status = params.auditStatus : '';
-
-    }
+    //教学教研模块
+    this.form.teachingMoudle.teaStatus = params.auditStatus;
+    this.form.teachingMoudle.workLoad ? this.form.teachingMoudle.workLoad.status = params.auditStatus : '';
+    this.form.teachingMoudle.teachResChild ? this.form.teachingMoudle.teachResChild.status = params.auditStatus : '';
+    this.form.teachingMoudle.teaProAndOther ? this.form.teachingMoudle.teaProAndOther.status = params.auditStatus :'';
+    //科研模块
+    this.form.scienceMoudle.sciStatus = params.auditStatus;
+    this.form.scienceMoudle.sciFunds ? this.form.scienceMoudle.sciFunds.status = params.auditStatus :'';
+    this.form.scienceMoudle.sciPapers ? this.form.scienceMoudle.sciPapers.status = params.auditStatus :'';
+    this.form.scienceMoudle.sciProjects ? this.form.scienceMoudle.sciProjects.status = params.auditStatus :'';
+    this.form.scienceMoudle.sciAchievement ? this.form.scienceMoudle.sciAchievement.status = params.auditStatus :'';
+    //学科、研究生、人才等建设模块
+    this.form.xyrModule.xyrStatus = params.auditStatus; 
+    this.form.zygxModule.zygxStatus = params.auditStatus; 
+    this.form.xsgzModule.xsgzStatus = params.auditStatus; 
+    this.form.xyrModule.xyr ? this.form.xyrModule.xyr.status = params.auditStatus : '';
+    this.form.zygxModule.jingsai ? this.form.zygxModule.jingsai.status = params.auditStatus : '';
+    this.form.zygxModule.zyjs ? this.form.zygxModule.zyjs.status = params.auditStatus : '';
+    this.form.xsgzModule.huojiang ? this.form.xsgzModule.huojiang.status = params.auditStatus : '';
+    this.form.xsgzModule.zhuanxiang ? this.form.xsgzModule.zhuanxiang.status = params.auditStatus : '';
     this.form.finalAuditRecord.unshift(params);
     console.log('this.form :>> ', this.form);
     localStorage.removeItem('_id');
@@ -700,7 +698,51 @@ export default {
         xhr.responseType = 'blob';
         xhr.setRequestHeader('token',getToken())
         xhr.send();
-    }
+    },
+     //导出表格数据
+  exportData() {
+    console.log(' 导出表格数据:>> ');
+    this.$confirm('此操作将导出excel文件，是否继续？','提示',{
+      confirmButtonText:'确定',
+      cancelButtonText:'取消',
+      type:'warning'
+    }).then(() => {
+      for (let item of this.list) {
+        console.log('item---- :>> ', item);
+        item.teachWeightScore = item.teachingMoudle.weightScore ? item.teachingMoudle.weightScore : 0;
+        item.scienceWeightScore = item.scienceMoudle.weightScore ? item.scienceMoudle.weightScore : 0;
+        item.xyrWeightScore = item.xyrModule.weightScore ? item.xyrModule.weightScore : 0;
+        item.zygxWeightScore = item.zygxModule.weightScore ? item.zygxModule.weightScore : 0;
+        item.xsgzWeightScore = item.xsgzModule.weightScore ? item.xsgzModule.weightScore : 0;
+        // item.workLoadSum = item.teachingMoudle.workLoad ? item.teachingMoudle.workLoad.itemScore : 0;
+        // item.teachResChildSum = item.teachingMoudle.teachResChild ? item.teachingMoudle.teachResChild.teachResScoreSum : 0;
+        // item.teaProAndOtherSum = item.teachingMoudle.teaProAndOther ? item.teachingMoudle.teaProAndOther.teaProScoreSum : 0;
+        // item.teachSum = item.teachingMoudle.teachProScoreSum ? item.teachingMoudle.teachProScoreSum : 0;
+        // item.weightScore = item.teachingMoudle.weightScore ? item.teachingMoudle.weightScore : 0;
+      }
+      this.excelData = this.list;//导出的数据list
+      this.exportExcel();
+    }).catch(() => {
+      this.$message({
+        type:'info',
+        message:'已取消！'
+      })
+    });
+  },
+  exportExcel(){
+    const that = this;
+    require.ensure([], () => {
+      const { export_json_to_excel } = require('../../excel/Export2Excel.js');
+      const tHeader = ['姓名','工号','岗位','部门','教研考评岗位权重计分','科研考评岗位权重计分','学科建设研究生工作权重计分','专业贡献权重计分','学生工作权重计分'];
+      const filterVal = ['name','jobID','station','department','teachWeightScore','scienceWeightScore','xyrWeightScore','zygxWeightScore','xsgzWeightScore'];
+      const list = that.excelData;
+      const data = that.formatJson(filterVal, list);
+      export_json_to_excel(tHeader, data ,'岗位绩效绩分数据汇总单')
+    });
+  },
+  formatJson(filterVal, jsonData) {
+    return jsonData.map(v => filterVal.map(j => v[j]))
+  }
   }
 }
 </script>

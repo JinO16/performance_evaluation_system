@@ -216,15 +216,22 @@ export default {
                     value: '领导',
                     label: '领导'
                 },{
-                    value: '教学审核员',
-                    label: '教学审核员'
+                    value: '教研考评审核员',
+                    label: '教研考评审核员'
                 },{
-                    value: '科研审核员',
-                    label: '科研审核员'
+                    value: '科研考评审核员',
+                    label: '科研考评审核员'
                 },{
-                    value: '学科建设审核员',
-                label: '学科建设审核员'
-            }],
+                    value: '学科、研究生、人才引进审核员',
+                    label: '学科、研究生、人才引进审核员'
+                },{
+                    value: '专业贡献审核员',
+                    label: '专业贡献审核员'
+                },{
+                    value: '学生工作审核员',
+                    label: '学生工作审核员'
+                }
+            ],
             searchPerson:'',//搜索人员绑定字段    
             pageTotal:1,   //分页总页数
         }
@@ -299,16 +306,12 @@ export default {
            
         },
         //获取所有用户信息列表方法
-        getAllPerson(param) {
-            param =  {
-                skip: 1,   
-            }
+        getAllPerson() {
             const t = this;
-            getAllUser(param).then(res => {
+            getAllUser().then(res => {
                 if (res.code === 200) {
                      t.listLoading = false;
                      t.allPersonData = res.result;
-                     t.pageTotal = res.count;
                 } else {
                     this.$message({
                         type: 'error',

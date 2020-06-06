@@ -49,7 +49,7 @@
                 {{tag.name}}
             </el-tag>
             <!-- </el-tooltip> -->
-            <el-button class="button-new-tag" size="small" @click="handleStationAdd">+ 添加岗位权重</el-button>
+            <el-button class="button-new-tag" size="small" v-if="visibleAddButton" @click="handleStationAdd">+ 添加岗位权重</el-button>
         </el-card>
     </el-row>
     <!-- 审核员弹出框 -->
@@ -119,11 +119,11 @@ export default {
     data() {
         return {
             zyjs: {
-                title: '专业建设子模块审核员',
+                title: '专业建设审核员',
                 data: []
             },
             jingsai: {
-                title: '竞赛相关子模块审核员',
+                title: '竞赛相关审核员',
                 data: []
             },
            
@@ -156,7 +156,9 @@ export default {
                     weight:0
                 }
                 
-            }
+            },
+            visibleAddButton: false,//当岗位信息为0时显示，否则隐藏
+        
         }
     },
     mounted (){
@@ -168,7 +170,10 @@ export default {
         getStation() {
             getZygxStation().then(res => {
                 if (res.code == 200) {
-                    this.stationData = res.result
+                    this.stationData = res.result;
+                    if (this.stationData.length == 0) {
+                        this.visibleAddButton = true;
+                    }
                 }
             })
         },
@@ -180,8 +185,9 @@ export default {
                   const resultArr = []
                 for(let i of res.result) {
                     if (i.role !== '领导' && i.role !== '系统管理员' 
-                    && i.role !== '用户管理员' && i.role !== '教学审核员'
-                    && i.role !== '科研审核员' && i.role !== '学科建设审核员') {
+                     && i.role !== '用户管理员' && i.role !== '教研考评审核员'
+                    && i.role !== '科研考评审核员' && i.role !== '学科、研究生、人才引进审核员'
+                    && i.role !== '专业贡献审核员' && i.role !== '学生工作审核员') {
                        resultArr.push(i)
                     }
                 }
