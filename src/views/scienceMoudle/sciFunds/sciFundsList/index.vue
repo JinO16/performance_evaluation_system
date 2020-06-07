@@ -131,25 +131,28 @@
     <!-- 创建数据单弹出框 -->
     <el-dialog el-drag-dialog :visible.sync="dialogTableVisible" :title="dialogTitle">
       <el-form ref="formParams" :inline="true" :model="formParams" class="demo-form-inline">
-        <el-form-item label="额定科研经费金额">
+        <el-form-item label="额定科研经费金额" required>
           <el-input v-model="formParams.scienceMoudle.sciFunds.ratedFunds"></el-input>
         </el-form-item>
-        <el-form-item label="科研经费实际到账金额">
+        <el-form-item label="科研经费实际到账金额" required>
           <el-input v-model="formParams.scienceMoudle.sciFunds.virtualFunds" ></el-input>
         </el-form-item>
          <el-form-item label="折抵科研经费的教学工作量"v-if="visibleItem">
           <el-input v-model="formParams.scienceMoudle.sciFunds.workLoads"></el-input>
         </el-form-item>
-        <el-form-item label="折抵科研经费的教学工作量对应科研经费金额" v-if="visibleItem">
+        <!-- <el-form-item label="折抵科研经费的教学工作量对应科研经费金额" v-if="visibleItem">
           <el-input v-model="formParams.scienceMoudle.sciFunds.scienceFunds"></el-input>
-        </el-form-item>
+        </el-form-item> -->
         <!-- <el-form-item label="是否完成本部门人均相应工作量的三分之二">
           <el-switch v-model="formParams.teachingMoudle.workLoad.isFinish"></el-switch>
         </el-form-item> -->
-        <el-form-item label="折抵后科研经费完成金额">
+        <el-form-item label="折抵科研经费的教学工作量对应科研经费金额：" v-if="visibleItem">
+          {{Math.floor(formParams.scienceMoudle.sciFunds.workLoads * 100)}}
+        </el-form-item>
+        <el-form-item label="折抵后科研经费完成金额" >
           <el-input v-model="formParams.scienceMoudle.sciFunds.fScienceFunds"></el-input>
         </el-form-item>
-        <el-form-item label="科研经费完成比例" required>
+        <el-form-item label="科研经费完成比例" >
           <el-input v-model="formParams.scienceMoudle.sciFunds.finishPro"></el-input>
         </el-form-item>
         <el-form-item label="个人逐项计分">
@@ -388,6 +391,11 @@ export default {
             type:'warning',
             message:'科研经费实际到账金额是必填选项！！！' 
          })
+      //  }else if(!this.formParams.scienceMoudle.sciFunds.fScienceFunds){
+      //     this.$message({
+      //       type:'warning',
+      //       message:'折抵后科研经费完成金额是必填选项！！！' 
+      //    })
        } else {
          console.log('this.formParams----- :>> ', this.formParams);
          this.formParams.scienceMoudle.sciFunds.status = '待审核';
@@ -463,6 +471,11 @@ export default {
             type:'warning',
             message:'科研经费实际到账金额是必填选项！！！' 
          })
+        // }else if(!this.formParams.scienceMoudle.sciFunds.fScienceFunds){
+        //   this.$message({
+        //     type:'warning',
+        //     message:'折抵后科研经费完成金额是必填选项！！！' 
+        //  })
       } else {
         if (!id) {
           createTeachWorkload(this.formParams).then(res => {
