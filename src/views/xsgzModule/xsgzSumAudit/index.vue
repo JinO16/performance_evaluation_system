@@ -301,6 +301,7 @@ export default {
          break;
      }
      getAllTeachWorkload().then(res => {
+       const resultArr = [];
        for (let i of res.result) {
         if (i.xsgzModule) {
            //教研项目总分
@@ -324,10 +325,13 @@ export default {
               } else {
                 i.xsgzModule.xsgzStatus = '审核中'
               }
+              resultArr.unshift(i);
+            } else {
+              i.xsgzModule.xsgzStatus = '审核中'
             }
         }
        }
-       this.list = res.result.reverse();
+       this.list = resultArr
        this.listLoading = false;
      })
    },

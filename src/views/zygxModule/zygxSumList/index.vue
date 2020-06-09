@@ -187,24 +187,28 @@ export default {
         console.log('res :>> ', res);
         if(res.code == 200) {
           this.listLoading = false;
+          const resultArr = [];
           for(let i of res.result) {
             console.log('i :>> ', i);
-            if (i.zygxModule) {
+            if (i.zygxModule.zyjs || i.zygxModule.jingsai) {
               if(i.zygxModule.zyjs && i.zygxModule.zyjs.status == '驳回' 
               || i.zygxModule.jingsai && i.zygxModule.jingsai.status =='驳回')
-            {
-              i.zygxModule.zygxStatus = '驳回';
-            }else if(i.zygxModule.zygxStatus === '审核中'  || (i.zygxModule.zyjs && i.zygxModule.zyjs.status == '审核中')|| (i.zygxModule.jingsai && i.zygxModule.jingsai.status == '审核中'))
-            {
+              {
+                i.zygxModule.zygxStatus = '驳回';
+              }else if(i.zygxModule.zygxStatus === '审核中'  || (i.zygxModule.zyjs && i.zygxModule.zyjs.status == '审核中')|| (i.zygxModule.jingsai && i.zygxModule.jingsai.status == '审核中'))
+              {
+                i.zygxModule.zygxStatus = '审核中'
+              };
+              resultArr.unshift(i);
+            } else {
               i.zygxModule.zygxStatus = '审核中'
-            };
             }
             if(i.station == '科研岗') {
               this.visibleItem = true;
             }
           };
           
-          this.list = res.result.reverse();
+          this.list = resultArr;
         }
       })
     },

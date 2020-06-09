@@ -67,7 +67,6 @@ export const asyncRouter = [
             name:'workloadAudit',
             component: () => import('@/views/teachingMoudle/workload/workloadAudit'),
             meta: {title: '工作量审核单',icon:'list',role:['工作量审核员','系统管理员']},
-            // hidden: isShow
           }
         ]
       },

@@ -47,7 +47,7 @@
         <el-row>
             <div class="row-item" >
                 <el-col :span="2">
-                    <span class="data-item">部门:</span>
+                    <span class="data-item department">部门:</span>
                 </el-col>
                 <el-col :span="6">
                   <el-select v-model="form.department" placeholder="请选择部门">
@@ -444,6 +444,11 @@ border-radius: 4px;
 min-height: 36px;
 }
 .data-item.station::before {
+    content:'*';
+    color: #F56C6C;
+    margin-left: 4px;
+}
+.data-item.department::before {
     content:'*';
     color: #F56C6C;
     margin-left: 4px;

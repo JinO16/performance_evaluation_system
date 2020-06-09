@@ -313,40 +313,42 @@ export default {
          break;
      }
       getAllTeachWorkload().then(res => {
-      for (let i of res.result) {
-         //科研经费以外总分
-        if(i.scienceMoudle) {
-           if(i.scienceMoudle.sciFunds || i.scienceMoudle.sciPapers || i.scienceMoudle.sciProjects || i.scienceMoudle.sciAchievement) {
-            i.scienceMoudle.sciProScoreSum = (i.scienceMoudle.sciPapers ? i.scienceMoudle.sciPapers.sciPapersSum : 0)  + (i.scienceMoudle.sciProjects ? i.scienceMoudle.sciProjects.sciProjectsSum : 0) 
-            +(i.scienceMoudle.sciAchievement ? i.scienceMoudle.sciAchievement.sciAchievementSum : 0)
-            > 40 ? 40 :(i.scienceMoudle.sciPapers ? i.scienceMoudle.sciPapers.sciPapersSum : 0)  + (i.scienceMoudle.sciProjects ? i.scienceMoudle.sciProjects.sciProjectsSum : 0) 
-            +(i.scienceMoudle.sciAchievement ? i.scienceMoudle.sciAchievement.sciAchievementSum : 0) ;
-            //岗位权重计分
-            i.scienceMoudle.weightScore =Math.floor(((i.scienceMoudle.sciFunds ? i.scienceMoudle.sciFunds.itemScore : 0) + i.scienceMoudle.sciProScoreSum) * staWeight);
-          //科研考评审核状态
-            if(i.scienceMoudle.sciFunds && i.scienceMoudle.sciFunds.status == '驳回' 
-              || i.scienceMoudle.sciPapers && i.scienceMoudle.sciPapers.status =='驳回'
-              || i.scienceMoudle.sciProjects && i.scienceMoudle.sciProjects.status == '驳回'
-              || i.scienceMoudle.sciAchievement && i.scienceMoudle.sciAchievement.status == '驳回') {
-              i.scienceMoudle.sciStatus = '驳回';
-            } else if (i.scienceMoudle.sciFunds && i.scienceMoudle.sciFunds.status == '待审核' 
-              || i.scienceMoudle.sciPapers && i.scienceMoudle.sciPapers.status =='待审核' 
-              ||  i.scienceMoudle.sciProjects && i.scienceMoudle.sciProjects.status == '待审核'
-              || i.scienceMoudle.sciAchievement && i.scienceMoudle.sciAchievement.status == '待审核'
-              || (i.scienceMoudle.sciFunds && i.scienceMoudle.sciFunds.status == '审核中' 
-              || i.scienceMoudle.sciPapers && i.scienceMoudle.sciPapers.status =='审核中' 
-              ||  i.scienceMoudle.sciProjects && i.scienceMoudle.sciProjects.status == '审核中'
-              || i.scienceMoudle.sciAchievement && i.scienceMoudle.sciAchievement.status == '审核中') && i.scienceMoudle.sciStatus !=='审核中' ) {
-              i.scienceMoudle.sciStatus = '待审核';
-            } else if(i.finalStatus == '已完成') {
-              i.scienceMoudle.sciStatus = '已完成'
-            } else {
-              i.scienceMoudle.sciStatus = '审核中'
+        const resultArr = []
+        for (let i of res.result) {
+          //科研经费以外总分
+          if(i.scienceMoudle) {
+            if(i.scienceMoudle.sciFunds || i.scienceMoudle.sciPapers || i.scienceMoudle.sciProjects || i.scienceMoudle.sciAchievement) {
+              i.scienceMoudle.sciProScoreSum = (i.scienceMoudle.sciPapers ? i.scienceMoudle.sciPapers.sciPapersSum : 0)  + (i.scienceMoudle.sciProjects ? i.scienceMoudle.sciProjects.sciProjectsSum : 0) 
+              +(i.scienceMoudle.sciAchievement ? i.scienceMoudle.sciAchievement.sciAchievementSum : 0)
+              > 40 ? 40 :(i.scienceMoudle.sciPapers ? i.scienceMoudle.sciPapers.sciPapersSum : 0)  + (i.scienceMoudle.sciProjects ? i.scienceMoudle.sciProjects.sciProjectsSum : 0) 
+              +(i.scienceMoudle.sciAchievement ? i.scienceMoudle.sciAchievement.sciAchievementSum : 0) ;
+              //岗位权重计分
+              i.scienceMoudle.weightScore =Math.floor(((i.scienceMoudle.sciFunds ? i.scienceMoudle.sciFunds.itemScore : 0) + i.scienceMoudle.sciProScoreSum) * staWeight);
+            //科研考评审核状态
+              if(i.scienceMoudle.sciFunds && i.scienceMoudle.sciFunds.status == '驳回' 
+                || i.scienceMoudle.sciPapers && i.scienceMoudle.sciPapers.status =='驳回'
+                || i.scienceMoudle.sciProjects && i.scienceMoudle.sciProjects.status == '驳回'
+                || i.scienceMoudle.sciAchievement && i.scienceMoudle.sciAchievement.status == '驳回') {
+                i.scienceMoudle.sciStatus = '驳回';
+              } else if (i.scienceMoudle.sciFunds && i.scienceMoudle.sciFunds.status == '待审核' 
+                || i.scienceMoudle.sciPapers && i.scienceMoudle.sciPapers.status =='待审核' 
+                ||  i.scienceMoudle.sciProjects && i.scienceMoudle.sciProjects.status == '待审核'
+                || i.scienceMoudle.sciAchievement && i.scienceMoudle.sciAchievement.status == '待审核'
+                || (i.scienceMoudle.sciFunds && i.scienceMoudle.sciFunds.status == '审核中' 
+                || i.scienceMoudle.sciPapers && i.scienceMoudle.sciPapers.status =='审核中' 
+                ||  i.scienceMoudle.sciProjects && i.scienceMoudle.sciProjects.status == '审核中'
+                || i.scienceMoudle.sciAchievement && i.scienceMoudle.sciAchievement.status == '审核中') && i.scienceMoudle.sciStatus !=='审核中' ) {
+                i.scienceMoudle.sciStatus = '待审核';
+              } else if(i.finalStatus == '已完成') {
+                i.scienceMoudle.sciStatus = '已完成'
+              } else {
+                i.scienceMoudle.sciStatus = '审核中'
+              }
+              resultArr.unshift(i);
             }
           }
         }
-      }
-       this.list = res.result.reverse();
+       this.list = resultArr;
        this.listLoading = false;
      })
    },

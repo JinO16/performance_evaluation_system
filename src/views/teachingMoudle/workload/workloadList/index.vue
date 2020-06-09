@@ -164,7 +164,7 @@
           <el-input v-model="formParams.teachingMoudle.workLoad.scoreSum"></el-input>
         </el-form-item>
         <el-form-item label="个人逐项计分">
-          {{formParams.teachingMoudle.workLoad.scoreSum ? 28 * formParams.teachingMoudle.workLoad.scoreSum / stationBase  : 0}}
+          {{ formParams.teachingMoudle.workLoad.scoreSum ? Math.floor(28 * formParams.teachingMoudle.workLoad.scoreSum / stationBase)  : 0}}
         </el-form-item>
         <el-form-item style="display:flex;justify-content:center;margin-top:20px">
           <el-button type="primary" v-if="dialogTitle === '创建工作量数据单'" @click="handleSubmit">提交</el-button>
@@ -380,7 +380,7 @@ export default {
     },
     //提交修改
     UpdateSubmit() {
-      this.formParams.teachingMoudle.workLoad.itemScore = this.formParams.teachingMoudle.workLoad.scoreSum ? this.formParams.teachingMoudle.workLoad.scoreSum * 28 / this.stationBase : 0;
+      this.formParams.teachingMoudle.workLoad.itemScore = this.formParams.teachingMoudle.workLoad.scoreSum ? Math.floor(this.formParams.teachingMoudle.workLoad.scoreSum * 28 / this.stationBase)  : 0;
       this.formParams.teachingMoudle.workLoad.scienceFundsWork = Math.floor(this.formParams.teachingMoudle.workLoad.scienceFunds / 1000);  
       this.formParams.submitTime = new Date();
       if(this.formParams.teachingMoudle.workLoad.itemScore > 60) {
@@ -454,7 +454,7 @@ export default {
     },
     handleSubmit() {
       const id = this.$store.state.user._id;
-      this.formParams.teachingMoudle.workLoad.itemScore = this.formParams.teachingMoudle.workLoad.scoreSum ? this.formParams.teachingMoudle.workLoad.scoreSum * 28 / this.stationBase : 0;
+      this.formParams.teachingMoudle.workLoad.itemScore = this.formParams.teachingMoudle.workLoad.scoreSum ? Math.floor(this.formParams.teachingMoudle.workLoad.scoreSum * 28 / this.stationBase) : 0;
       this.formParams.teachingMoudle.workLoad.scienceFundsWork = Math.floor(this.formParams.teachingMoudle.workLoad.scienceFunds / 1000);
       console.log('this.formParams :>> ', this.formParams);
       if(this.formParams.teachingMoudle.workLoad.itemScore > 60) {

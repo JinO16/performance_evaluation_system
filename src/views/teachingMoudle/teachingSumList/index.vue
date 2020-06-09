@@ -282,9 +282,10 @@ export default {
         console.log('res :>> ', res);
         if(res.code == 200) {
           this.listLoading = false;
+          const resultArr = []
           for(let i of res.result) {
             console.log('i :>> ', i);
-            if(i.teachingMoudle) {
+            if(i.teachingMoudle.workLoad || i.teachingMoudle.teachResChild || i.teachingMoudle.teaProAndOther) {
               if(i.teachingMoudle.workLoad && i.teachingMoudle.workLoad.status == '驳回' 
               || i.teachingMoudle.teachResChild && i.teachingMoudle.teachResChild.status =='驳回'
               || i.teachingMoudle.teaProAndOther && i.teachingMoudle.teaProAndOther.status == '驳回') {
@@ -296,6 +297,9 @@ export default {
               {
                 i.teachingMoudle.teaStatus = '审核中'
               };
+              resultArr.unshift(i)
+            } else {
+                i.teachingMoudle.teaStatus = '审核中'
             }
            
             if(i.station == '科研岗') {
@@ -303,7 +307,7 @@ export default {
             }
           };
           
-          this.list = res.result.reverse();
+          this.list =resultArr;
         }
       })
     },

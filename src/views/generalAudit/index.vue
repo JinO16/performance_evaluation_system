@@ -34,17 +34,17 @@
       </el-table-column>
       <el-table-column width="120px" align="center" label="学科建设研究生工作权重计分">
         <template slot-scope="scope">
-          {{ scope.row.xyrModule ? scope.row.xyrModule.weightScore : 0}}
+          {{ scope.row.xyrModule ? (scope.row.xyrModule.weightScore ? scope.row.xyrModule.weightScore : 0) : 0}}
         </template>
       </el-table-column>
       <el-table-column width="120px" align="center" label="专业贡献权重计分">
         <template slot-scope="scope">
-          {{ scope.row.zygxModule ? scope.row.zygxModule.weightScore : 0}}
+          {{ scope.row.zygxModule ? (scope.row.zygxModule.weightScore ? scope.row.zygxModule.weightScore : 0) : 0}}
         </template>
       </el-table-column>
       <el-table-column width="120px" align="center" label="学生工作权重计分">
         <template slot-scope="scope">
-          {{ scope.row.xsgzModule ? scope.row.xsgzModule.weightScore : 0}}
+          {{ scope.row.xsgzModule ? (scope.row.xsgzModule.weightScore ? scope.row.xsgzModule.weightScore : 0) : 0}}
         </template>
       </el-table-column>
       <el-table-column width="120px" align="center" label="状态">
@@ -555,21 +555,36 @@ export default {
         getAllTeachWorkload().then(res => {
             console.log('res 获取所有的数据单:>> ', res);
             if (res.code == 200) {
+              const resultArr = [];
                 for (let i of res.result) {
+                  if ((!i.teachingMoudle.workLoad && !i.teachingMoudle.teachResChild && !i.teachingMoudle.teaProAndOther)) {
+                    i.teachingMoudle.teaStatus = '审核中'
+                  }
+                  if(!i.scienceMoudle.sciFunds && !i.scienceMoudle.sciPapers && !i.scienceMoudle.sciProjects && !i.scienceMoudle.sciAchievement) {
+                    i.scienceMoudle.sciStatus = '审核中'
+                  }
+                  if (!i.xsgzModule.zhuanxiang && !i.xsgzModule.huojiang) {
+                    i.xsgzModule.xsgzStatus = '审核中'
+                  }
+                  if (!i.xyrModule.xyr){
+                    i.xyrModule.xyrStatus = '审核中'
+                  }
+                  if (!i.zygxModule.jingsai && !i.zygxModule.zyjs) {
+                    i.zygxModule.zygxStatus = '审核中'
+                  }
+                  console.log('i :>> ', i);
                   //总审核状态
+                  if (i.finalStatus == '已完成' || i.finalStatus == '驳回') {
+                    resultArr.unshift(i)
+                  }
                   if ((i.teachingMoudle.teaStatus && i.teachingMoudle.teaStatus == '审核中') 
                     && (i.scienceMoudle.sciStatus && i.scienceMoudle.sciStatus == '审核中')
                     && (i.xsgzModule.xsgzStatus && i.xsgzModule.xsgzStatus == '审核中')
                     && (i.xyrModule.xyrStatus && i.xyrModule.xyrStatus == '审核中')
                     && (i.zygxModule.zygxStatus && i.zygxModule.zygxStatus == '审核中')) {
                          i.finalStatus = '待审核';
-                  } else if ((i.teachingMoudle.teaStatus && i.teachingMoudle.teaStatus == '待审核')
-                    || (i.scienceMoudle.sciStatus && i.scienceMoudle.sciStatus == '待审核')
-                    || (i.xsgzModule.xsgzStatus && i.xsgzModule.xsgzStatus == '待审核')
-                    || (i.xyrModule.xyrStatus && i.xyrModule.xyrStatus == '待审核')
-                    || (i.zygxModule.zygxStatus && i.zygxModule.zygxStatus == '待审核')) {
-                        res.result.pop(i);
-                  } else if ((i.teachingMoudle.teaStatus && i.teachingMoudle.teaStatus == '驳回')
+                         resultArr.unshift(i);
+                  }  else if ((i.teachingMoudle.teaStatus && i.teachingMoudle.teaStatus == '驳回')
                     || (i.scienceMoudle.sciStatus && i.scienceMoudle.sciStatus == '驳回')
                     || (i.xsgzModule.xsgzStatus && i.xsgzModule.xsgzStatus == '驳回')
                     || (i.xyrModule.xyrStatus && i.xyrModule.xyrStatus == '驳回')
@@ -577,7 +592,7 @@ export default {
                         i.finalStatus = '驳回';
                   }
                 }
-                this.list = res.result.reverse();
+                this.list = resultArr;
                 console.log('this.list---->数据列表 :>> ', this.list);
                 this.listLoading = false;
             }

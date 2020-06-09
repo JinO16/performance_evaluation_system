@@ -355,6 +355,7 @@ export default {
          break;
      }
      getAllTeachWorkload().then(res => {
+       const resultArr = [];
        for (let i of res.result) {
          //教研项目总分
         if(i.teachingMoudle) {
@@ -380,11 +381,14 @@ export default {
             } else {
               i.teachingMoudle.teaStatus = '审核中'
             }
+            resultArr.unshift(i);
+          } else {
+            i.teachingMoudle.teaStatus = '审核中';
           }
         }
          
        }
-       this.list = res.result.reverse();
+       this.list = resultArr;
        this.listLoading = false;
      })
    },

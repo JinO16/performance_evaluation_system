@@ -185,9 +185,10 @@ export default {
         console.log('res :>> ', res);
         if(res.code == 200) {
           this.listLoading = false;
+          const resultArr = [];
           for(let i of res.result) {
             console.log('i :>> ', i);
-            if(i.xyrModule) {
+            if(i.xyrModule.xyr) {
               if(i.xyrModule.xyr && i.xyrModule.xyr.status == '驳回' ) 
               {
                 i.xyrModule.xyrStatus = '驳回';
@@ -195,6 +196,9 @@ export default {
               {
                 i.xyrModule.xyrStatus = '审核中'
               };
+              resultArr.unshift(i);
+            } else {
+              i.xyrModule.xyrStatus = '审核中'
             }
 
             if(i.station == '科研岗') {
@@ -202,7 +206,7 @@ export default {
             }
           };
           
-          this.list = res.result.reverse();
+          this.list = resultArr;
         }
       })
     },

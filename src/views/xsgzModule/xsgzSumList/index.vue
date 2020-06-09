@@ -222,9 +222,10 @@ export default {
         console.log('res :>> ', res);
         if(res.code == 200) {
           this.listLoading = false;
+          const resultArr = [];
           for(let i of res.result) {
             console.log('i :>> ', i);
-            if(i.xsgzModule) {
+            if(i.xsgzModule.huojiang || i.xsgzModule.zhuanxiang) {
               if (i.xsgzModule.huojiang && i.xsgzModule.huojiang.status == '驳回' 
                 || i.xsgzModule.zhuanxiang && i.xsgzModule.zhuanxiang.status =='驳回') {
                   i.xsgzModule.xsgzStatus = '驳回';
@@ -232,6 +233,9 @@ export default {
               {
                 i.xsgzModule.xsgzStatus = '审核中'
               };
+              resultArr.unshift(i)
+            } else {
+              i.xsgzModule.xsgzStatus = '审核中'
             }
 
             if(i.station == '科研岗') {
@@ -239,7 +243,7 @@ export default {
             }
           };
           
-          this.list = res.result.reverse();
+          this.list = resultArr;
         }
       })
     },

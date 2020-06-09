@@ -243,8 +243,9 @@ export default {
         console.log('res表格数据接口返回数据 :>> ', res);
         if(res.code == 200) {
           this.listLoading = false;
+          const resultArr = [];
           for(let i of res.result) {
-            if (i.scienceMoudle) {
+            if (i.scienceMoudle.sciFunds || i.scienceMoudle.sciPapers || i.scienceMoudle.sciProjects || i.scienceMoudle.sciAchievement) {
               if (i.scienceMoudle.sciFunds && i.scienceMoudle.sciFunds.status == '驳回' 
               || i.scienceMoudle.sciPapers && i.scienceMoudle.sciPapers.status =='驳回'
               || i.scienceMoudle.sciProjects && i.scienceMoudle.sciProjects.status == '驳回'
@@ -258,13 +259,14 @@ export default {
               {
                 i.scienceMoudle.sciStatus = '审核中'
               };
+              resultArr.unshift(i)
             }
             if(i.station == '科研岗') {
               this.visibleItem = false;
             }
           };
           
-          this.list = res.result.reverse();
+          this.list = resultArr;
           // console.log('获取的表格数据this.list :>> ', this.list);
         }
       })
