@@ -141,7 +141,7 @@
           <el-input v-model="formParams.scienceMoudle.sciFunds.workLoads"></el-input>
         </el-form-item>
         <el-form-item label="折抵科研经费的教学工作量对应科研经费金额" v-if="visibleItem">
-          {{Math.floor(formParams.scienceMoudle.sciFunds.scienceFunds * 100)}}
+          {{Math.floor(formParams.scienceMoudle.sciFunds.workLoads * 100)}}
         </el-form-item>
         <!-- <el-form-item label="是否完成本部门人均相应工作量的三分之二">
           <el-switch v-model="formParams.teachingMoudle.workLoad.isFinish"></el-switch>
@@ -154,7 +154,7 @@
         </el-form-item>
         <el-form-item label="个人逐项计分">
           {{formParams.scienceMoudle.sciFunds.ratedFunds && formParams.scienceMoudle.sciFunds.virtualFunds ? 
-          30 * formParams.scienceMoudle.sciFunds.virtualFunds / formParams.scienceMoudle.sciFunds.ratedFunds  : 0}}
+         Math.floor( 30 * formParams.scienceMoudle.sciFunds.virtualFunds / formParams.scienceMoudle.sciFunds.ratedFunds)  : 0}}
         </el-form-item>
         <el-form-item style="display:flex;justify-content:center;margin-top:20px">
           <el-button type="primary" v-if="dialogTitle === '创建科研经费数据单'" @click="handleSubmit">提交</el-button>
@@ -375,8 +375,8 @@ export default {
     //提交修改
     UpdateSubmit() {
       this.formParams.scienceMoudle.sciFunds.itemScore = this.formParams.scienceMoudle.sciFunds.ratedFunds && this.formParams.scienceMoudle.sciFunds.virtualFunds 
-      ? (this.formParams.scienceMoudle.sciFunds.virtualFunds * 30 / this.formParams.scienceMoudle.sciFunds.ratedFunds > 60 ? 60 :
-      this.formParams.scienceMoudle.sciFunds.virtualFunds * 30 / this.formParams.scienceMoudle.sciFunds.ratedFunds) : 0;
+      ? (Math.floor(this.formParams.scienceMoudle.sciFunds.virtualFunds * 30 / this.formParams.scienceMoudle.sciFunds.ratedFunds) > 60 ? 60 :
+      Math.floor(this.formParams.scienceMoudle.sciFunds.virtualFunds * 30 / this.formParams.scienceMoudle.sciFunds.ratedFunds)) : 0;
       this.formParams.submitTime = new Date();
       if (!this.formParams.scienceMoudle.sciFunds.ratedFunds) {
           this.$message({
@@ -450,8 +450,8 @@ export default {
     handleSubmit() {
       const id = this.$store.state.user._id;
       this.formParams.scienceMoudle.sciFunds.itemScore = this.formParams.scienceMoudle.sciFunds.ratedFunds && this.formParams.scienceMoudle.sciFunds.virtualFunds 
-      ? (this.formParams.scienceMoudle.sciFunds.virtualFunds * 30 / this.formParams.scienceMoudle.sciFunds.ratedFunds > 60 ? 60 :
-      this.formParams.scienceMoudle.sciFunds.virtualFunds * 30 / this.formParams.scienceMoudle.sciFunds.ratedFunds) : 0;
+      ? (Math.floor(this.formParams.scienceMoudle.sciFunds.virtualFunds * 30 / this.formParams.scienceMoudle.sciFunds.ratedFunds) > 60 ? 60 :
+      Math.floor(this.formParams.scienceMoudle.sciFunds.virtualFunds * 30 / this.formParams.scienceMoudle.sciFunds.ratedFunds)) : 0;
       console.log('this.formParams :>> ', this.formParams);
       if (!this.formParams.scienceMoudle.sciFunds.ratedFunds) {
          this.$message({

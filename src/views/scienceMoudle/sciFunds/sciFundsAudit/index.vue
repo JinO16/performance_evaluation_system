@@ -107,7 +107,7 @@
               <!-- <div class="collapse-item" v-if="visibleItem"><strong>折抵科研经费的教学工作量上限为40%：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? (form.scienceMoudle.sciFunds.upperLimit ? '是' :'否'):'') : ''}}</div> -->
               <div class="collapse-item"><strong>折抵后科研经费完成金额:</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.fScienceFunds :0) : 0}}</div>
               <div class="collapse-item"><strong>科研经费完成比例：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.finishPro : 0 ) : 0}}</div>
-              <div class="collapse-item"><strong>个人逐项计分：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? 30 * form.scienceMoudle.sciFunds.virtualFunds / form.scienceMoudle.sciFunds.ratedFunds : 0) : 0}}</div>
+              <div class="collapse-item"><strong>个人逐项计分：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? Math.floor(30 * form.scienceMoudle.sciFunds.virtualFunds / form.scienceMoudle.sciFunds.ratedFunds) : 0) : 0}}</div>
           </el-collapse-item>
           <el-collapse-item title="审核记录">
             <div v-for="(item,key) in form.finalAuditRecord">
