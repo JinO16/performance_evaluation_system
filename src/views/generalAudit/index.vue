@@ -24,7 +24,7 @@
       </el-table-column>
        <el-table-column width="120px" align="center" label="教研考评岗位权重计分">
         <template slot-scope="scope">
-          {{ scope.row.teachingMoudle ? scope.row.teachingMoudle.weightScore : 0}}
+          {{ scope.row.teachingMoudle ? (scope.row.teachingMoudle.weightScore ?  scope.row.teachingMoudle.weightScore : 0) : 0}}
         </template>
       </el-table-column>
       <el-table-column width="120px" align="center" label="科研考评岗位权重计分">

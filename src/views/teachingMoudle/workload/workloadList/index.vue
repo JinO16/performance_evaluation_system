@@ -152,7 +152,7 @@
           <el-input v-model="formParams.teachingMoudle.workLoad.scienceFunds"></el-input>
         </el-form-item>
         <el-form-item label="科研经费折抵的教学工作量" v-if="visibleItem">
-          {{Math.floor(formParams.teachingMoudle.workLoad.scienceFunds / 1000)}}
+          {{(formParams.teachingMoudle.workLoad.scienceFunds / 1000).toFixed(2)}}
         </el-form-item>
         <!-- <el-form-item label="是否完成本部门人均相应工作量的三分之二">
           <el-switch v-model="formParams.teachingMoudle.workLoad.isFinish"></el-switch>
@@ -164,8 +164,13 @@
           <el-input v-model="formParams.teachingMoudle.workLoad.scoreSum"></el-input>
         </el-form-item>
         <el-form-item label="个人逐项计分">
-          {{ formParams.teachingMoudle.workLoad.scoreSum ? Math.floor(28 * formParams.teachingMoudle.workLoad.scoreSum / stationBase)  : 0}}
+          {{ formParams.teachingMoudle.workLoad.scoreSum ? 
+          ((28 * formParams.teachingMoudle.workLoad.scoreSum / stationBase).toFixed(2) > 60 
+          ? 60 : (28 * formParams.teachingMoudle.workLoad.scoreSum / stationBase).toFixed(2) ) : 0
+          }}
         </el-form-item>
+        <el-alert :title="tips" type="info" :closable="false" show-icon></el-alert>
+        
         <el-form-item style="display:flex;justify-content:center;margin-top:20px">
           <el-button type="primary" v-if="dialogTitle === '创建工作量数据单'" @click="handleSubmit">提交</el-button>
           <el-button type="success" v-else @click="UpdateSubmit('formParams')">确认修改</el-button>
@@ -217,6 +222,7 @@ export default {
       },
       visibleItem: false,//当岗位为非科研岗时隐藏的项
       stationBase:350,//不同岗位对应算法的基数不同
+      tips:'当前用于计分的工作量上限为',//提示信息
       formParams: {
         name: this.$store.state.user.name,//用户姓名
         jobID: this.$store.state.user.jobID,//用户工号
@@ -328,7 +334,7 @@ export default {
             default:
               this.$router.push('/user')
           }
-          console.log('this.stationBase :>> ', this.stationBase);
+          this.tips = this.tips + (60 * this.stationBase / 28).toFixed(2);
         }
         
       })
@@ -380,14 +386,11 @@ export default {
     },
     //提交修改
     UpdateSubmit() {
-      this.formParams.teachingMoudle.workLoad.itemScore = this.formParams.teachingMoudle.workLoad.scoreSum ? Math.floor(this.formParams.teachingMoudle.workLoad.scoreSum * 28 / this.stationBase)  : 0;
-      this.formParams.teachingMoudle.workLoad.scienceFundsWork = Math.floor(this.formParams.teachingMoudle.workLoad.scienceFunds / 1000);  
+      this.formParams.teachingMoudle.workLoad.itemScore = this.formParams.teachingMoudle.workLoad.scoreSum ? (this.formParams.teachingMoudle.workLoad.scoreSum * 28 / this.stationBase).toFixed(2)  : 0;
+      this.formParams.teachingMoudle.workLoad.scienceFundsWork = (this.formParams.teachingMoudle.workLoad.scienceFunds / 1000).toFixed(2);  
       this.formParams.submitTime = new Date();
       if(this.formParams.teachingMoudle.workLoad.itemScore > 60) {
-        this.$message({
-          type:'warning',
-          message:'工作量的个人逐项计分最高为60，请确定填写的用于计分的工作量是否在范围之内！'
-        })
+        this.formParams.teachingMoudle.workLoad.itemScore = 60;
       } else if (!this.formParams.teachingMoudle.workLoad.scoreSum) {
          this.$message({
            type:'warning',
@@ -454,14 +457,11 @@ export default {
     },
     handleSubmit() {
       const id = this.$store.state.user._id;
-      this.formParams.teachingMoudle.workLoad.itemScore = this.formParams.teachingMoudle.workLoad.scoreSum ? Math.floor(this.formParams.teachingMoudle.workLoad.scoreSum * 28 / this.stationBase) : 0;
-      this.formParams.teachingMoudle.workLoad.scienceFundsWork = Math.floor(this.formParams.teachingMoudle.workLoad.scienceFunds / 1000);
+      this.formParams.teachingMoudle.workLoad.itemScore = this.formParams.teachingMoudle.workLoad.scoreSum ? (this.formParams.teachingMoudle.workLoad.scoreSum * 28 / this.stationBase).toFixed(2) : 0;
+      this.formParams.teachingMoudle.workLoad.scienceFundsWork = (this.formParams.teachingMoudle.workLoad.scienceFunds / 1000).toFixed(2);
       console.log('this.formParams :>> ', this.formParams);
       if(this.formParams.teachingMoudle.workLoad.itemScore > 60) {
-        this.$message({
-          type:'warning',
-          message:'工作量的个人逐项计分最高为60，请确定填写的用于计分的工作量是否在范围之内！'
-        })
+        this.formParams.teachingMoudle.workLoad.itemScore = 60;
       } else if (!this.formParams.teachingMoudle.workLoad.scoreSum) {
          this.$message({
             type:'warning',

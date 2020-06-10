@@ -262,7 +262,7 @@ export default {
             i.xyrModule.xyr.xyrScoreSum = (i.xyrModule.xyr ? i.xyrModule.xyr.xkjs.sum : 0)  + (i.xyrModule.xyr ? i.xyrModule.xyr.yjsgz.sum : 0) + (i.xyrModule.xyr ? i.xyrModule.xyr.rcyj.sum : 0) 
             > 100 ? 100 : (i.xyrModule.xyr ? i.xyrModule.xyr.xkjs.sum : 0)  + (i.xyrModule.xyr ? i.xyrModule.xyr.yjsgz.sum : 0) + (i.xyrModule.xyr ? i.xyrModule.xyr.rcyj.sum : 0);
             //岗位权重计分
-            i.xyrModule.weightScore =Math.floor((i.xyrModule.xyr ? i.xyrModule.xyr.xyrScoreSum : 0) * staWeight);
+            i.xyrModule.weightScore =((i.xyrModule.xyr ? i.xyrModule.xyr.xyrScoreSum : 0) * staWeight).toFixed(2);
             if(i.xyrModule.xyr && i.xyrModule.xyr.status == '驳回' ) 
             {
               i.xyrModule.xyrStatus = '驳回';

@@ -280,7 +280,7 @@ export default {
             i.zygxModule.zygxScoreSum = (i.zygxModule.jingsai ? i.zygxModule.jingsai.canjiajingsai.sum : 0)  + (i.zygxModule.zyjs ? i.zygxModule.zyjs.exchange.sum : 0) + (i.zygxModule.zyjs ? i.zygxModule.zyjs.zhuanye.sum : 0) 
             > 100 ? 100 : (i.zygxModule.jingsai ? i.zygxModule.jingsai.canjiajingsai.sum : 0)  + (i.zygxModule.zyjs ? i.zygxModule.zyjs.exchange.sum : 0) + (i.zygxModule.zyjs ? i.zygxModule.zyjs.zhuanye.sum : 0);
             //岗位权重计分
-            i.zygxModule.weightScore =Math.floor((i.zygxModule.zygxScoreSum ) * staWeight);
+            i.zygxModule.weightScore = ((i.zygxModule.zygxScoreSum ) * staWeight).toFixed(2);
             if(i.zygxModule.zyjs && i.zygxModule.zyjs.status == '驳回' 
               || i.zygxModule.jingsai && i.zygxModule.jingsai.status =='驳回'
              ) {

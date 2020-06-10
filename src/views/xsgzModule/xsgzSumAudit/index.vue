@@ -309,7 +309,7 @@ export default {
               i.xsgzModule.xsgzScoreSum = (i.xsgzModule.zhuanxiang ? i.xsgzModule.zhuanxiang.gongzuo.sum : 0)  + (i.xsgzModule.zhuanxiang ? i.xsgzModule.zhuanxiang.chuangxin.sum : 0) + (i.xsgzModule.huojiang ? i.xsgzModule.huojiang.geren.sum : 0)  + (i.xsgzModule.huojiang ? i.xsgzModule.huojiang.jiti.sum : 0) + (i.xsgzModule.huojiang ? i.xsgzModule.huojiang.biaozhang.sum : 0)
             > 100 ? 100 : (i.xsgzModule.zhuanxiang ? i.xsgzModule.zhuanxiang.gongzuo.sum : 0)  + (i.xsgzModule.zhuanxiang ? i.xsgzModule.zhuanxiang.chuangxin.sum : 0) + (i.xsgzModule.huojiang ? i.xsgzModule.huojiang.geren.sum : 0)  + (i.xsgzModule.huojiang ? i.xsgzModule.huojiang.jiti.sum : 0) + (i.xsgzModule.huojiang ? i.xsgzModule.huojiang.biaozhang.sum : 0);
             //岗位权重计分
-            i.xsgzModule.weightScore =Math.floor((i.xsgzModule.xsgzScoreSum ) * staWeight);
+            i.xsgzModule.weightScore = ((i.xsgzModule.xsgzScoreSum ) * staWeight).toFixed(2);
               if(i.xsgzModule.huojiang && i.xsgzModule.huojiang.status == '驳回' 
                 || i.xsgzModule.zhuanxiang && i.xsgzModule.zhuanxiang.status =='驳回'
               ) {

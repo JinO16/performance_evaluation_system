@@ -102,7 +102,7 @@
               <div class="collapse-item"><strong>是否完成本部门人均相应工作量的三分之二：</strong>{{form.teachingMoudle ? (form.teachingMoudle.workLoad ? (form.teachingMoudle.workLoad.isFinish ? '是' :'否'):'') : ''}}</div>
               <div class="collapse-item"><strong>教学工作量合计:</strong>{{form.teachingMoudle ? (form.teachingMoudle.workLoad ? form.teachingMoudle.workLoad.teachWorkSum :0) : 0}}</div>
               <div class="collapse-item"><strong>用于计分的工作量：</strong>{{form.teachingMoudle ? (form.teachingMoudle.workLoad ? form.teachingMoudle.workLoad.scoreSum : 0 ) : 0}}</div>
-              <div class="collapse-item"><strong>个人逐项计分：</strong>{{form.teachingMoudle ? (form.teachingMoudle.workLoad ? Math.floor(28 * form.teachingMoudle.workLoad.scoreSum / stationBase)  : 0) : 0}}</div>
+              <div class="collapse-item"><strong>个人逐项计分：</strong>{{form.teachingMoudle ? (form.teachingMoudle.workLoad ? (28 * form.teachingMoudle.workLoad.scoreSum / stationBase).toFixed(2)  : 0) : 0}}</div>
           </el-collapse-item>
           <el-collapse-item title="审核记录">
             <div v-for="(item,key) in form.finalAuditRecord">
@@ -253,7 +253,7 @@ export default {
               sum += parseInt(i.teachingMoudle.workLoad.teachWorkSum ? i.teachingMoudle.workLoad.teachWorkSum : 0) 
             }
           }
-        this.averageWorkload = Math.floor (2 * (sum / res.result.length) / 3);
+        this.averageWorkload =(2 * (sum / res.result.length) / 3).toFixed(2);
             
       });
       await this.getList().then(res => {

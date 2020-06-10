@@ -363,7 +363,7 @@ export default {
             i.teachingMoudle.teachProScoreSum = (i.teachingMoudle.teaProAndOther ? i.teachingMoudle.teaProAndOther.teaProScoreSum : 0)  + (i.teachingMoudle.teachResChild ? i.teachingMoudle.teachResChild.teachResScoreSum : 0) 
           > 40 ? 40 :(i.teachingMoudle.teaProAndOther ? i.teachingMoudle.teaProAndOther.teaProScoreSum : 0)  + (i.teachingMoudle.teachResChild ? i.teachingMoudle.teachResChild.teachResScoreSum : 0) ;
           //岗位权重计分
-          i.teachingMoudle.weightScore =Math.floor(((i.teachingMoudle.workLoad ? i.teachingMoudle.workLoad.itemScore : 0) + i.teachingMoudle.teachProScoreSum) * staWeight);
+          i.teachingMoudle.weightScore =(((i.teachingMoudle.workLoad ? i.teachingMoudle.workLoad.itemScore : 0) + i.teachingMoudle.teachProScoreSum) * staWeight).toFixed(2);
           //教学教研审核状态
             if(i.teachingMoudle.workLoad && i.teachingMoudle.workLoad.status == '驳回' 
               || i.teachingMoudle.teachResChild && i.teachingMoudle.teachResChild.status =='驳回'

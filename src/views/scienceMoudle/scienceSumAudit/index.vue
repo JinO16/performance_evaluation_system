@@ -324,7 +324,7 @@ export default {
               > 40 ? 40 :(i.scienceMoudle.sciPapers ? i.scienceMoudle.sciPapers.sciPapersSum : 0)  + (i.scienceMoudle.sciProjects ? i.scienceMoudle.sciProjects.sciProjectsSum : 0) 
               +(i.scienceMoudle.sciAchievement ? i.scienceMoudle.sciAchievement.sciAchievementSum : 0) ;
               //岗位权重计分
-              i.scienceMoudle.weightScore =Math.floor(((i.scienceMoudle.sciFunds ? i.scienceMoudle.sciFunds.itemScore : 0) + i.scienceMoudle.sciProScoreSum) * staWeight);
+              i.scienceMoudle.weightScore =(((i.scienceMoudle.sciFunds ? i.scienceMoudle.sciFunds.itemScore : 0) + i.scienceMoudle.sciProScoreSum) * staWeight).toFixed(2);
             //科研考评审核状态
               if(i.scienceMoudle.sciFunds && i.scienceMoudle.sciFunds.status == '驳回' 
                 || i.scienceMoudle.sciPapers && i.scienceMoudle.sciPapers.status =='驳回'
