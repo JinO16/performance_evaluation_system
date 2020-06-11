@@ -140,9 +140,6 @@
          <el-form-item label="折抵科研经费的教学工作量"v-if="visibleItem">
           <el-input v-model="formParams.scienceMoudle.sciFunds.workLoads"></el-input>
         </el-form-item>
-        <el-form-item label="折抵科研经费的教学工作量对应科研经费金额" v-if="visibleItem">
-          {{(formParams.scienceMoudle.sciFunds.workLoads * 100).toFixed(2)}}
-        </el-form-item>
         <!-- <el-form-item label="是否完成本部门人均相应工作量的三分之二">
           <el-switch v-model="formParams.teachingMoudle.workLoad.isFinish"></el-switch>
         </el-form-item> -->
