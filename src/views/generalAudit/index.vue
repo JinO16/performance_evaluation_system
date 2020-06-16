@@ -200,7 +200,7 @@
               <div class="collapse-item" v-if="visibleItem"><strong>折抵科研经费的教学工作量对应科研经费金额：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.scienceFunds :0) : 0}}</div>
               <div class="collapse-item"><strong>折抵后科研经费完成金额:</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.fScienceFunds :0) : 0}}</div>
               <div class="collapse-item"><strong>科研经费完成比例：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? form.scienceMoudle.sciFunds.finishPro : 0 ) : 0}}</div>
-              <div class="collapse-item"><strong>个人逐项计分：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? 30 * form.scienceMoudle.sciFunds.virtualFunds / form.scienceMoudle.sciFunds.ratedFunds : 0) : 0}}</div>
+              <div class="collapse-item"><strong>个人逐项计分：</strong>{{form.scienceMoudle ? (form.scienceMoudle.sciFunds ? 30 * form.scienceMoudle.sciFunds.fScienceFunds / form.scienceMoudle.sciFunds.ratedFunds : 0) : 0}}</div>
             </el-collapse-item>
             <el-collapse-item title="科研论文">
               <div v-for="(item,key) in form.scienceMoudle ? (form.scienceMoudle.sciPapers ? form.scienceMoudle.sciPapers.item : []) : []">

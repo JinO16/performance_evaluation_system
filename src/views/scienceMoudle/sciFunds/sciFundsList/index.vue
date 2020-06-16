@@ -72,9 +72,9 @@
           {{scope.row.scienceMoudle.sciFunds ? scope.row.scienceMoudle.sciFunds.ratedFunds : 0}}
         </template>
       </el-table-column>
-      <el-table-column width="150px" align="center" label="科研经费实际到账金额">
+      <el-table-column width="150px" align="center" label="折抵后科研经费到账金额">
         <template slot-scope="scope">
-          {{scope.row.scienceMoudle.sciFunds ? scope.row.scienceMoudle.sciFunds.virtualFunds : 0}}
+          {{scope.row.scienceMoudle.sciFunds ? scope.row.scienceMoudle.sciFunds.fScienceFunds : 0}}
         </template>
       </el-table-column>
        <el-table-column width="150px" align="center" label="个人逐项计分">
@@ -146,15 +146,15 @@
         <el-form-item label="折抵科研经费的教学工作量对应科研经费金额：" v-if="visibleItem">
           {{(formParams.scienceMoudle.sciFunds.workLoads * 100).toFixed(2)}}
         </el-form-item>
-        <el-form-item label="折抵后科研经费完成金额" >
+        <el-form-item label="折抵后科研经费完成金额" required>
           <el-input v-model="formParams.scienceMoudle.sciFunds.fScienceFunds"></el-input>
         </el-form-item>
         <el-form-item label="科研经费完成比例">
           <el-input v-model="formParams.scienceMoudle.sciFunds.finishPro"></el-input>
         </el-form-item>
         <el-form-item label="个人逐项计分">
-          {{formParams.scienceMoudle.sciFunds.ratedFunds && formParams.scienceMoudle.sciFunds.virtualFunds ? 
-          ( 30 * formParams.scienceMoudle.sciFunds.virtualFunds / formParams.scienceMoudle.sciFunds.ratedFunds).toFixed(2)  : 0}}
+          {{formParams.scienceMoudle.sciFunds.ratedFunds && formParams.scienceMoudle.sciFunds.fScienceFunds ? 
+          ( 30 * formParams.scienceMoudle.sciFunds.fScienceFunds / formParams.scienceMoudle.sciFunds.ratedFunds).toFixed(2)  : 0}}
         </el-form-item>
         <el-form-item style="display:flex;justify-content:center;margin-top:20px">
           <el-button type="primary" v-if="dialogTitle === '创建科研经费数据单'" @click="handleSubmit">提交</el-button>
@@ -374,9 +374,9 @@ export default {
     },
     //提交修改
     UpdateSubmit() {
-      this.formParams.scienceMoudle.sciFunds.itemScore = this.formParams.scienceMoudle.sciFunds.ratedFunds && this.formParams.scienceMoudle.sciFunds.virtualFunds 
-      ? ((this.formParams.scienceMoudle.sciFunds.virtualFunds * 30 / this.formParams.scienceMoudle.sciFunds.ratedFunds).toFixed(2) > 60 ? 60 :
-        (this.formParams.scienceMoudle.sciFunds.virtualFunds * 30 / this.formParams.scienceMoudle.sciFunds.ratedFunds).toFixed(2)) : 0;
+      this.formParams.scienceMoudle.sciFunds.itemScore = this.formParams.scienceMoudle.sciFunds.ratedFunds && this.formParams.scienceMoudle.sciFunds.fScienceFunds
+      ? ((this.formParams.scienceMoudle.sciFunds.fScienceFunds * 30 / this.formParams.scienceMoudle.sciFunds.ratedFunds).toFixed(2) > 60 ? 60 :
+        (this.formParams.scienceMoudle.sciFunds.fScienceFunds * 30 / this.formParams.scienceMoudle.sciFunds.ratedFunds).toFixed(2)) : 0;
       this.formParams.submitTime = new Date();
       if (!this.formParams.scienceMoudle.sciFunds.ratedFunds) {
           this.$message({
@@ -388,11 +388,11 @@ export default {
             type:'warning',
             message:'科研经费实际到账金额是必填选项！！！' 
          })
-      //  }else if(!this.formParams.scienceMoudle.sciFunds.fScienceFunds){
-      //     this.$message({
-      //       type:'warning',
-      //       message:'折抵后科研经费完成金额是必填选项！！！' 
-      //    })
+       }else if(!this.formParams.scienceMoudle.sciFunds.fScienceFunds){
+          this.$message({
+            type:'warning',
+            message:'折抵后科研经费完成金额是必填选项！！！' 
+         })
        } else {
          console.log('this.formParams----- :>> ', this.formParams);
          this.formParams.scienceMoudle.sciFunds.status = '待审核';
@@ -454,9 +454,9 @@ export default {
     },
     handleSubmit() {
       const id = this.$store.state.user._id;
-      this.formParams.scienceMoudle.sciFunds.itemScore = this.formParams.scienceMoudle.sciFunds.ratedFunds && this.formParams.scienceMoudle.sciFunds.virtualFunds 
-      ? ((this.formParams.scienceMoudle.sciFunds.virtualFunds * 30 / this.formParams.scienceMoudle.sciFunds.ratedFunds).toFixed(2) > 60 ? 60 :
-      (this.formParams.scienceMoudle.sciFunds.virtualFunds * 30 / this.formParams.scienceMoudle.sciFunds.ratedFunds).toFixed(2)) : 0;
+      this.formParams.scienceMoudle.sciFunds.itemScore = this.formParams.scienceMoudle.sciFunds.ratedFunds && this.formParams.scienceMoudle.sciFunds.fScienceFunds 
+      ? ((this.formParams.scienceMoudle.sciFunds.fScienceFunds * 30 / this.formParams.scienceMoudle.sciFunds.ratedFunds).toFixed(2) > 60 ? 60 :
+      (this.formParams.scienceMoudle.sciFunds.fScienceFunds * 30 / this.formParams.scienceMoudle.sciFunds.ratedFunds).toFixed(2)) : 0;
       console.log('this.formParams :>> ', this.formParams);
       if (!this.formParams.scienceMoudle.sciFunds.ratedFunds) {
          this.$message({
@@ -468,11 +468,11 @@ export default {
             type:'warning',
             message:'科研经费实际到账金额是必填选项！！！' 
          })
-        // }else if(!this.formParams.scienceMoudle.sciFunds.fScienceFunds){
-        //   this.$message({
-        //     type:'warning',
-        //     message:'折抵后科研经费完成金额是必填选项！！！' 
-        //  })
+        }else if(!this.formParams.scienceMoudle.sciFunds.fScienceFunds){
+          this.$message({
+            type:'warning',
+            message:'折抵后科研经费完成金额是必填选项！！！' 
+         })
       } else {
         if (!id) {
           createTeachWorkload(this.formParams).then(res => {
